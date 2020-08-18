@@ -1,0 +1,59 @@
+html, main {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    background-color: #484d62;
+    font-family: 'Roboto', sans-serif;
+    color: #f9fbfa;
+
+}
+
+.flex-container {
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.splash {
+    width: 100%;
+    padding-top: 10%;
+    flex-direction: column;
+    justify-content: center;
+}
+
+h1 {
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 800;
+}
+
+.game-frame {
+    width: 600px;
+	height: 600px;
+	margin: 0 auto;
+    border: 2px solid #c1c6d4;
+    border-radius: 10px;
+}
+.main {
+    width: 600px;
+}
+
+.text-input {
+    width: 100%;
+}
+.text-field {
+    overflow: hidden;
+}
+.button {
+    width: 200px;
+}
+
+.btn-submit {
+    float: right;
+}
+
+
