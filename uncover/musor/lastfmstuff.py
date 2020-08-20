@@ -1,14 +1,13 @@
-import time
-import os
 import json
+import os
+import time
 
 import requests
 import requests_cache
 
 requests_cache.install_cache()
 
-import pandas
-from IPython.core.display import clear_output
+# import pandas
 
 
 def jprint(obj):
@@ -109,4 +108,4 @@ def lookup_tags(artist):
     return tags_string
 
 
-print(lookup_tags('Billie Eilish'))
+print(lookup_tags('David Bowie'))

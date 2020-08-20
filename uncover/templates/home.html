@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>uncover</h1>
+    <h1 class="text-primary">uncover</h1>
     <div class="flex-container">
-        <form class="main" action="" enctype="multipart/form-data">
+        <form method="POST" class="main" action="" enctype="multipart/form-data">
             <button type="submit" class="btn btn-primary btn-submit">OK</button>
             <div class="text-field">
-                <input type="text" class="text-input form-control" id="username" name="username" placeholder="comma-separated artists (e.g. David Bowie, Arcade Fire)">
+                <input type="text" class="text-input form-control" name="artist" placeholder="comma-separated artists (e.g. David Bowie, Arcade Fire)">
             </div>
         </form>
     </div>
@@ -16,5 +16,11 @@
         <input class="button btn btn-light" type="submit" name="submit_button" value="spot">
     </div>
 
-    <div class="game-frame"></div>
+    <div class="flex-container game-frame">
+        {% if albums %}
+            {% for album, image in albums.items() %}
+                 <img src="{{ image }}" alt="{{ album }}">
+            {% endfor %}
+        {% endif %}
+    </div>
 {% endblock content %}
