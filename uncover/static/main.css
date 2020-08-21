@@ -59,7 +59,16 @@ h1 {
     float: right;
 }
 
+.btn-submit:hover {
+    background-color: #ed6663;
+}
+
 img {
     height: 200px;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #ed6663;
 }
 

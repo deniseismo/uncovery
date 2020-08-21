@@ -1,33 +1,24 @@
 import os
-import time
-import requests
-import requests_cache
 import json
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from uncover import app
 from uncover.helpers import lookup_tags, get_top_albums, get_users_top_albums
 
 
-@app.route("/", methods=["POST", "GET"])
-@app.route("/home", methods=["POST", "GET"])
+@app.route("/")
+@app.route("/home")
 def home():
-    tags = ''
+    return render_template("home.html")
+
+
+@app.route("/by_username", methods=["POST"])
+def get_top_albums():
     if request.method == "POST":
-        if not request.form["artist"]:
-            print("must provide artist")
-        else:
-            artist = request.form["artist"]
-            # tags = lookup_tags(artist)
-            albums = get_users_top_albums(artist)
-            print(tags)
-            print(os.environ.get("API_KEY"))
-            print(os.environ.get('USER_AGENT'))
-            return render_template("home.html", albums=albums)
+        username = request.form["username"]
+        # tags = lookup_tags(artist)
+        albums = get_users_top_albums(username)
+        print(f'username is {username}')
+        print(albums)
+        print(f'jsonified albums are {jsonify(albums)}')
+        return jsonify(albums)
 
-    return render_template("home.html", tags=tags)
-
-
-@app.route("/about", methods=['GET', 'POST'])
-def about():
-    title = "About"
-    return render_template("about.html", title=title)

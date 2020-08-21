@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1 class="text-primary">uncover</h1>
+<h1 class="text-primary"><a href="{{ url_for('home') }}">uncover</a></h1>
     <div class="flex-container">
-        <form method="POST" class="main" action="" enctype="multipart/form-data">
-            <button type="submit" class="btn btn-primary btn-submit">OK</button>
+        <form class="main" action="" id="submit-form" onSubmit="return false;" enctype="multipart/form-data">
+            <input class="btn btn-primary btn-submit" type="button" id="submit-btn" value="OK">
+<!--            <button type="button" id="submit-btn" class="btn btn-primary btn-submit">OK</button>-->
             <div class="text-field">
-                <input type="text" class="text-input form-control" name="artist" placeholder="comma-separated artists (e.g. David Bowie, Arcade Fire)">
+                <input type="text" class="text-input form-control" id="text-field" name="artist" placeholder="comma-separated artists (e.g. David Bowie, Arcade Fire)">
             </div>
         </form>
     </div>
@@ -16,7 +17,7 @@
         <input class="button btn btn-light" type="submit" name="submit_button" value="spot">
     </div>
 
-    <div class="flex-container game-frame">
+    <div class="flex-container game-frame" id="game-frame">
         {% if albums %}
             {% for album, image in albums.items() %}
                  <img src="{{ image }}" alt="{{ album }}">

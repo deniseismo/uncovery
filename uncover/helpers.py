@@ -77,7 +77,7 @@ def get_users_top_albums(username):
     return album_images
 
 
-print(lookup_tags("David Bowie"))
-print(get_top_albums('Arcade Fire'))
-print(get_users_top_albums('tomsk-seismo'))
+# print(lookup_tags("David Bowie"))
+# print(get_top_albums('Arcade Fire'))
+# print(get_users_top_albums('tomsk-seismo'))
 
