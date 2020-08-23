@@ -18,9 +18,10 @@ body {
 
 }
 
+/* div for all the items in the layout's body */
 .splash {
     width: 100%;
-    padding-top: 10%;
+    padding-top: 5%;
     flex-direction: column;
     justify-content: center;
 }
@@ -34,12 +35,8 @@ h1 {
     width: 600px;
 	height: 600px;
 	margin: 0 auto;
-/*
-    border: 2px solid #c1c6d4;
-*/
-    border-radius: 10px;
     flex-flow: row wrap;
-    justify-content: flex-start;
+    justify-content: center;
 }
 .main {
     width: 600px;
@@ -63,12 +60,46 @@ h1 {
     background-color: #ed6663;
 }
 
-img {
-    height: 200px;
-}
-
 a:hover {
     text-decoration: none;
     color: #ed6663;
 }
 
+.cover-art {
+    width: 200px;
+    height: 200px;
+}
+
+/* failure art width & height */
+#failure-art {
+    -webkit-filter: drop-shadow(16px 16px 10px rgba(0,0,0,0.9));
+    filter: drop-shadow(16px 16px 10px rgba(0,0,0,0.9));
+    width: 600px;
+    height: 600px;
+    -webkit-animation: filter-animation 5s infinite;
+}
+
+@-webkit-keyframes filter-animation {
+  0% {
+    -webkit-filter: sepia(0) saturate(2);
+  }
+
+  50% {
+    -webkit-filter: sepia(1) saturate(8);
+  }
+
+  100% {
+    -webkit-filter: sepia(0) saturate(2);
+  }
+}
+
+
+
+
+/* Bottom right text */
+.text-block {
+  position: absolute;
+  background-color: rgba(220, 53, 69, 0.5);
+  color: red;
+  padding: 15px 20px 10px 20px;
+}
