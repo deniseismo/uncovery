@@ -18,6 +18,7 @@ def lastfm_get(payload):
 
 
 def get_artist_info(artist):
+    # TODO: if an artist has no mbid on lastfm, find it on mb directly, or get images from lastfm
     response = lastfm_get({
         'method': 'artist.getInfo',
         'artist': artist
@@ -25,8 +26,11 @@ def get_artist_info(artist):
     # in case of an error, return None
     if response.status_code != 200:
         return None
-
-    return response.json()['artist']['mbid']
+    try:
+        artist_mbid = response.json()['artist']['mbid']
+    except KeyError:
+        return None
+    return artist_mbid
 
 
 def lookup_tags(artist):
@@ -51,9 +55,10 @@ def lookup_tags(artist):
     return tags_string
 
 
-def get_artists_top_albums_via_lastfm(artist):
+def get_artists_top_albums_via_lastfm(artist, size=3, amount=9):
     """
-
+    :param amount: a number of albums, default = 9
+    :param size: 3 - large size (300x300)
     :param artist: artist's name (musician, band, etc)
     :return: a dict {album_name: album_image_url }
     """
@@ -67,8 +72,8 @@ def get_artists_top_albums_via_lastfm(artist):
     # albums = [album['name'] for album in response.json()['topalbums']['album'][:3]]
     try:
         album_images = {
-            album['name']: album['image'][3]["#text"] for album in response.json()['topalbums']['album'][:9]
-            if album['image'][3]["#text"]}
+            album['name']: album['image'][size]["#text"] for album in response.json()['topalbums']['album'][:amount]
+            if album['image'][size]["#text"]}
     except KeyError:
         return None
     return album_images

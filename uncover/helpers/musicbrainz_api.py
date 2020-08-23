@@ -13,62 +13,133 @@ requests_cache.install_cache()
 musicbrainzngs.set_useragent("albumguesser", "0.1", "denisseismo@gmail.com")
 
 
-def get_artists_albums(artist):
+def get_artists_albums(artist, mbid=None, amount=9):
+    """
+
+    :param artist: artist's name
+    :param mbid: MusicBrainz id (overrides artist's name if present)
+    :param amount: a number of albums
+    :return:
+    """
     filters = "%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json"
-    artist_mbid = get_artist_info(artist)
-    # payload = {'query': 'arid:' + artist_mbid}
-    # response = requests.get(
-    #     url="https://musicbrainz.org/ws/2/",
-    #     params=payload
-    # )
-    # print(artist_mbid)
+    if mbid:
+        artist_mbid = mbid
+    else:
+        artist_mbid = get_artist_info(artist)
+    if not artist_mbid:
+        return None
     url = 'https://musicbrainz.org/ws/2/'
     response = requests.get(
-        'https://musicbrainz.org/ws/2/release-group?query=arid:' + artist_mbid + ' primarytype:album%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json')
-    # print(response.json())
-    albums = {release['title']: release['releases'][0]['id'] for release in response.json()["release-groups"][:9]}
-    # print(f'albums: {albums}')
+        'https://musicbrainz.org/ws/2/release-group?query=arid:' + artist_mbid + ' primarytype:album%20AND%20status:official%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json')
+    # in case of an error, return None
+    if response.status_code != 200:
+        return None
+    albums = {release['title']: release['id'] for release in response.json()["release-groups"][:]
+              if release['artist-credit'][0]['artist']['id'] == artist_mbid}
+    print(f'there are {len(albums)} {artist} albums')
     return albums
 
 
-def get_album_image(mbid, size='small'):
+# for album, id in get_artists_albums('Arcade Fire').items():
+#     print(album, (id))
+
+
+# def get_album_image(mbid, size='small'):
+#     """
+#     :param mbid: mbid for an album release on MusicBrainz
+#     :param size: small, etc.
+#     :return: an album cover location
+#     """
+#     url = "http://coverartarchive.org/release/" + mbid
+#     # print(url)
+#     response = requests.get(url)
+#     if response.status_code != 200:
+#         return None
+#     print('___images____')
+#     jprint(response.json())
+#     print('___images____')
+#     image = response.json()['images'][0]['thumbnails']['small']
+#     return image
+
+
+def get_album_image(mbid: str, size='small'):
     """
     :param mbid: mbid for an album release on MusicBrainz
     :param size: small, etc.
     :return: an album cover location
     """
-    url = "http://coverartarchive.org/release/" + mbid
+    if not mbid:
+        return None
+    url = "http://coverartarchive.org/release-group/" + mbid
     # print(url)
     response = requests.get(url)
     if response.status_code != 200:
+        print('something went wrong!')
         return None
+    print('___images____')
+    # jprint(response.json())
+    print('___images____')
     image = response.json()['images'][0]['thumbnails']['small']
     return image
 
+print(get_album_image('c091b282-aa91-3bc0-9c95-938db1f1f930'))
 
-def get_artists_albums_pictures(artist):
-    albums = get_artists_albums(artist).items()
+
+def get_artists_top_albums_via_mb(artist):
+    """
+
+    :param artist: artist's name
+    :return: a dict of album pictures {album_title: album_image_url}
+    """
+    try:
+        albums = get_artists_albums(artist).items()
+    except AttributeError:
+        return None
     albums_ids = list(get_artists_albums(artist).values())
-    # print(f'ids: {albums_ids}')
-    album_images = [get_album_image(album_id) for album_id in albums_ids if get_album_image(album_id)]
-    album_info = {album_title: get_album_image(album_id) for album_title, album_id in albums if
-                  get_album_image(album_id)}
+    album_images = [get_album_image(album_id) for album_id in albums_ids
+                    if get_album_image(album_id)]
+    album_info = {album_title: get_album_image(album_id) for album_title, album_id in albums
+                  if get_album_image(album_id)}
     # print(f'images: {album_images}')
     # print(f'album info: {album_info}')
+    print(len(album_info))
     return album_info
 
 
+# for album, album_image in get_artists_top_albums_via_mb('Arcade Fire').items():
+#     print(f'{album}, ({album_image})')
+
+# musicbrainzngs browsing implementation:
 artist_id = "5441c29d-3602-4898-b1a1-b77fa23b8e50"  # bowie
+#
+# result = musicbrainzngs.browse_releases(artist=artist_id,
+#                                         release_type=["album"],
+#                                         release_status=['official'],
+#                                         limit=100)
+# jprint(result)
+# print(len(result['release-list']))
 
-result = musicbrainzngs.browse_releases(artist=artist_id, release_type=["album"])
-jprint(result)
-
+# result = musicbrainzngs.browse_release_groups(artist=artist_id,
+#                                         release_type=["album"],
+#                                         limit=100)
+# jprint(result)
+# print(len(result['release-group-list']))
+# musicbrainzngs release-groups:
 # result = musicbrainzngs.get_artist_by_id(artist_id,
 #               includes=["release-groups"], release_type=["album"])
 # for release_group in result["artist"]["release-group-list"]:
-#     print("{title} ({type})".format(title=release_group["title"],
-#                                     type=release_group["type"]))
+#     print(f'{release_group["title"]} ({release_group["type"]})')
 # jprint(result)
+
+# musicbrainzngs releases:
+# result = musicbrainzngs.get_artist_by_id(artist_id,
+#                                          includes=["releases"],
+#                                          release_type=["album"],
+#                                          release_status=['official'])
+# jprint(result)
+# print(len([album['title'] for album in result['artist']['release-list']]))
+# print(set([album['title'] for album in result['artist']['release-list']]))
+
 
 
 # print(musicbrainzngs.get_release_group_by_id("5441c29d-3602-4898-b1a1-b77fa23b8e50"))
@@ -81,9 +152,3 @@ jprint(result)
 # print("bowie's info: ", get_artist_info('David Bowie'))
 # print(get_artists_albums("David Bowie"))
 #
-
-# print(get_artists_albums('David Bowie'))
-# print(requests.get('http://coverartarchive.org/release/c04730ea-87cb-478b-a256-08c0561d20e6/').json()['images'][0]['thumbnails']['small'])
-
-# print(requests.get('https://musicbrainz.org//ws/2/release-group?artist=410c9baf-5469-44f6-9852-826524b80c61&type'])=album|ep'))
-# print(requests.get('https://musicbrainz.org/ws/2/release-group?query=arid:5441c29d-3602-4898-b1a1-b77fa23b8e50%20primarytype:album%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json').json()['release-groups']
