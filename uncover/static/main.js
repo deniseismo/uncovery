@@ -38,4 +38,16 @@ $(document).on("submit", "#submit-form", submitInput);
 $('.button').on('click', function(){
     $('.button').removeClass('active');
     $(this).addClass('active');
+
+    if ($('.button.active').attr('id') == 'by_username') {
+    $('#text-field').attr('placeholder', 'last.fm username');
+} else if ($('.button.active').attr('id') == 'by_artist') {
+     $('#text-field').attr(
+                        'placeholder',
+                        "artist/band/group (e.g. Arcade Fire, David Bowie or MGMT)");
+} else {
+     $('#text-field').attr(
+                        'placeholder',
+                        "Spotify Playlist Link");
+}
 });

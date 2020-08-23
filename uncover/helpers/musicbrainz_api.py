@@ -1,3 +1,4 @@
+import urllib.parse
 import requests
 import requests_cache
 import musicbrainzngs
@@ -21,7 +22,9 @@ def get_artists_albums(artist, mbid=None, amount=9):
     :param amount: a number of albums
     :return:
     """
+    my_filter = "' primarytype:album%20AND%20status:official%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json'"
     filters = "%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json"
+    another_filter = "http://musicbrainz.org/ws/2/release-group/?query=arid:381086ea-f511-4aba-bdf9-71c753dc5077%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json"
     if mbid:
         artist_mbid = mbid
     else:
@@ -29,8 +32,15 @@ def get_artists_albums(artist, mbid=None, amount=9):
     if not artist_mbid:
         return None
     url = 'https://musicbrainz.org/ws/2/'
+    params = {
+        'primarytype': 'album',
+        'status': 'official',
+
+    }
     response = requests.get(
-        'https://musicbrainz.org/ws/2/release-group?query=arid:' + artist_mbid + ' primarytype:album%20AND%20status:official%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json')
+        'https://musicbrainz.org/ws/2/release-group?query=arid:'
+        + artist_mbid
+        + '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json')
     # in case of an error, return None
     if response.status_code != 200:
         return None
@@ -81,6 +91,7 @@ def get_album_image(mbid: str, size='small'):
     print('___images____')
     image = response.json()['images'][0]['thumbnails']['small']
     return image
+
 
 print(get_album_image('c091b282-aa91-3bc0-9c95-938db1f1f930'))
 
@@ -139,7 +150,6 @@ artist_id = "5441c29d-3602-4898-b1a1-b77fa23b8e50"  # bowie
 # jprint(result)
 # print(len([album['title'] for album in result['artist']['release-list']]))
 # print(set([album['title'] for album in result['artist']['release-list']]))
-
 
 
 # print(musicbrainzngs.get_release_group_by_id("5441c29d-3602-4898-b1a1-b77fa23b8e50"))
