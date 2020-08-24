@@ -1,9 +1,8 @@
-import urllib.parse
 import requests
 import requests_cache
 import musicbrainzngs
 
-from uncover.utils import jprint
+from uncover.helpers.utils import jprint
 from uncover.helpers.lastfm_api import get_artist_info
 
 requests_cache.install_cache()
@@ -44,6 +43,7 @@ def get_artists_albums(artist, mbid=None, amount=9):
     # in case of an error, return None
     if response.status_code != 200:
         return None
+    jprint(response.json())
     albums = {release['title']: release['id'] for release in response.json()["release-groups"][:]
               if release['artist-credit'][0]['artist']['id'] == artist_mbid}
     print(f'there are {len(albums)} {artist} albums')
@@ -86,14 +86,12 @@ def get_album_image(mbid: str, size='small'):
     if response.status_code != 200:
         print('something went wrong!')
         return None
-    print('___images____')
-    # jprint(response.json())
-    print('___images____')
-    image = response.json()['images'][0]['thumbnails']['small']
+    jprint(response.json())
+    image = response.json()['images'][0]['thumbnails']['large']
     return image
 
 
-print(get_album_image('c091b282-aa91-3bc0-9c95-938db1f1f930'))
+# print(get_album_image('c091b282-aa91-3bc0-9c95-938db1f1f930'))
 
 
 def get_artists_top_albums_via_mb(artist):
@@ -113,11 +111,11 @@ def get_artists_top_albums_via_mb(artist):
                   if get_album_image(album_id)}
     # print(f'images: {album_images}')
     # print(f'album info: {album_info}')
-    print(len(album_info))
+    print(f'there are {len(album_info)} cover art images')
     return album_info
 
-
-# for album, album_image in get_artists_top_albums_via_mb('Arcade Fire').items():
+#
+# for album, album_image in get_artists_top_albums_via_mb('Metallica').items():
 #     print(f'{album}, ({album_image})')
 
 # musicbrainzngs browsing implementation:

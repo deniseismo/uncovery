@@ -65,9 +65,16 @@ a:hover {
     color: #ed6663;
 }
 
+
 .cover-art {
     width: 200px;
     height: 200px;
+    transition: transform .1s ease;
+}
+/* magnifies cover art on hover */
+.cover-art:hover {
+    transform: scale(1.5);
+    transition: transform .3s cubic-bezier(.17,.67,.49,1.53);
 }
 
 /* failure art width & height */
@@ -79,6 +86,7 @@ a:hover {
     -webkit-animation: filter-animation 5s infinite;
 }
 
+/* failure art psychedelic animation */
 @-webkit-keyframes filter-animation {
   0% {
     -webkit-filter: sepia(0) saturate(2);
@@ -94,9 +102,7 @@ a:hover {
 }
 
 
-
-
-/* Bottom right text */
+/* failure art message */
 .text-block {
   position: absolute;
   background-color: rgba(220, 53, 69, 0.5);

@@ -12,7 +12,7 @@ var submitInput = function() {
          console.log(response);
             $('#game-frame').empty();
          $.each(response, function(key, value){
-            $('#game-frame').append("<img src=" + value + "/>");
+            $('#game-frame').append("<img src=" + value + " alt=" + key + "/>");
          });
             $('img').addClass('cover-art');
             $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style

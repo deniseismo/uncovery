@@ -60,7 +60,7 @@ def get_artists_top_albums_via_lastfm(artist, size=3, amount=9):
     :param amount: a number of albums, default = 9
     :param size: 3 - large size (300x300)
     :param artist: artist's name (musician, band, etc)
-    :return: a dict {album_name: album_image_url }
+    :return: a dict {album_name: album_image_url}
     """
     response = lastfm_get({
         'method': 'artist.getTopAlbums',
