@@ -120,4 +120,8 @@ def get_artists_top_albums_via_mb(artist):
         if get_album_image(album_id):
             album_info["albums"][album_title] = get_album_image(album_id)
     print(f'there are {len(album_info["albums"])} cover art images!')
+    if not album_info["albums"]:
+        # if the artist somehow has no albums to show
+        print('error: no albums to show')
+        return None
     return album_info
