@@ -126,8 +126,13 @@ def get_users_top_albums(username, size=3):
     album_info = {"info": f"{username}'s favorite albums", "albums": dict()}
     try:
         for album in response.json()['topalbums']['album'][:9]:
-            album_info["albums"][album['name']] = album['image'][size]['#text']
+            if album['image'][size]['#text']:
+                # checks for incorrect/broken images
+                album_info["albums"][album['name']] = album['image'][size]['#text']
     except KeyError:
         return None
-
+    if not album_info["albums"]:
+        print('user has nothing to show')
+        # if the user has no albums to show
+        return None
     return album_info

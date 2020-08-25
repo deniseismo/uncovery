@@ -119,5 +119,5 @@ def get_artists_top_albums_via_mb(artist):
     for album_title, album_id in albums:
         if get_album_image(album_id):
             album_info["albums"][album_title] = get_album_image(album_id)
-
+    print(f'there are {len(album_info["albums"])} cover art images!')
     return album_info

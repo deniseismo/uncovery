@@ -45,7 +45,6 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
-
     return jsonify(albums)
     # return jsonify(artists_albums)
 
