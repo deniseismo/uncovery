@@ -79,13 +79,45 @@ def get_albums_by_artist():
     return jsonify(sliced_albums)
 
 
+# @app.route("/by_spotify", methods=["POST"])
+# def get_albums_by_spotify():
+#     """
+#     gets album cover art images based on Spotify's playlist
+#     :return: jsonified dictionary {album_name: cover_art}
+#     """
+#     playlist_id = request.form["qualifier"]
+#     if not playlist_id:
+#         # if the input's empty, send an error message and a 'failure' image
+#         failure_art_filename = display_failure_art(get_failure_images())
+#         return make_response(jsonify(
+#             {'message': "your playlist's id looks kinda empty to me",
+#              'failure_art': url_for('static',
+#                                     filename=failure_art_filename)}
+#         ),
+#             404)
+#     # gets albums info through spotify's api based on playlist's id
+#     albums = get_albums_by_playlist(playlist_id)
+#     if not albums:
+#         # if the given username has no albums or the username's incorrect
+#         failure_art_filename = display_failure_art(get_failure_images())
+#         return make_response(jsonify(
+#             {'message': f"your playlist's kinda dumb",
+#              'failure_art': url_for('static',
+#                                     filename=failure_art_filename)}
+#         ),
+#             404)
+#
+#     # slicing the dictionary to make it 9 albums long
+#     sliced_albums = dict(itertools.islice(albums.items(), 9))
+#     return jsonify(sliced_albums)
+
+
 @app.route("/by_spotify", methods=["POST"])
 def get_albums_by_spotify():
     """
     gets album cover art images based on Spotify's playlist
     :return: jsonified dictionary {album_name: cover_art}
     """
-    # TODO: the whole spotify function
     playlist_id = request.form["qualifier"]
     if not playlist_id:
         # if the input's empty, send an error message and a 'failure' image
@@ -109,5 +141,5 @@ def get_albums_by_spotify():
             404)
 
     # slicing the dictionary to make it 9 albums long
-    sliced_albums = dict(itertools.islice(albums.items(), 9))
-    return jsonify(sliced_albums)
+    albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
+    return jsonify(albums)

@@ -2,6 +2,7 @@ import os
 import time
 import requests
 import requests_cache
+from uncover.helpers.utils import jprint
 
 requests_cache.install_cache()
 
@@ -25,12 +26,35 @@ def get_artist_info(artist):
     })
     # in case of an error, return None
     if response.status_code != 200:
+        print(f"couldn't find {artist} on last.fm")
         return None
     try:
         artist_mbid = response.json()['artist']['mbid']
     except KeyError:
+        print(f"there is no mbid for {artist}")
         return None
     return artist_mbid
+
+
+def get_artist_correct_name(artist):
+    """
+    Use the last.fm corrections data to check whether the supplied artist has a correction to a canonical artist
+    :param artist: artist's name as is
+    :return: corrected version of the artist's name
+    """
+    response = lastfm_get({
+        'method': 'artist.getCorrection',
+        'artist': artist
+    })
+    # in case of an error, return None
+    if response.status_code != 200:
+        return None
+    try:
+        correct_name = response.json()["corrections"]["correction"]["artist"]["name"]
+    except KeyError:
+        return None
+    jprint(response.json())
+    return correct_name
 
 
 def lookup_tags(artist):
@@ -62,6 +86,11 @@ def get_artists_top_albums_via_lastfm(artist, size=3, amount=9):
     :param artist: artist's name (musician, band, etc)
     :return: a dict {album_name: album_image_url}
     """
+    # try correcting some typos in artist's name
+    correct_name = get_artist_correct_name(artist)
+    if correct_name:
+        artist = correct_name
+
     response = lastfm_get({
         'method': 'artist.getTopAlbums',
         'artist': artist
@@ -69,7 +98,6 @@ def get_artists_top_albums_via_lastfm(artist, size=3, amount=9):
     # in case of an error, return None
     if response.status_code != 200:
         return None
-    # albums = [album['name'] for album in response.json()['topalbums']['album'][:3]]
     try:
         album_images = {
             album['name']: album['image'][size]["#text"] for album in response.json()['topalbums']['album'][:amount]
@@ -84,7 +112,7 @@ def get_users_top_albums(username, size=3):
 
     :param username: lastfm username
     :param size: 0 - small (34x34), 1 - medium (64x64), 2 - large (174x174), 3 - XL (300x300)
-    :return: a dictionary of 9 top the username's top albums {album_name: album_image_location}
+    :return: a dictionary  {"info": username, "albums": 9 x [album_title : image_url]}
     """
     response = lastfm_get({
         'method': 'user.getTopAlbums',
@@ -93,11 +121,13 @@ def get_users_top_albums(username, size=3):
     # in case of an error, return None
     if response.status_code != 200:
         return None
-    # albums = [album['name'] for album in response.json()['topalbums']['album'][:3]]
 
+    # initialize a dict to avoid KeyErrors
+    album_info = {"info": f"{username}'s favorite albums", "albums": dict()}
     try:
-        album_images = {album['name']: album['image'][size]['#text'] for album in
-                        response.json()['topalbums']['album'][:9]}
+        for album in response.json()['topalbums']['album'][:9]:
+            album_info["albums"][album['name']] = album['image'][size]['#text']
     except KeyError:
         return None
-    return album_images
+
+    return album_info

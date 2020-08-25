@@ -10,12 +10,17 @@ var submitInput = function() {
     }).done(function(response) {
          // when done, removes current pictures from the frame, adds new ones
          console.log(response);
-            $('#game-frame').empty();
-         $.each(response, function(key, value){
+
+         $('#game-frame').empty();
+         $.each(response["albums"], function(key, value){
             $('#game-frame').append("<img src=" + value + " alt=" + key + "/>");
          });
-            $('img').addClass('cover-art');
-            $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
+
+         $('#text-field').val(response["info"]);
+
+         $('img').addClass('cover-art');
+
+         $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
     }).fail(function(response) {
             console.log(response.responseJSON);
           $('#text-field').addClass('is-invalid').val(response.responseJSON['message']); // show error message
@@ -49,5 +54,6 @@ $('.button').on('click', function(){
      $('#text-field').attr(
                         'placeholder',
                         "Spotify Playlist Link");
-}
+};
+$('#text-field').val('');
 });
