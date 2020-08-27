@@ -31,6 +31,9 @@ def get_artist_mbid(artist):
     return mbid
 
 
+print(get_artist_mbid('Wu-Tang Clan'))
+
+
 def get_artists_albums_v2(artist):
     artist_mbid = get_artist_mbid(artist)
     if not artist_mbid:
@@ -47,7 +50,7 @@ def get_artists_albums_v2(artist):
     return albums
 
 
-def get_artists_albums(artist, mbid=None, amount=9):
+def get_artists_albums(artist: str, mbid=None, amount=9):
     """
 
     :param artist: artist's name
@@ -59,10 +62,17 @@ def get_artists_albums(artist, mbid=None, amount=9):
     filters = "%20NOT%20secondarytype:live%20NOT%20secondarytype:compilation%20NOT%20secondarytype:remix%20NOT%20secondarytype:interview%20NOT%20secondarytype:soundtrack&fmt=json"
     another_filter = "http://musicbrainz.org/ws/2/release-group/?query=arid:381086ea-f511-4aba-bdf9-71c753dc5077%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json"
     if mbid:
+        # if mbid is already provided
         artist_mbid = mbid
     else:
+        # find mbid through lastfm's API
         artist_mbid = get_artist_info(artist)
     if not artist_mbid:
+        # in case lastfm doesn't have an mbid, try finding it directly through MusicBrainz
+        artist_mbid = get_artist_mbid(artist)
+    if not artist_mbid:
+        # if nothing found
+        print("could't find correct mbid")
         return None
 
     response = requests.get(

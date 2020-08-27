@@ -74,8 +74,8 @@ def get_albums_by_artist():
         ),
             404)
     # slicing the dictionary to make it 9 albums long
-    sliced_albums = dict(itertools.islice(albums.items(), 9))
-    return jsonify(sliced_albums)
+    albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
+    return jsonify(albums)
 
 
 # @app.route("/by_spotify", methods=["POST"])
