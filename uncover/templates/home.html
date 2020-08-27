@@ -5,7 +5,13 @@
         <form class="main" action="" id="submit-form" onSubmit="return false;" enctype="multipart/form-data">
             <input class="btn btn-primary btn-submit" type="submit" id="submit-btn" value="OK">
             <div class="text-field">
-                <input type="text" class="text-input form-control" id="text-field" placeholder="last.fm username">
+                <input type="text" class="form-control" id="text-field" placeholder="last.fm username">
+                <select class="custom-select no-transition" id="select-options">
+                    <option value="overall" selected>All-time</option>
+                    <option value="7day">7 days</option>
+                    <option value="3month">3 months</option>
+                    <option value="12month">1 year</option>
+                </select>
             </div>
         </form>
     </div>

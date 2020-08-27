@@ -27,7 +27,7 @@ def lastfm_get(payload):
     return response
 
 
-# r = lastfm_get({
+# r = lastfm_get_response({
 #     'method': 'chart.gettopartists'
 # })
 #
@@ -53,7 +53,7 @@ def lastfm_get(payload):
 #     clear_output(wait=True)
 #
 #     # make the API call
-#     response = lastfm_get(payload)
+#     response = lastfm_get_response(payload)
 #
 #     # if we get an error, print the response and halt the loop
 #     if response.status_code != 200:

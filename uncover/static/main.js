@@ -6,7 +6,8 @@ var submitInput = function() {
     $('#game-frame').html('<img src="static/images/loading/broken-1.1s-47px.gif"/>');
     // posts to the flask's route /by_username
     $.post(`/${desired_method}`, {
-            "qualifier": $('#text-field').val()
+            "qualifier": $('#text-field').val(),
+            "option": $('#select-options').val()
     }).done(function(response) {
          // when done, removes current pictures from the frame, adds new ones
          console.log(response);
@@ -56,4 +57,15 @@ $('.button').on('click', function(){
                         "Spotify Playlist Link");
 };
 $('#text-field').val('');
+});
+
+/* displays 'options' menu when the input's focused  */
+var timerID;
+$("#text-field, #select-options").focus(function() {
+  clearTimeout(timerID);
+  $("#select-options").show();
+}).focusout(function(){
+    timerID = setTimeout(function() {
+        $("#select-options").hide();
+    }, 10);
 });

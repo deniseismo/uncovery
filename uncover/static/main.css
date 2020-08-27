@@ -42,15 +42,28 @@ h1 {
     width: 600px;
 }
 
-.text-input {
-    width: 100%;
+#text-field {
+    width: 400px;
+    display: flex;
+    flex: 1 0 auto;
+}
+#select-options {
+    display: none;
+    flex: 1 1 auto;
 }
 .text-field {
+    display: flex;
+    flex-flow: row nowrap;
     overflow: hidden;
 }
 .button {
     width: 200px;
 }
+
+.it-floats {
+    float: right;
+}
+
 
 .btn-submit {
     float: right;
