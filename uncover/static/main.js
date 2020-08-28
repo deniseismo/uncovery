@@ -13,8 +13,8 @@ var submitInput = function() {
          console.log(response);
 
          $('#game-frame').empty();
-         $.each(response["albums"], function(key, value){
-            $('#game-frame').append("<img src=" + value + " alt=" + key + "/>");
+         $.each(response["albums"], function(album_title, image_url){
+            $('#game-frame').append($('<img>', {src:`${image_url}`, alt:`${album_title}`}));
          });
 
          $('#text-field').val(response["info"]);
