@@ -132,7 +132,7 @@ def get_users_top_albums(username: str, size=3, time_period="overall"):
         return None
 
     # initialize a dict to avoid KeyErrors
-    album_info = {"info": f"{username}'s favorite albums {time_period_table[time_period]}", "albums": dict()}
+    album_info = {"info": f"{username}'s top albums {time_period_table[time_period]}", "albums": dict()}
     try:
         for album in response.json()['topalbums']['album'][:9]:
             if album['image'][size]['#text']:

@@ -26,7 +26,7 @@ def get_artist_mbid(artist: str):
         return None
     try:
         mbid = response.json()["artists"][0]["id"]
-    except KeyError:
+    except (KeyError, IndexError):
         return None
     return mbid
 

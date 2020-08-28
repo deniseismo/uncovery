@@ -126,3 +126,7 @@ a:hover {
 a {
     color: #3b444b;
 }
+#submit-btn {
+    background-color: #3b444b;
+    color: #ebecf1;
+}
