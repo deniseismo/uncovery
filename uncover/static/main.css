@@ -26,7 +26,9 @@ body {
     justify-content: center;
 }
 
-h1 {
+header h1 {
+    float: left;
+    position: relative;
     font-size: 1.5rem;
     font-weight: 800;
 }
@@ -130,3 +132,14 @@ a {
     background-color: #3b444b;
     color: #ebecf1;
 }
+
+#logo {
+    float: left;
+}
+
+#logo:hover {
+    filter: hue-rotate(90deg);
+
+
+}
+

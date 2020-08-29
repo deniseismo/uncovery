@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1 class="text-primary uncover"><a href="{{ url_for('home') }}">uncover</a></h1>
+    <header>
+        <img src="{{ url_for('static', filename='images/logo/turntable.png') }}" id="logo"/>
+        <h1 class="text-primary uncover mt-2"><a href="{{ url_for('home') }}">uncover</a></h1>
+    </header>
+
     <div class="flex-container">
         <form class="main" action="" id="submit-form" onSubmit="return false;" enctype="multipart/form-data">
             <input class="btn btn-submit" type="submit" id="submit-btn" value="OK">

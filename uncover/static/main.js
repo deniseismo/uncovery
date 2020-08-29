@@ -11,6 +11,8 @@ var submitInput = function() {
     }).done(function(response) {
          // when done, removes current pictures from the frame, adds new ones
          console.log(response);
+         var album_object = response;
+         console.log(album_object);
 
          $('#game-frame').empty();
          $.each(response["albums"], function(album_title, image_url){
@@ -18,8 +20,8 @@ var submitInput = function() {
          });
 
          $('#text-field').val(response["info"]);
-
-         $('img').addClass('cover-art');
+         // targets all images inside a #game-frame div, then gives them a 'cover-art' class
+         $('#game-frame img').addClass('cover-art');
 
          $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
     }).fail(function(response) {
@@ -50,7 +52,7 @@ $('.button').on('click', function(){
 } else if ($('.button.active').attr('id') == 'by_artist') {
      $('#text-field').attr(
                         'placeholder',
-                        "artist/band/group (e.g. Arcade Fire, David Bowie or MGMT)");
+                        "artist name");
 } else {
      $('#text-field').attr(
                         'placeholder',
@@ -63,7 +65,9 @@ $('#text-field').val('');
 var timerID;
 $("#text-field, #select-options").focus(function() {
   clearTimeout(timerID);
-  $("#select-options").show();
+  if ($('.button.active').attr('id') == 'by_username') {
+    $("#select-options").show();
+  };
 }).focusout(function(){
     timerID = setTimeout(function() {
         $("#select-options").hide();

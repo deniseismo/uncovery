@@ -6,6 +6,7 @@ from uncover.helpers.musicbrainz_api import get_artists_top_albums_via_mb
 from uncover.helpers.spotify_api import get_albums_by_playlist
 from uncover.helpers.utils import display_failure_art
 from uncover.info import get_failure_images
+from uncover.cover_art_game import CoverArtGame
 
 
 @app.route("/")
@@ -37,7 +38,6 @@ def get_albums_by_username():
         ),
             404)
     albums = get_users_top_albums(username, time_period=time_period)
-    # artists_albums = get_artists_albums_pictures(username)
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())
@@ -47,8 +47,9 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
+    # the_game = CoverArtGame(albums)
+    # the_game.get_dict()
     return jsonify(albums)
-    # return jsonify(artists_albums)
 
 
 @app.route("/by_artist", methods=["POST"])
