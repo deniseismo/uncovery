@@ -18,9 +18,7 @@
     <body>
 
         <main>
-            <div class="flex-container splash">
-                {% block content %}{% endblock %}
-            </div>
+            {% block content %}{% endblock %}
         </main>
 
         <script src="{{ url_for('static', filename='main.js') }}">

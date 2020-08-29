@@ -1,32 +1,46 @@
 {% extends "layout.html" %}
 {% block content %}
-    <header>
-        <img src="{{ url_for('static', filename='images/logo/turntable.png') }}" id="logo"/>
-        <h1 class="text-primary uncover mt-2"><a href="{{ url_for('home') }}">uncover</a></h1>
-    </header>
+    <div class="main-window">
+        <div class="flex-container splash">
+            <header>
+                <img src="{{ url_for('static', filename='images/logo/turntable.png') }}" id="logo"/>
+                <h1 class="text-primary uncover mt-2"><a href="{{ url_for('home') }}">uncover</a></h1>
+            </header>
 
-    <div class="flex-container">
-        <form class="main" action="" id="submit-form" onSubmit="return false;" enctype="multipart/form-data">
-            <input class="btn btn-submit" type="submit" id="submit-btn" value="OK">
-            <div class="text-field">
-                <input type="text" class="form-control" id="text-field" placeholder="last.fm username">
-                <select class="custom-select" id="select-options">
-                    <option value="overall" selected>All-time</option>
-                    <option value="7day">7 days</option>
-                    <option value="3month">3 months</option>
-                    <option value="12month">1 year</option>
-                </select>
+            <div class="flex-container">
+                <form class="main" action="" id="submit-form" onSubmit="return false;" enctype="multipart/form-data">
+                    <input class="btn btn-submit" type="submit" id="ok-btn" value="OK">
+                    <div class="text-field">
+                        <input type="text" class="form-control" id="text-field" placeholder="last.fm username">
+                        <select class="custom-select" id="select-options">
+                            <option value="overall" selected>All-time</option>
+                            <option value="7day">7 days</option>
+                            <option value="3month">3 months</option>
+                            <option value="12month">1 year</option>
+                        </select>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
 
-    <div class="flex-container">
-        <input class="button btn btn-light" id="by_artist" type="submit" name="submit_button" value="artist">
-        <input class="button btn btn-light active" id="by_username" type="submit" name="submit_button" value="username">
-        <input class="button btn btn-light" type="submit" id="by_spotify" name="submit_button" value="spotify">
-    </div>
+            <div class="flex-container">
+                <input class="button btn btn-light" id="by_artist" type="submit" name="submit_button" value="artist">
+                <input class="button btn btn-light active" id="by_username" type="submit" name="submit_button" value="username">
+                <input class="button btn btn-light" type="submit" id="by_spotify" name="submit_button" value="spotify">
+            </div>
 
-    <div class="flex-container game-frame" id="game-frame">
+            <div class="flex-container game-frame" id="game-frame">
+                <div class="lcd-text">
+                    <p id="i-heard">I heard</p>
+                    <p id="you-have">you have</p>
+                    <p id="a-compilation">a compilation</p>
+                    <p id="every-good-song">of every good song</p>
+                    <p id="ever">ever</p>
+                    <p id="done">done</p>
+                    <p id="by-anybody">by anybody.</p>
+                </div>
+            </div>
+            <input class="btn btn-submit" type="button" id="play-btn" value="PLAY">
+
+        </div>
     </div>
-    <input class="btn btn-submit" type="button" id="play-btn" value="PLAY">
 {% endblock content %}

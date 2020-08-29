@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'argesta_displayregular';
+    src: url('font/argestadisplay-regular-webfont.eot');
+    src: url('font/argestadisplay-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('font/argestadisplay-regular-webfont.woff2') format('woff2'),
+         url('font/argestadisplay-regular-webfont.woff') format('woff'),
+         url('font/argestadisplay-regular-webfont.ttf') format('truetype');
+}
+
 html, main {
     height: 100%;
 }
@@ -5,17 +14,129 @@ html, main {
 body {
     height: 100%;
     background-color: #ebecf1;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'argesta_displayregular', sans-serif;
     color: #f9fbfa;
-
 }
+
+p {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #3b444b;
+    visibility: hidden;
+}
+
+@keyframes showUp {
+    75% {
+        visibility: hidden;
+    }
+
+    98% {
+/*
+        margin-left: -45%;
+*/
+    }
+
+    100% {
+        visibility: visible;
+/*        margin-left: -20%;*/
+    }
+}
+
+p#i-heard {
+    width: 30%;
+    font-size: 3rem;
+    background-color: #FFDB57;
+    margin-top: 0.5rem;
+    margin-left: -20%;
+    font-weight: 200;
+    animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 0.2s forwards;
+/*    animation-name: showUp;
+    animation-duration: 0.5s;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(.26,-0.64,.83,1.62);*/
+}
+
+
+
+p#you-have {
+    font-size: 4rem;
+    margin-top: -10%;
+    margin-left: -10%;
+    line-height: 48px;
+    animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 0.3s forwards;
+}
+
+p#a-compilation {
+    margin-left: 20%;
+    font-size: 2rem;
+    font-weight: 300;
+    padding: 0;
+    line-height: 24px;
+    animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 0.4s forwards;
+}
+
+p#every-good-song {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+    padding: 0;
+    line-height: 24px;
+    letter-spacing: 5px;
+/*    background-color: #4549B0;*/
+    bottom: 2rem;
+    height: 0.3rem;
+    animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 1s forwards;
+}
+
+p#ever {
+    font-size: 10rem;
+    margin-bottom: 1.5rem;
+    margin-left: 1rem;
+    padding: 0;
+    line-height: 50px;
+    letter-spacing: 1px;
+    background-color: coral;
+    width: 55%;
+    animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 1.4s forwards;
+}
+
+p#done {
+    font-size: 3rem;
+    margin-left: 6rem;
+    margin-bottom: 0;
+    padding: 0;
+    line-height: 50px;
+    letter-spacing: 1px;
+    animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 1.4s forwards;
+}
+
+p#by-anybody {
+    font-weight: 200;
+    font-size: 3rem;
+    margin-top: -5%;
+    margin-left: 50%;
+    padding: 0;
+    font-style: oblique;
+    animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 1.8s forwards;
+}
+
 
 .flex-container {
     height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+}
 
+.main-window {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+#i-heard {
+    flex: 1 0 auto;
 }
 
 /* div for all the items in the layout's body */
@@ -29,7 +150,7 @@ body {
 header h1 {
     float: left;
     position: relative;
-    font-size: 1.5rem;
+    font-size: 2.5rem;
     font-weight: 800;
 }
 
@@ -67,11 +188,13 @@ header h1 {
 }
 
 
-.btn-submit {
+#ok-btn {
     float: right;
+    background-color: #3b444b;
+    color: #ebecf1;
 }
 
-.btn-submit:hover {
+#ok-btn:hover {
     background-color: #ed6663;
 }
 
@@ -128,12 +251,10 @@ a:hover {
 a {
     color: #3b444b;
 }
-#submit-btn {
-    background-color: #3b444b;
-    color: #ebecf1;
-}
+
 
 #logo {
+    margin-top: 0.75rem;
     float: left;
 }
 
