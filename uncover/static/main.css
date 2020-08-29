@@ -138,8 +138,15 @@ a {
 }
 
 #logo:hover {
-    filter: hue-rotate(90deg);
-
-
+    filter: invert(1);
 }
+
+#play-btn {
+    display: block;
+    visibility: hidden;
+    width: 100px;
+    background-color: #3b444b;
+    color: #ebecf1;
+}
+
 

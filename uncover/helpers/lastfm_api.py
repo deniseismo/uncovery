@@ -107,7 +107,7 @@ def get_artists_top_albums_via_lastfm(artist: str, size=3, amount=9):
     return album_images
 
 
-def get_users_top_albums(username: str, size=3, time_period="overall"):
+def get_users_top_albums(username: str, size=3, time_period="overall", amount=25):
     """
 
     :param time_period: (Optional) : overall | 7day | 1month | 3month | 6month | 12month
@@ -134,7 +134,7 @@ def get_users_top_albums(username: str, size=3, time_period="overall"):
     # initialize a dict to avoid KeyErrors
     album_info = {"info": f"{username}'s top albums {time_period_table[time_period]}", "albums": dict()}
     try:
-        for album in response.json()['topalbums']['album'][:9]:
+        for album in response.json()['topalbums']['album'][:amount]:
             if album['image'][size]['#text']:
                 # checks for incorrect/broken images
                 album_info["albums"][album['name']] = album['image'][size]['#text']

@@ -1,5 +1,5 @@
 /* main AJAX function */
-var submitInput = function() {
+const submitInput = function() {
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
     desired_method = $(".button.active").attr('id');
     // spinner
@@ -11,7 +11,7 @@ var submitInput = function() {
     }).done(function(response) {
          // when done, removes current pictures from the frame, adds new ones
          console.log(response);
-         var album_object = response;
+         let album_object = response;
          console.log(album_object);
 
          $('#game-frame').empty();
@@ -19,11 +19,15 @@ var submitInput = function() {
             $('#game-frame').append($('<img>', {src:`${image_url}`, alt:`${album_title}`}));
          });
 
-         $('#text-field').val(response["info"]);
+          if ($('.button.active').attr('id') == 'by_artist') {
+                $('#text-field').val(response["info"]);
+           };
+//         $('#text-field').val(response["info"]);
          // targets all images inside a #game-frame div, then gives them a 'cover-art' class
          $('#game-frame img').addClass('cover-art');
 
          $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
+         $("#play-btn").show();
     }).fail(function(response) {
             console.log(response.responseJSON);
           $('#text-field').addClass('is-invalid').val(response.responseJSON['message']); // show error message
@@ -66,6 +70,7 @@ var timerID;
 $("#text-field, #select-options").focus(function() {
   clearTimeout(timerID);
   if ($('.button.active').attr('id') == 'by_username') {
+    /* makes sure it's only visible for user's top albums */
     $("#select-options").show();
   };
 }).focusout(function(){

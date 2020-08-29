@@ -49,6 +49,8 @@ def get_albums_by_username():
             404)
     # the_game = CoverArtGame(albums)
     # the_game.get_dict()
+    # slicing the dictionary to make it 9 albums long
+    albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
     return jsonify(albums)
 
 
