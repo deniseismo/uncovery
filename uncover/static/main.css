@@ -1,3 +1,5 @@
+/* add a custom font 'argesta' */
+
 @font-face {
     font-family: 'argesta_displayregular';
     src: url('font/argestadisplay-regular-webfont.eot');
@@ -13,18 +15,20 @@ html, main {
 
 body {
     height: 100%;
-    background-color: #ebecf1;
+    background-color: #ebecf1; /* main background light grey color */
     font-family: 'argesta_displayregular', sans-serif;
     color: #f9fbfa;
 }
 
-p {
+/* default text style for the LCD Soundsystem quote */
+.lcd-text p {
     font-size: 2rem;
     font-weight: bold;
     color: #3b444b;
     visibility: hidden;
 }
 
+/* animation for the LCD Soundsystem quote */
 @keyframes showUp {
     75% {
         visibility: hidden;
@@ -42,6 +46,7 @@ p {
     }
 }
 
+/* LCD Soundsystem quote in several different paragraphs: */
 p#i-heard {
     width: 30%;
     font-size: 3rem;
@@ -50,14 +55,7 @@ p#i-heard {
     margin-left: -20%;
     font-weight: 200;
     animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 0.2s forwards;
-/*    animation-name: showUp;
-    animation-duration: 0.5s;
-    animation-delay: 0.5s;
-    animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(.26,-0.64,.83,1.62);*/
 }
-
-
 
 p#you-have {
     font-size: 4rem;
@@ -121,7 +119,6 @@ p#by-anybody {
     animation: showUp 0.5s cubic-bezier(.26,-0.64,.83,1.62) 1.8s forwards;
 }
 
-
 .flex-container {
     height: auto;
     display: flex;
@@ -161,6 +158,7 @@ header h1 {
     flex-flow: row wrap;
     justify-content: center;
 }
+
 .main {
     width: 600px;
 }
@@ -170,15 +168,18 @@ header h1 {
     display: flex;
     flex: 1 0 auto;
 }
+
 #select-options {
     display: none;
     flex: 1 1 auto;
 }
+
 .text-field {
     display: flex;
     flex-flow: row nowrap;
     overflow: hidden;
 }
+
 .button {
     width: 200px;
 }
@@ -186,7 +187,6 @@ header h1 {
 .it-floats {
     float: right;
 }
-
 
 #ok-btn {
     float: right;
@@ -203,12 +203,12 @@ a:hover {
     color: #ed6663;
 }
 
-
 .cover-art {
     width: 200px;
     height: 200px;
     transition: transform .1s ease;
 }
+
 /* magnifies cover art on hover */
 .cover-art:hover {
     transform: scale(1.5);
@@ -239,7 +239,6 @@ a:hover {
   }
 }
 
-
 /* failure art message */
 .text-block {
   position: absolute;
@@ -251,7 +250,6 @@ a:hover {
 a {
     color: #3b444b;
 }
-
 
 #logo {
     margin-top: 0.75rem;
@@ -266,8 +264,16 @@ a {
     display: block;
     visibility: hidden;
     width: 100px;
-    background-color: #3b444b;
+    background-color: #3b444b; /* main grayish color */
     color: #ebecf1;
 }
 
+/* overrides default bootstrap tooltip styles */
+.tooltip-inner {
+    background-color: #3b444b; /* main grayish color */
+}
 
+.bs-tooltip-auto[x-placement^=bottom] .arrow::before,
+.bs-tooltip-bottom .arrow::before {
+  border-bottom-color: #3b444b;  /* main grayish color */
+}

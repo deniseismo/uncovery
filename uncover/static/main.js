@@ -1,3 +1,7 @@
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
 /* main AJAX function */
 const submitInput = function() {
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
