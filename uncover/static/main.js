@@ -4,8 +4,9 @@ $(document).ready(function(){
 
 /* main AJAX function */
 const submitInput = function() {
+    "use strict";
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
-    desired_method = $(".button.active").attr('id');
+    const desired_method = $(".button.active").attr('id');
     // spinner
     $('#game-frame').html('<img src="static/images/loading/broken-1.1s-47px.gif"/>');
     // posts to the flask's route /by_username
@@ -15,12 +16,14 @@ const submitInput = function() {
     }).done(function(response) {
          // when done, removes current pictures from the frame, adds new ones
          console.log(response);
-         let album_object = response;
-         console.log(album_object);
 
          $('#game-frame').empty();
+         /* adds a class 'loading' to block animation before all images are loaded */
+         $('#game-frame').addClass('loading');
+         var counter = 0;
          $.each(response["albums"], function(album_title, image_url){
-            $('#game-frame').append($('<img>', {src:`${image_url}`, alt:`${album_title}`}));
+            $('#game-frame').append($('<img>', {src:`${image_url}`, alt:`${album_title}`, id: `art-${counter}`}));
+            counter++;
          });
 
           if ($('.button.active').attr('id') == 'by_artist') {
@@ -32,6 +35,12 @@ const submitInput = function() {
 
          $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
          $("#play-btn").show();
+
+         /* waiting for all images to load before showing them up*/
+          $('#game-frame').waitForImages().done(function() {
+            $('#game-frame').removeClass('loading');
+        });
+
     }).fail(function(response) {
             console.log(response.responseJSON);
           $('#text-field').addClass('is-invalid').val(response.responseJSON['message']); // show error message
@@ -44,6 +53,7 @@ const submitInput = function() {
           `);
     })
 };
+
 
 
 
