@@ -211,8 +211,8 @@ a:hover {
     height: 200px;
     transition: transform .1s ease;
     opacity: 0;
-    animation: show-on-load 1s .2s cubic-bezier(0,1.6,.6,1) forwards,
-bounce 1s .2s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .2s cubic-bezier(0,1.6,.6,1) forwards,
+bounce 0.6s .2s cubic-bezier(0,1.6,.6,1) none;
 
 }
 
@@ -235,40 +235,40 @@ bounce 1s .2s cubic-bezier(0,1.6,.6,1) none;
 }
 
 #art-1 {
-    animation: show-on-load 1s .25s cubic-bezier(0,1.6,.6,1) forwards,
-                animation: bounce 1s .25s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .25s cubic-bezier(0,1.6,.6,1) forwards,
+                animation: bounce 0.6s .25s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-2 {
-    animation: show-on-load 1s .3s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .3s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .3s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .3s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-3 {
-    animation: show-on-load 1s .35s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .35s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .35s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .35s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-6 {
-    animation: show-on-load 1s .4s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .4s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .4s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .4s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-5 {
-    animation: show-on-load 1s .45s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .45s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .45s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .45s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-4 {
-    animation: show-on-load 1s .5s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .5s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .5s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .5s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-7 {
-    animation: show-on-load 1s .55s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .55s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .55s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .55s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-8 {
-    animation: show-on-load 1s .6s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .6s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .6s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .6s cubic-bezier(0,1.6,.6,1) none;
 }
 #art-9 {
-    animation: show-on-load 1s .65s cubic-bezier(0,1.6,.6,1) forwards,
-                bounce 1s .65s cubic-bezier(0,1.6,.6,1) none;
+    animation: show-on-load 0.6s .65s cubic-bezier(0,1.6,.6,1) forwards,
+                bounce 0.6s .65s cubic-bezier(0,1.6,.6,1) none;
 }
 
 

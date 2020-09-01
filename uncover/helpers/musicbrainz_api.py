@@ -2,7 +2,7 @@ import requests
 import requests_cache
 import musicbrainzngs
 
-from uncover.helpers.utils import jprint
+from uncover.helpers.utils import jprint, timeit
 from uncover.helpers.lastfm_api import get_artist_info, get_artist_correct_name
 
 requests_cache.install_cache()
@@ -116,7 +116,8 @@ def get_album_image_via_mb(mbid: str, size='large'):
     return image
 
 
-def get_artists_top_albums_via_mb(artist):
+@timeit
+def get_artists_top_albums_images_via_mb(artist):
     """
     :param artist: artist's name
     :return: a dict of album pictures {album_title: album_image_url}
@@ -132,8 +133,9 @@ def get_artists_top_albums_via_mb(artist):
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": dict()}
     for album_title, album_id in albums:
-        if get_album_image_via_mb(album_id):
-            album_info["albums"][album_title] = get_album_image_via_mb(album_id)
+        album_image = get_album_image_via_mb(album_id)
+        if album_image:
+            album_info["albums"][album_title] = album_image
     print(f'there are {len(album_info["albums"])} cover art images!')
     if not album_info["albums"]:
         # if the artist somehow has no albums to show
