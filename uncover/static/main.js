@@ -5,6 +5,7 @@ $(document).ready(function(){
 /* main AJAX function */
 const submitInput = function() {
     "use strict";
+    $('#info').remove();
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
     const desired_method = $(".button.active").attr('id');
     // spinner
@@ -16,7 +17,6 @@ const submitInput = function() {
     }).done(function(response) {
          // when done, removes current pictures from the frame, adds new ones
          console.log(response);
-
          $('#game-frame').empty();
          /* adds a class 'loading' to block animation before all images are loaded */
          $('#game-frame').addClass('loading');
@@ -44,6 +44,11 @@ const submitInput = function() {
                 $('#load-bar').remove();
              /* remove 'loading' class that blocks animation of albums images */
                 $('#game-frame').removeClass('loading');
+                if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
+                    $('#game-frame').after(`<div id="info">${response["info"]}</div>`);
+                };
+
+
             }, function(loaded, count, success) {
             /* animate progress bar */
                  var bar1 = new ldBar("#load-bar");

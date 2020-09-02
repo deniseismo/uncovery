@@ -353,6 +353,11 @@ a {
     color: black;
 }
 
+.ldBar {
+    width: 200px !important;
+    height: auto !important;
+}
+
 /* removes % from the progress bar */
 .ldBar-label {
    display: none;
@@ -361,4 +366,13 @@ a {
 /* progress bar main line color */
 .ldBar path.mainline {
     stroke: #3b444b;
+    stroke-width: 2;
+}
+
+#info {
+    margin: .375rem .75rem;
+    color: #3b444b;
+    font-size: 1.25rem;
+    font-weight: 400;
+
 }
