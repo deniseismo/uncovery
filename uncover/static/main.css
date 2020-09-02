@@ -348,3 +348,12 @@ a {
 .loading *:after {
   animation-play-state: paused !important;
 }
+
+#game-frame {
+    color: black;
+}
+
+/* removes % from the progress bar */
+.ldBar-label {
+   display: none;
+}

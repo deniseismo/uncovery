@@ -36,10 +36,21 @@ const submitInput = function() {
          $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
          $("#play-btn").show();
 
-         /* waiting for all images to load before showing them up*/
-          $('#game-frame').waitForImages().done(function() {
-            $('#game-frame').removeClass('loading');
-        });
+         /* add a progress bar */
+            $('#buttons-container').after($('<div>', {class: 'ldBar', id: 'load-bar'}));
+          /* waiting for all images to load before showing them up*/
+            $('#game-frame').waitForImages(function() {
+            /* remove progress bar once loaded */
+                $('#load-bar').remove();
+             /* remove 'loading' class that blocks animation of albums images */
+                $('#game-frame').removeClass('loading');
+            }, function(loaded, count, success) {
+            /* animate progress bar */
+                 var bar1 = new ldBar("#load-bar");
+                 bar1.set((loaded + 1 / count) * 100);
+                 console.log(loaded, count);
+            });
+
 
     }).fail(function(response) {
             console.log(response.responseJSON);
@@ -48,13 +59,10 @@ const submitInput = function() {
                 <img src="${response.responseJSON['failure_art']}" id="failure-art"/>
                 <div class="text-block">
                     <h1 class="text-light">someone made an oopsie!</h1>
-
                 </div>
           `);
     })
 };
-
-
 
 
 //$('#submit-btn').on('click' , submitInput);

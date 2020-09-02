@@ -31,9 +31,6 @@ def get_artist_mbid(artist: str):
     return mbid
 
 
-print(get_artist_mbid('Wu-Tang Clan'))
-
-
 def get_artists_albums_v2(artist: str):
     """
     reserve function in case of some failures
@@ -51,7 +48,6 @@ def get_artists_albums_v2(artist: str):
         + '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json')
     if response.status_code != 200:
         return None
-    jprint(response.json())
     albums = {release['title']: release['id'] for release in response.json()["release-groups"][:]
               if release['artist-credit'][0]['artist']['id'] == artist_mbid}
     return albums
@@ -88,14 +84,17 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
     # in case of an error, return None
     if response.status_code != 200:
         return None
-    jprint(response.json())
     albums = {release['title']: release['id'] for release in response.json()["release-groups"][:]
               if release['artist-credit'][0]['artist']['id'] == artist_mbid}
     print(f'there are {len(albums)} {artist} albums')
     if not albums:
         #  in case of some weird error with the mbid taken via lastfm make another attempt with v2
         albums = get_artists_albums_v2(artist)
+    for i, album_title in enumerate(albums.keys()):
+        print(i, album_title)
     return albums
+
+get_artists_albums('BRian Eno')
 
 
 def get_album_image_via_mb(mbid: str, size='large'):
@@ -111,7 +110,6 @@ def get_album_image_via_mb(mbid: str, size='large'):
     if response.status_code != 200:
         print('something went wrong!')
         return None
-    jprint(response.json())
     image = response.json()['images'][0]['thumbnails'][size]
     return image
 

@@ -53,7 +53,6 @@ def get_artist_correct_name(artist: str):
         correct_name = response.json()["corrections"]["correction"]["artist"]["name"]
     except KeyError:
         return None
-    jprint(response.json())
     return correct_name
 
 

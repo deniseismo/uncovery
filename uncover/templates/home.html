@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="main-window">
-        <div class="flex-container splash">
+        <div class="flex-container splash" id="splash">
             <header>
                 <img src="{{ url_for('static', filename='images/logo/turntable.png') }}" id="logo"/>
                 <h1 class="text-primary uncover mt-2"><a href="{{ url_for('home') }}">uncover</a></h1>
             </header>
 
-            <div class="flex-container">
+            <div class="flex-container" id="submit-container">
                 <form class="main" action="" id="submit-form" onSubmit="return false;" enctype="multipart/form-data">
                     <input class="btn btn-submit" type="submit" id="ok-btn" value="OK">
                     <div class="text-field">
@@ -22,12 +22,13 @@
                 </form>
             </div>
 
-            <div class="flex-container">
+            <div class="flex-container" id="buttons-container">
                 <input class="button btn btn-light" id="by_artist" type="submit" name="submit_button" value="artist">
                 <input class="button btn btn-light active" id="by_username" type="submit" name="submit_button" value="username">
                 <input class="button btn btn-light" type="submit" id="by_spotify" name="submit_button" value="spotify">
             </div>
-
+<!--            <div class="ldBar" data-value="77" data-preset="bubble">-->
+<!--            </div>-->
             <div class="flex-container game-frame" id="game-frame">
                 <div class="lcd-text" data-toggle="tooltip" data-placement="bottom" title="© LCD Soundsystem">
                     <p id="i-heard">I heard</p>
