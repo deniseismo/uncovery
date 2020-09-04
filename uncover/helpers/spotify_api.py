@@ -1,9 +1,8 @@
 import spotipy
-import requests
 from spotipy.oauth2 import SpotifyClientCredentials
-from uncover.helpers.musicbrainz_api import get_artists_albums, get_artists_albums_v2
+
 from uncover.helpers.lastfm_api import get_artist_correct_name
-from uncover.helpers.utils import timeit, jprint
+from uncover.helpers.musicbrainz_api import get_artists_albums
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -37,7 +36,7 @@ def search_an_album(album: str, artist: str):
     """
     query = "album:" + album + " artist:" + artist
     try:
-        album_info = spotify.search(q=query, type="album", limit=20, market='RU')
+        album_info = spotify.search(q=query, type="album", limit=1, market='SE')
     except spotipy.exceptions.SpotifyException:
         return None
 
@@ -50,7 +49,7 @@ def search_an_album(album: str, artist: str):
 # if "https://api.spotify.com/v1/search?query=album%3AComputerwelt+artist%3Akraftwerk&type=album&offset=0&limit=20" == "https://api.spotify.com/v1/search?query=album%3AComputerwelt+artist%3Akraftwerk&type=album&offset=0&limit=20":
 #     print("equal")
 #
-# jprint(search_an_album('Music for Films, Volume 2', "Brian Eno"))
+# jprint(search_an_album('Computerwelt', "Kraftwerk"))
 
 
 

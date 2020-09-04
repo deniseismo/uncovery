@@ -7,56 +7,50 @@ const submitInput = function() {
     "use strict";
     $('#info').remove();
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
-    const desired_method = $(".button.active").attr('id');
+    const desiredMethod = $(".button.active").attr('id');
     // spinner
     $('#game-frame').html('<img src="static/images/loading/broken-1.1s-47px.gif"/>');
     // posts to the flask's route /by_username
-    $.post(`/${desired_method}`, {
+    $.post(`/${desiredMethod}`, {
             "qualifier": $('#text-field').val(),
             "option": $('#select-options').val()
     }).done(function(response) {
-         // when done, removes current pictures from the frame, adds new ones
-         console.log(response);
-         $('#game-frame').empty();
-         /* adds a class 'loading' to block animation before all images are loaded */
-         $('#game-frame').addClass('loading');
-         var counter = 0;
-         $.each(response["albums"], function(album_title, image_url){
-            $('#game-frame').append($('<img>', {src:`${image_url}`, alt:`${album_title}`, id: `art-${counter}`}));
-            counter++;
-         });
+        // when done, removes current pictures from the frame, adds new ones
+        console.log(response);
+        $('#game-frame').empty();
+        /* adds a class 'loading' to block animation before all images are loaded */
+        $('#game-frame').addClass('loading');
+        let counter = 0;
+        $.each(response["albums"], function(album_title, image_url){
+        $('#game-frame').append($('<img>', {src:`${image_url}`, alt:`${album_title}`, id: `art-${counter}`}));
+        counter++;
+        });
+        if ($('.button.active').attr('id') == 'by_artist') {
+            $('#text-field').val(response["info"]);
+        };
+        //         $('#text-field').val(response["info"]);
+        // targets all images inside a #game-frame div, then gives them a 'cover-art' class
+        $('#game-frame img').addClass('cover-art');
 
-          if ($('.button.active').attr('id') == 'by_artist') {
-                $('#text-field').val(response["info"]);
-           };
-//         $('#text-field').val(response["info"]);
-         // targets all images inside a #game-frame div, then gives them a 'cover-art' class
-         $('#game-frame img').addClass('cover-art');
+        $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
 
-         $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
-         $("#play-btn").show();
-
-         /* add a progress bar */
-            $('#buttons-container').after($('<div>', {class: 'ldBar', id: 'load-bar'}));
-          /* waiting for all images to load before showing them up*/
-            $('#game-frame').waitForImages(function() {
-            /* remove progress bar once loaded */
-                $('#load-bar').remove();
-             /* remove 'loading' class that blocks animation of albums images */
-                $('#game-frame').removeClass('loading');
-                if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
-                    $('#game-frame').after(`<div id="info">${response["info"]}</div>`);
-                };
-
-
-            }, function(loaded, count, success) {
-            /* animate progress bar */
-                 var bar1 = new ldBar("#load-bar");
-                 bar1.set((loaded + 1 / count) * 100);
-                 console.log(loaded, count);
-            });
-
-
+        /* add a progress bar */
+        $('#buttons-container').after($('<div>', {class: 'ldBar', id: 'load-bar'}));
+        /* waiting for all images to load before showing them up*/
+        $('#game-frame').waitForImages(function() {
+        /* remove progress bar once loaded */
+            $('#load-bar').remove();
+         /* remove 'loading' class that blocks animation of albums images */
+            $('#game-frame').removeClass('loading');
+            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
+                $('#game-frame').after(`<div id="info">${response["info"]}</div>`);
+            };
+        }, function(loaded, count, success) {
+        /* animate progress bar */
+             var bar1 = new ldBar("#load-bar");
+             bar1.set((loaded + 1 / count) * 100);
+             console.log(loaded, count);
+        });
     }).fail(function(response) {
             console.log(response.responseJSON);
           $('#text-field').addClass('is-invalid').val(response.responseJSON['message']); // show error message

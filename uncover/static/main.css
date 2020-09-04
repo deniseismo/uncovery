@@ -325,13 +325,7 @@ a {
     filter: invert(1);
 }
 
-#play-btn {
-    display: block;
-    visibility: hidden;
-    width: 100px;
-    background-color: #3b444b; /* main grayish color */
-    color: #ebecf1;
-}
+
 
 /* overrides default bootstrap tooltip styles */
 .tooltip-inner {
