@@ -1,9 +1,9 @@
+import musicbrainzngs
 import requests
 import requests_cache
-import musicbrainzngs
 
-from uncover.helpers.utils import jprint, timeit
 from uncover.helpers.lastfm_api import get_artist_info, get_artist_correct_name
+from uncover.helpers.utils import timeit
 
 requests_cache.install_cache()
 
@@ -53,6 +53,7 @@ def get_artists_albums_v2(artist: str):
     return albums
 
 
+@timeit
 def get_artists_albums(artist: str, mbid=None, amount=9):
     """
     :param artist: artist's name
@@ -84,7 +85,7 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
     # in case of an error, return None
     if response.status_code != 200:
         return None
-    albums = {release['title']: release['id'] for release in response.json()["release-groups"][:]
+    albums = {release['title'].lower(): release['id'] for release in response.json()["release-groups"][:]
               if release['artist-credit'][0]['artist']['id'] == artist_mbid}
     print(f'there are {len(albums)} {artist} albums')
     if not albums:
@@ -93,8 +94,6 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
     for i, album_title in enumerate(albums.keys()):
         print(i, album_title)
     return albums
-
-get_artists_albums('BRian Eno')
 
 
 def get_album_image_via_mb(mbid: str, size='large'):

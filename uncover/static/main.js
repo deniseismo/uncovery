@@ -2,10 +2,13 @@ $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
 });
 
+let albums;
+
 /* main AJAX function */
 const submitInput = function() {
     "use strict";
     $('#info').remove();
+    $('#play-button').removeClass('active');
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
     const desiredMethod = $(".button.active").attr('id');
     // spinner
@@ -17,6 +20,7 @@ const submitInput = function() {
     }).done(function(response) {
         // when done, removes current pictures from the frame, adds new ones
         console.log(response);
+        albums = response['albums'];
         $('#game-frame').empty();
         /* adds a class 'loading' to block animation before all images are loaded */
         $('#game-frame').addClass('loading');
@@ -28,10 +32,9 @@ const submitInput = function() {
         if ($('.button.active').attr('id') == 'by_artist') {
             $('#text-field').val(response["info"]);
         };
-        //         $('#text-field').val(response["info"]);
+        // $('#text-field').val(response["info"]);
         // targets all images inside a #game-frame div, then gives them a 'cover-art' class
         $('#game-frame img').addClass('cover-art');
-
         $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
 
         /* add a progress bar */
@@ -42,6 +45,7 @@ const submitInput = function() {
             $('#load-bar').remove();
          /* remove 'loading' class that blocks animation of albums images */
             $('#game-frame').removeClass('loading');
+            $('#play-button').addClass('active');
             if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
                 $('#game-frame').after(`<div id="info">${response["info"]}</div>`);
             };
@@ -63,7 +67,9 @@ const submitInput = function() {
     })
 };
 
-
+$("#play-button").on('click', function() {
+    console.log(albums);
+});
 //$('#submit-btn').on('click' , submitInput);
 $(document).on("submit", "#submit-form", submitInput);
 
