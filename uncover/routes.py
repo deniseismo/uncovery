@@ -1,12 +1,13 @@
 import itertools
+
 from flask import render_template, request, jsonify, make_response, url_for
+
 from uncover import app
+from uncover.helpers.discogs_api import get_artist_top_albums_images_via_discogs
 from uncover.helpers.lastfm_api import get_users_top_albums
-from uncover.helpers.musicbrainz_api import get_artists_top_albums_images_via_mb
-from uncover.helpers.spotify_api import get_albums_by_playlist, get_artists_top_albums_images_via_spotify
+from uncover.helpers.spotify_api import get_albums_by_playlist
 from uncover.helpers.utils import display_failure_art
 from uncover.info import get_failure_images
-from uncover.cover_art_game import CoverArtGame
 
 
 @app.route("/")
@@ -74,7 +75,8 @@ def get_albums_by_artist():
 
     # albums = get_artists_top_albums_via_lastfm(artist)  # through lastfm api
     # albums = get_artists_top_albums_images_via_mb(artist)  # through musicbrainz
-    albums = get_artists_top_albums_images_via_spotify(artist) # through Spotify
+    # albums = get_artists_top_albums_images_via_spotify(artist) # through Spotify
+    albums = get_artist_top_albums_images_via_discogs(artist)
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())

@@ -1,8 +1,10 @@
 import os
 import time
+
 import requests
 import requests_cache
-from uncover.helpers.utils import jprint
+
+from uncover.helpers.utils import timeit
 
 requests_cache.install_cache()
 
@@ -106,6 +108,7 @@ def get_artists_top_albums_via_lastfm(artist: str, size=3, amount=9):
     return album_images
 
 
+@timeit
 def get_users_top_albums(username: str, size=3, time_period="overall", amount=25):
     """
 

@@ -8,9 +8,9 @@ let albums;
 const submitInput = function() {
     "use strict";
     $('#info').remove();
-    $('#play-button').removeClass('active');
+    $('#play-button').removeClass('visible');
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
-    const desiredMethod = $(".button.active").attr('id');
+    const desiredMethod = $(".method.active").attr('id');
     // spinner
     $('#game-frame').html('<img src="static/images/loading/broken-1.1s-47px.gif"/>');
     // posts to the flask's route /by_username
@@ -45,7 +45,8 @@ const submitInput = function() {
             $('#load-bar').remove();
          /* remove 'loading' class that blocks animation of albums images */
             $('#game-frame').removeClass('loading');
-            $('#play-button').addClass('active');
+
+            $('#play-button').addClass('visible');
             if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
                 $('#game-frame').after(`<div id="info">${response["info"]}</div>`);
             };
@@ -69,6 +70,12 @@ const submitInput = function() {
 
 $("#play-button").on('click', function() {
     console.log(albums);
+    $('#text-field')
+                    .attr('id', 'play-field')
+                    .attr('placeholder', 'try guessing the albums')
+                    .val('');
+    $("#select-options").hide();
+    $(".method").toggle();
 });
 //$('#submit-btn').on('click' , submitInput);
 $(document).on("submit", "#submit-form", submitInput);
@@ -94,7 +101,7 @@ $('#text-field').val('');
 
 /* displays 'options' menu when the input's focused  */
 var timerID;
-$("#text-field, #select-options").focus(function() {
+$("#text-field, #select-options").focusin(function() {
   clearTimeout(timerID);
   if ($('.button.active').attr('id') == 'by_username') {
     /* makes sure it's only visible for user's top albums */
