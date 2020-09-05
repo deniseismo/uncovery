@@ -1,7 +1,8 @@
-class CoverArtGame:
+class CoverArtInfo:
     """
 
     """
+
     def __init__(self, dictionary):
         self.dictionary = dictionary
 

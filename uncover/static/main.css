@@ -192,6 +192,7 @@ header h1 {
 }
 
 #ok-btn {
+    font-weight: 500;
     float: right;
     background-color: #3b444b;
     color: #ebecf1;
@@ -372,6 +373,7 @@ a {
 }
 
 #play-button {
+    font-weight: 500;
     visibility: hidden;
     opacity: 0;
     background-color: #3b444b;

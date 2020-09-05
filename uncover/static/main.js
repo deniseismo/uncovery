@@ -25,8 +25,8 @@ const submitInput = function() {
         /* adds a class 'loading' to block animation before all images are loaded */
         $('#game-frame').addClass('loading');
         let counter = 0;
-        $.each(response["albums"], function(album_title, image_url){
-        $('#game-frame').append($('<img>', {src:`${image_url}`, alt:`${album_title}`, id: `art-${counter}`}));
+        $.each(response["albums"], function(album_title, album_info){
+        $('#game-frame').append($('<img>', {src:`${album_info['image']}`, alt:`${album_title}`, id: `art-${counter}`}));
         counter++;
         });
         if ($('.button.active').attr('id') == 'by_artist') {
@@ -81,6 +81,7 @@ $("#play-button").on('click', function() {
         $("#select-options").hide();
         $(".method").hide();
         $(this).val('GIVE UP');
+        $('#ok-btn').hide();
     }
     else {
         $('#play-field')
@@ -88,6 +89,7 @@ $("#play-button").on('click', function() {
                         .val('');
         $(".method").show();
         $(this).val('PLAY');
+        $('#ok-btn').show();
     };
 });
 //$('#submit-btn').on('click' , submitInput);

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import musicbrainzngs
 import requests
 import requests_cache
@@ -11,6 +13,40 @@ requests_cache.install_cache()
 # (this step is required, as per the webservice access rules
 # at http://wiki.musicbrainz.org/XML_Web_Service/Rate_Limiting )
 musicbrainzngs.set_useragent("albumguesser", "0.1", "denisseismo@gmail.com")
+
+
+def get_album_alternative_name(album_id: str):
+    """
+    :param album_id: album_id from MusicBrainz
+    :return: alternative name for an album
+    """
+    url = "http://musicbrainz.org/ws/2/release-group/" + album_id
+    params = {"inc": "ratings", "fmt": "json"}
+    response = requests.get(url=url, params=params)
+    if response.status_code != 200:
+        return None
+    try:
+        alternative = response.json()['disambiguation']
+    except (KeyError, IndexError):
+        return None
+    return alternative
+
+
+def get_album_rating(album_id: str):
+    """
+    :param album_id: album_id from MusicBrainz
+    :return: rating (float)
+    """
+    url = "http://musicbrainz.org/ws/2/release-group/" + album_id
+    params = {"inc": "ratings", "fmt": "json"}
+    response = requests.get(url=url, params=params)
+    if response.status_code != 200:
+        return None
+    try:
+        rating = response.json()['rating']['value']
+    except (KeyError, IndexError):
+        return None
+    return rating
 
 
 def get_artist_mbid(artist: str):
@@ -31,6 +67,9 @@ def get_artist_mbid(artist: str):
     return mbid
 
 
+print(get_album_rating('6c9ae3dd-32ad-472c-96be-69d0a3536261'))
+
+
 def get_artists_albums_v2(artist: str):
     """
     reserve function in case of some failures
@@ -48,8 +87,15 @@ def get_artists_albums_v2(artist: str):
         + '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json')
     if response.status_code != 200:
         return None
-    albums = {release['title']: release['id'] for release in response.json()["release-groups"][:]
-              if release['artist-credit'][0]['artist']['id'] == artist_mbid}
+    albums = defaultdict(dict)
+    for release in response.json()["release-groups"][:]:
+        # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
+        # add an id of an album to the dict
+        albums[release['title'].lower()]['id'] = release['id']
+        # get album rating
+        rating = get_album_rating(release['id'])
+        # add rating if exists
+        albums[release['title'].lower()]['rating'] = rating if rating else 0
     return albums
 
 
@@ -85,15 +131,29 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
     # in case of an error, return None
     if response.status_code != 200:
         return None
-    albums = {release['title'].lower(): release['id'] for release in response.json()["release-groups"][:]
-              if release['artist-credit'][0]['artist']['id'] == artist_mbid}
+
+    albums = defaultdict(dict)
+    for release in response.json()["release-groups"][:]:
+        # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
+        # add an id of an album to the dict
+        alternative_name = get_album_alternative_name(release['id'])
+        albums[release['title'].lower()]['album_names'] = [release['title'].lower()]
+        if alternative_name:
+            albums[release['title'].lower()]['album_names'].append(alternative_name)
+        albums[release['title'].lower()]['id'] = release['id']
+        # get album rating
+        rating = get_album_rating(release['id'])
+        # add rating if exists
+        albums[release['title'].lower()]['rating'] = rating if rating else 0
     print(f'there are {len(albums)} {artist} albums')
     if not albums:
         #  in case of some weird error with the mbid taken via lastfm make another attempt with v2
         albums = get_artists_albums_v2(artist)
-    for i, album_title in enumerate(albums.keys()):
-        print(i, album_title)
-    return albums
+    sorted_list = sorted(albums.items(), key=lambda item: item[1]['rating'], reverse=True)
+
+    sorted_albums = {key: value for key, value in sorted_list}
+    print(sorted_albums)
+    return sorted_albums
 
 
 def get_album_image_via_mb(mbid: str, size='large'):
@@ -124,18 +184,26 @@ def get_artists_top_albums_images_via_mb(artist):
     if correct_name:
         artist = correct_name
     try:
-        albums = get_artists_albums(artist).items()
+        albums = get_artists_albums(artist)
     except AttributeError:
         return None
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": dict()}
-    for album_title, album_id in albums:
-        album_image = get_album_image_via_mb(album_id)
+
+    for album in list(albums.items()):
+        album_image = get_album_image_via_mb(album[1]['id'])
         if album_image:
-            album_info["albums"][album_title] = album_image
-    print(f'there are {len(album_info["albums"])} cover art images!')
-    if not album_info["albums"]:
-        # if the artist somehow has no albums to show
-        print('error: no albums to show')
-        return None
+            albums[album[0]]['image'] = album_image
+    # print(f'there are {len(album_info["albums"])} cover art images!')
+    # if not album_info["albums"]:
+    #     # if the artist somehow has no albums to show
+    #     print('error: no albums to show')
+    #     return None
+    for key, value in albums.items():
+        if 'image' in value:
+            album_info['albums'][key] = value
+    print(album_info)
     return album_info
+
+
+get_artists_top_albums_images_via_mb('David Bowie')
