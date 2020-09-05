@@ -1,8 +1,11 @@
+from collections import defaultdict
+
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 from uncover.helpers.lastfm_api import get_artist_correct_name
 from uncover.helpers.musicbrainz_api import get_artists_albums
+from uncover.helpers.utils import jprint
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -19,12 +22,19 @@ def get_albums_by_playlist(playlist_id: str):
         # Invalid playlist ID
         return None
     # initialize a dict to avoid KeyErrors
-    album_info = {"info": f"'{playlist_info['name']}' by {playlist_info['owner']['display_name']}", "albums": dict()}
+    album_info = {"info": f"'{playlist_info['name']}' by {playlist_info['owner']['display_name']}",
+                  "albums": defaultdict(dict)}
     # iterate through tracks
     for track in playlist_info["tracks"]["items"]:
-        album_info["albums"][track["track"]["album"]["name"]] = track["track"]["album"]["images"][0]["url"]
-
+        # TODO: sort by popularity
+        album_info["albums"][track["track"]["album"]["name"]]['names'] = track['track']['album']['name']
+        album_info["albums"][track["track"]["album"]["name"]]['image'] = track["track"]["album"]["images"][0]["url"]
+        album_info["albums"][track["track"]["album"]["name"]]['rating'] = track["track"]['popularity']
+    jprint(album_info)
     return album_info
+
+
+get_albums_by_playlist('https://open.spotify.com/playlist/2qoLvXr84mMas2tOEH8gEJ?si=YoHsJME-SNCmPKP-u8LJJQ')
 
 
 def search_an_album(album: str, artist: str):
