@@ -68,14 +68,27 @@ const submitInput = function() {
     })
 };
 
+/* play button */
 $("#play-button").on('click', function() {
     console.log(albums);
-    $('#text-field')
-                    .attr('id', 'play-field')
-                    .attr('placeholder', 'try guessing the albums')
-                    .val('');
-    $("#select-options").hide();
-    $(".method").toggle();
+    $(this).toggleClass('on off');
+
+    if($(this).hasClass('on')) {
+        $('#text-field')
+                        .attr('id', 'play-field')
+                        .attr('placeholder', 'try guessing the albums')
+                        .val('');
+        $("#select-options").hide();
+        $(".method").hide();
+        $(this).val('GIVE UP');
+    }
+    else {
+        $('#play-field')
+                        .attr('id', 'text-field')
+                        .val('');
+        $(".method").show();
+        $(this).val('PLAY');
+    };
 });
 //$('#submit-btn').on('click' , submitInput);
 $(document).on("submit", "#submit-form", submitInput);

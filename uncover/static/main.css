@@ -386,3 +386,7 @@ a {
     transform: scale(1);
 }
 
+#play-button.on {
+    background-color: #ed6663;
+    color: #3b444b;
+}
