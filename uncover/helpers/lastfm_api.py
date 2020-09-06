@@ -1,4 +1,5 @@
 import os
+import random
 import time
 
 import requests
@@ -136,16 +137,23 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
     """
 
     :param amount: amount ot albums
-    :param time_period: (Optional) : overall | 7day | 1month | 3month | 6month | 12month
+    :param time_period: (Optional) : overall | 7day | 1month | 3month | 6month | 12month | shuffle
                                     - The time period over which to retrieve top artists for.
     :param username: lastfm username
     :param size: 0 - small (34x34), 1 - medium (64x64), 2 - large (174x174), 3 - XL (300x300)
     :return: a dictionary  {"info": username, "albums": 9 x [album_title : image_url]}
     """
+    shuffle = False
+    possible_time_periods = ["overall", "7day", "1month", "3month", "6month", "12month"]
+    if time_period == "shuffle":
+        shuffle = True
+        time_period = random.choice(possible_time_periods)
     time_period_table = {
         "overall": "of all time",
         "7day": "for the past 7 days",
+        "1month": "for the past month",
         "3month": "for the past 3 months",
+        "6month": "for the past 6 months",
         "12month": "for the past 12 months"
     }
     response = lastfm_get_response({
@@ -162,6 +170,8 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
         "info": f"{username}'s top albums {time_period_table[time_period]}",
         "albums": list()
     }
+    if shuffle:
+        album_info["info"] = f"{username} random albums {time_period_table[time_period]}"
     try:
         for album in response.json()['topalbums']['album'][:amount]:
             # checks for incorrect/broken images
@@ -171,12 +181,14 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
                     "names": [album['name']],
                     "image": album['image'][size]['#text']
                 }
-            # appends an album dict with all the info to the list
-            album_info["albums"].append(an_album_dict)
+                # appends an album dict with all the info to the list
+                album_info["albums"].append(an_album_dict)
     except KeyError:
         return None
     if not album_info["albums"]:
         print('user has nothing to show')
         # if the user has no albums to show
         return None
+    if shuffle:
+        random.shuffle(album_info["albums"])
     return album_info
