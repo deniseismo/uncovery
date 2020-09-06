@@ -42,7 +42,7 @@ def get_album_info(album: str, artist: str):
     except KeyError:
         print(f"there are no listeners for {album}")
         return None
-    return album_listeners
+    return int(album_listeners)
 
 
 def get_artist_info(artist: str):

@@ -4,7 +4,7 @@ import musicbrainzngs
 import requests
 import requests_cache
 
-from uncover.helpers.lastfm_api import get_artist_info, get_artist_correct_name
+from uncover.helpers.lastfm_api import get_artist_info, get_artist_correct_name, get_album_info
 from uncover.helpers.utils import timeit
 
 requests_cache.install_cache()
@@ -134,7 +134,8 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
         # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
         # add an id of an album to the dict
         alternative_name = get_album_alternative_name(release['id'])
-        rating = get_album_rating(release['id'])
+        # rating = get_album_rating(release['id'])
+        rating = get_album_info(release['title'], artist)
         an_album_dict = {
             "title": release['title'].lower(),
             "names": [release['title'].lower()],
