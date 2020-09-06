@@ -67,9 +67,6 @@ def get_artist_mbid(artist: str):
     return mbid
 
 
-print(get_album_rating('6c9ae3dd-32ad-472c-96be-69d0a3536261'))
-
-
 def get_artists_albums_v2(artist: str):
     """
     reserve function in case of some failures
@@ -198,14 +195,13 @@ def get_artists_top_albums_images_via_mb(artist):
         if album_image:
             album['image'] = album_image
     # print(f'there are {len(album_info["albums"])} cover art images!')
-    # if not album_info["albums"]:
-    #     # if the artist somehow has no albums to show
-    #     print('error: no albums to show')
-    #     return None
     for album in albums:
         if 'image' in album:
             album_info['albums'].append(album)
-    print(f'album_info is {album_info}')
+    if not album_info["albums"]:
+        # if the artist somehow has no albums to show
+        print('error: no albums to show')
+        return None
     return album_info
 
 

@@ -46,11 +46,6 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
-    # the_game = CoverArtGame(albums)
-    # the_game.get_dict()
-    # slicing the dictionary to make it 9 albums long
-    # albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
-    print(albums)
     return jsonify(albums)
 
 
@@ -118,6 +113,4 @@ def get_albums_by_spotify():
                                     filename=failure_art_filename)}
         ),
             404)
-
-    # slicing the dictionary to make it 9 albums long
     return jsonify(albums)

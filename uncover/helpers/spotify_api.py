@@ -1,9 +1,10 @@
+import random
+
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 from uncover.helpers.lastfm_api import get_artist_correct_name
 from uncover.helpers.musicbrainz_api import get_artists_albums
-from uncover.helpers.utils import jprint
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -32,7 +33,8 @@ def get_albums_by_playlist(playlist_id: str):
             "rating": track["track"]['popularity']
         }
         album_info["albums"].append(an_album_dict)
-    jprint(album_info)
+    # shuffles a list of albums to get random results
+    random.shuffle(album_info["albums"])
     return album_info
 
 
