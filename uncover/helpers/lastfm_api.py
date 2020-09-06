@@ -1,6 +1,5 @@
 import os
 import time
-from collections import defaultdict
 
 import requests
 import requests_cache
@@ -21,8 +20,31 @@ def lastfm_get_response(payload: dict):
     return response
 
 
+def get_album_info(album: str, artist: str):
+    """
+
+    :param album: album's title
+    :param artist: artist's name
+    :return:
+    """
+    response = lastfm_get_response({
+        'method': ' album.getInfo',
+        'album': album,
+        'artist': artist
+    })
+    # in case of an error, return None
+    if response.status_code != 200:
+        print(f"couldn't find {album} on last.fm")
+        return None
+    try:
+        album_listeners = response.json()['album']['listeners']
+    except KeyError:
+        print(f"there are no listeners for {album}")
+        return None
+    return album_listeners
+
+
 def get_artist_info(artist: str):
-    # TODO: if an artist has no mbid on lastfm, find it on mb directly, or get images from lastfm
     response = lastfm_get_response({
         'method': 'artist.getInfo',
         'artist': artist
@@ -138,14 +160,19 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
     # initialize a dict to avoid KeyErrors
     album_info = {
         "info": f"{username}'s top albums {time_period_table[time_period]}",
-        "albums": defaultdict(dict)
+        "albums": list()
     }
     try:
         for album in response.json()['topalbums']['album'][:amount]:
+            # checks for incorrect/broken images
             if album['image'][size]['#text']:
-                # checks for incorrect/broken images
-                album_info["albums"][album['name']]['names'] = [album['name']]
-                album_info["albums"][album['name']]['image'] = album['image'][size]['#text']
+                an_album_dict = {
+                    "title": album['name'],
+                    "names": [album['name']],
+                    "image": album['image'][size]['#text']
+                }
+            # appends an album dict with all the info to the list
+            album_info["albums"].append(an_album_dict)
     except KeyError:
         return None
     if not album_info["albums"]:

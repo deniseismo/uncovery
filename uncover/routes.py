@@ -1,5 +1,3 @@
-import itertools
-
 from flask import render_template, request, jsonify, make_response, url_for
 
 from uncover import app
@@ -51,7 +49,8 @@ def get_albums_by_username():
     # the_game = CoverArtGame(albums)
     # the_game.get_dict()
     # slicing the dictionary to make it 9 albums long
-    albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
+    # albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
+    print(albums)
     return jsonify(albums)
 
 
@@ -87,7 +86,7 @@ def get_albums_by_artist():
         ),
             404)
     # slicing the dictionary to make it 9 albums long
-    albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
+    # albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
     return jsonify(albums)
 
 
@@ -121,5 +120,4 @@ def get_albums_by_spotify():
             404)
 
     # slicing the dictionary to make it 9 albums long
-    albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
     return jsonify(albums)

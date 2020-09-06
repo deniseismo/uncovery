@@ -20,15 +20,23 @@ const submitInput = function() {
     }).done(function(response) {
         // when done, removes current pictures from the frame, adds new ones
         console.log(response);
+        /* storing album info in a global object */
         albums = response['albums'];
+
         $('#game-frame').empty();
         /* adds a class 'loading' to block animation before all images are loaded */
         $('#game-frame').addClass('loading');
-        let counter = 0;
-        $.each(response["albums"], function(album_title, album_info){
-        $('#game-frame').append($('<img>', {src:`${album_info['image']}`, alt:`${album_title}`, id: `art-${counter}`}));
-        counter++;
-        });
+
+        /* main iteration */
+        const totalAmountOfAlbums = response['albums'].length;
+        let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
+        for (let i = 0; i < length; i++) {
+            let album = response['albums'][i];
+            let title = response['albums'][i]['title'];
+            let image = response['albums'][i]['image'];
+            $('#game-frame').append($('<img>', {src:`${image}`, alt:`${title}`, id: `art-${i}`}));
+        }
+
         if ($('.button.active').attr('id') == 'by_artist') {
             $('#text-field').val(response["info"]);
         };
@@ -54,7 +62,6 @@ const submitInput = function() {
         /* animate progress bar */
              var bar1 = new ldBar("#load-bar");
              bar1.set((loaded + 1 / count) * 100);
-             console.log(loaded, count);
         });
     }).fail(function(response) {
             console.log(response.responseJSON);

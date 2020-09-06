@@ -132,26 +132,28 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
     if response.status_code != 200:
         return None
 
-    albums = defaultdict(dict)
+    albums = []
     for release in response.json()["release-groups"][:]:
         # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
         # add an id of an album to the dict
         alternative_name = get_album_alternative_name(release['id'])
-        albums[release['title'].lower()]['album_names'] = [release['title'].lower()]
-        if alternative_name:
-            albums[release['title'].lower()]['album_names'].append(alternative_name)
-        albums[release['title'].lower()]['id'] = release['id']
-        # get album rating
         rating = get_album_rating(release['id'])
-        # add rating if exists
-        albums[release['title'].lower()]['rating'] = rating if rating else 0
+        an_album_dict = {
+            "title": release['title'].lower(),
+            "names": [release['title'].lower()],
+            "id": release['id'],
+            "rating": rating if rating else 0
+        }
+        if alternative_name:
+            an_album_dict["names"].append(alternative_name)
+        albums.append(an_album_dict)
     print(f'there are {len(albums)} {artist} albums')
+    print(albums)
     if not albums:
         #  in case of some weird error with the mbid taken via lastfm make another attempt with v2
         albums = get_artists_albums_v2(artist)
-    sorted_list = sorted(albums.items(), key=lambda item: item[1]['rating'], reverse=True)
+    sorted_albums = sorted(albums, key=lambda item: item['rating'], reverse=True)
 
-    sorted_albums = {key: value for key, value in sorted_list}
     print(sorted_albums)
     return sorted_albums
 
@@ -186,24 +188,25 @@ def get_artists_top_albums_images_via_mb(artist):
     try:
         albums = get_artists_albums(artist)
     except AttributeError:
+        print('attribute error')
         return None
     # initialize a dict to avoid KeyErrors
-    album_info = {"info": artist, "albums": dict()}
+    album_info = {"info": artist, "albums": []}
 
-    for album in list(albums.items()):
-        album_image = get_album_image_via_mb(album[1]['id'])
+    for album in list(albums):
+        album_image = get_album_image_via_mb(album['id'])
         if album_image:
-            albums[album[0]]['image'] = album_image
+            album['image'] = album_image
     # print(f'there are {len(album_info["albums"])} cover art images!')
     # if not album_info["albums"]:
     #     # if the artist somehow has no albums to show
     #     print('error: no albums to show')
     #     return None
-    for key, value in albums.items():
-        if 'image' in value:
-            album_info['albums'][key] = value
-    print(album_info)
+    for album in albums:
+        if 'image' in album:
+            album_info['albums'].append(album)
+    print(f'album_info is {album_info}')
     return album_info
 
 
-get_artists_top_albums_images_via_mb('David Bowie')
+get_artists_albums('David Bowie')

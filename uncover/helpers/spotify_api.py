@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -23,13 +21,17 @@ def get_albums_by_playlist(playlist_id: str):
         return None
     # initialize a dict to avoid KeyErrors
     album_info = {"info": f"'{playlist_info['name']}' by {playlist_info['owner']['display_name']}",
-                  "albums": defaultdict(dict)}
+                  "albums": []}
     # iterate through tracks
     for track in playlist_info["tracks"]["items"]:
         # TODO: sort by popularity
-        album_info["albums"][track["track"]["album"]["name"]]['names'] = track['track']['album']['name']
-        album_info["albums"][track["track"]["album"]["name"]]['image'] = track["track"]["album"]["images"][0]["url"]
-        album_info["albums"][track["track"]["album"]["name"]]['rating'] = track["track"]['popularity']
+        an_album_dict = {
+            "title": track['track']['album']['name'],
+            "names": [track['track']['album']['name']],
+            "image": track["track"]["album"]["images"][0]["url"],
+            "rating": track["track"]['popularity']
+        }
+        album_info["albums"].append(an_album_dict)
     jprint(album_info)
     return album_info
 
