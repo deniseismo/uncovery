@@ -62,6 +62,9 @@ def get_artist_info(artist: str):
     return artist_mbid
 
 
+print(get_artist_info('Pond'))
+
+
 def get_artist_correct_name(artist: str):
     """
     Use the last.fm corrections data to check whether the supplied artist has a correction to a canonical artist

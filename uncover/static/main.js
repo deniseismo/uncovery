@@ -89,6 +89,8 @@ $("#play-button").on('click', function() {
         $(".method").hide();
         $(this).val('GIVE UP');
         $('#ok-btn').hide();
+        let input = document.querySelector('#play-field');
+        input.oninput = handleInput;
     }
     else {
         $('#play-field')
@@ -99,6 +101,35 @@ $("#play-button").on('click', function() {
         $('#ok-btn').show();
     };
 });
+
+
+function handleInput(e) {
+    // TODO: handle guessing the albums
+    const options = {
+    // isCaseSensitive: false,
+    // includeScore: false,
+    // shouldSort: true,
+    // includeMatches: false,
+    // findAllMatches: false,
+    minMatchCharLength: 12,
+    location: 2,
+    threshold: 0.03,
+    // distance: 100,
+    // useExtendedSearch: false,
+    // ignoreLocation: false,
+    // ignoreFieldNorm: false,
+    keys: [
+    "names",
+     ]
+    };
+  const fuse = new Fuse(albums, options);
+  const pattern = e.target.value;
+  if (fuse.search(pattern).length > 0) {
+    console.log(pattern);
+    console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
+  }
+};
+
 //$('#submit-btn').on('click' , submitInput);
 $(document).on("submit", "#submit-form", submitInput);
 

@@ -4,7 +4,7 @@ import musicbrainzngs
 import requests
 import requests_cache
 
-from uncover.helpers.lastfm_api import get_artist_info, get_artist_correct_name, get_album_info
+from uncover.helpers.lastfm_api import get_artist_correct_name, get_album_info
 from uncover.helpers.utils import timeit
 
 requests_cache.install_cache()
@@ -111,10 +111,7 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
         # if mbid is already provided
         artist_mbid = mbid
     else:
-        # find mbid through lastfm's API
-        artist_mbid = get_artist_info(artist)
-    if not artist_mbid:
-        # in case lastfm doesn't have an mbid, try finding it directly through MusicBrainz
+        # find mbid directly through MB
         artist_mbid = get_artist_mbid(artist)
     if not artist_mbid:
         # if nothing found
