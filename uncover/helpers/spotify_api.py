@@ -23,11 +23,10 @@ def get_albums_by_playlist(playlist_id: str):
     # initialize a dict to avoid KeyErrors
     album_info = {"info": f"'{playlist_info['name']}' by {playlist_info['owner']['display_name']}",
                   "albums": []}
-    # initialize a list of titles used to filter duplicate titles
-    list_of_titles = []
+    # initialize a set of titles used to filter duplicate titles
+    list_of_titles = set()
     # iterate through tracks
     for track in playlist_info["tracks"]["items"]:
-        # TODO: sort by popularity
         an_album_dict = {
             "title": track['track']['album']['name'],
             "names": [track['track']['album']['name']],
@@ -37,7 +36,7 @@ def get_albums_by_playlist(playlist_id: str):
         # filter duplicates:
         if an_album_dict['title'] not in list_of_titles:
             # append a title to a set of titles
-            list_of_titles.append(an_album_dict['title'])
+            list_of_titles.add(an_album_dict['title'])
             # adds an album info only if a title hasn't been seen before
             album_info["albums"].append(an_album_dict)
     # shuffles a list of albums to get random results

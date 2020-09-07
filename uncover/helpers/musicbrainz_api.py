@@ -127,6 +127,8 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
         return None
 
     albums = []
+    # initialize a set of titles used to filter duplicate titles
+    a_set_of_titles = set()
     for release in response.json()["release-groups"][:]:
         # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
         # add an id of an album to the dict
@@ -141,7 +143,9 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
         }
         if alternative_name:
             an_album_dict["names"].append(alternative_name)
-        albums.append(an_album_dict)
+        if an_album_dict['title'] not in a_set_of_titles:
+            a_set_of_titles.add(an_album_dict['title'])
+            albums.append(an_album_dict)
     print(f'there are {len(albums)} {artist} albums')
     print(albums)
     if not albums:
@@ -164,7 +168,7 @@ def get_album_image_via_mb(mbid: str, size='large'):
     url = "http://coverartarchive.org/release-group/" + mbid
     response = requests.get(url)
     if response.status_code != 200:
-        print('something went wrong!')
+        print("couldn't find an image :(")
         return None
     image = response.json()['images'][0]['thumbnails'][size]
     return image
