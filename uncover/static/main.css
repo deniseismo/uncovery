@@ -349,7 +349,7 @@ a {
 }
 
 .ldBar {
-    width: 200px !important;
+    width: 600px !important;
     height: auto !important;
 }
 
@@ -361,7 +361,7 @@ a {
 /* progress bar main line color */
 .ldBar path.mainline {
     stroke: #3b444b;
-    stroke-width: 2;
+    stroke-width: 1;
 }
 
 #info {
@@ -391,4 +391,8 @@ a {
 #play-button.on {
     background-color: #ed6663;
     color: #3b444b;
+}
+
+.guessed-right {
+    filter: hue-rotate(90deg);
 }

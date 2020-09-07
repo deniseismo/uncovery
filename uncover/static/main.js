@@ -34,7 +34,8 @@ const submitInput = function() {
             let album = response['albums'][i];
             let title = response['albums'][i]['title'];
             let image = response['albums'][i]['image'];
-            $('#game-frame').append($('<img>', {src:`${image}`, alt:`${title}`, id: `art-${i}`}));
+            let id = response['albums'][i]['id']
+            $('#game-frame').append($('<img>', {src:`${image}`, alt:`${title}`, id: `art-${id}`}));
         }
 
         if ($('.button.active').attr('id') == 'by_artist') {
@@ -46,7 +47,7 @@ const submitInput = function() {
         $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
 
         /* add a progress bar */
-        $('#buttons-container').after($('<div>', {class: 'ldBar', id: 'load-bar'}));
+        $('#buttons-container').after($('<div>', {id: 'load-bar'}));
         /* waiting for all images to load before showing them up*/
         $('#game-frame').waitForImages(function() {
         /* remove progress bar once loaded */
@@ -60,7 +61,9 @@ const submitInput = function() {
             };
         }, function(loaded, count, success) {
         /* animate progress bar */
-             var bar1 = new ldBar("#load-bar");
+             var bar1 = new ldBar("#load-bar", {
+                 'preset': 'line'
+             });
              bar1.set((loaded + 1 / count) * 100);
         });
     }).fail(function(response) {
@@ -125,8 +128,11 @@ function handleInput(e) {
   const fuse = new Fuse(albums, options);
   const pattern = e.target.value;
   if (fuse.search(pattern).length > 0) {
+    let id = fuse.search(pattern)[0]['item']['id'];
+    console.log(id);
     console.log(pattern);
     console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
+    $(`#art-${id}`).addClass('guessed-right');
   }
 };
 

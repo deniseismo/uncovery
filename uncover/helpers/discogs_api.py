@@ -46,17 +46,23 @@ def get_artist_top_albums_images_via_discogs(artist: str):
         artist = correct_name
     try:
         # gets album titles
-        album_titles = get_artists_albums(artist).keys()
+        albums = get_artists_albums(artist)
     except AttributeError:
         return None
-    if not album_titles:
+    if not albums:
         return None
     # initialize a dict to avoid KeyErrors
-    album_info = {"info": artist, "albums": dict()}
-    for album_title in album_titles:
-        album_id = get_album_id(album_title, artist=artist)
+    album_info = {"info": artist, "albums": []}
+    for album in list(albums):
+        album_id = get_album_id(album['title'], artist=artist)
         album_image = get_album_image(album_id)
         if album_image:
-            album_info["albums"][album_title] = album_image
+            album['image'] = album_image
+    for album in albums:
+        if 'image' in album:
+            album_info['albums'].append(album)
+    if not album_info['albums']:
+        print('error: no albums to show')
+        return None
     print(f'there are {len(album_info["albums"])} albums found with Discogs')
     return album_info
