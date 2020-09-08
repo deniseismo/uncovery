@@ -83,7 +83,3 @@ def get_artist_top_albums_images_via_discogs(artist: str):
         return None
     print(f'there are {len(album_info["albums"])} albums found with Discogs')
     return album_info
-
-
-print(get_album_id('born again', ''))
-print(get_album_image('88768'))

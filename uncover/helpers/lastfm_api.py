@@ -1,3 +1,4 @@
+import json
 import os
 import random
 import time
@@ -62,9 +63,6 @@ def get_artist_info(artist: str):
     return artist_mbid
 
 
-print(get_artist_info('Pond'))
-
-
 def get_artist_correct_name(artist: str):
     """
     Use the last.fm corrections data to check whether the supplied artist has a correction to a canonical artist
@@ -75,13 +73,12 @@ def get_artist_correct_name(artist: str):
         'method': 'artist.getCorrection',
         'artist': artist
     })
-    print(response.json())
     # in case of an error, return None
     if response.status_code != 200:
         return None
     try:
         correct_name = response.json()["corrections"]["correction"]["artist"]["name"]
-    except (KeyError, TypeError):
+    except (KeyError, TypeError, json.decoder.JSONDecodeError):
         return None
     return correct_name
 
