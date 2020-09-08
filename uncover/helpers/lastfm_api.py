@@ -186,7 +186,7 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
                 an_album_dict = {
                     "title": album['name'],
                     "names": [album['name']],
-                    "image": album['image'][size]['#text']
+                    "image": album['image'][size]['#text'],
                 }
                 # appends an album dict with all the info to the list
                 album_info["albums"].append(an_album_dict)
@@ -198,4 +198,9 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
         return None
     if shuffle:
         random.shuffle(album_info["albums"])
+    # get ids right
+    album_id = 0
+    for album in album_info['albums']:
+        album['id'] = album_id
+        album_id += 1
     return album_info

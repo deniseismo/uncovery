@@ -41,6 +41,10 @@ def get_albums_by_playlist(playlist_id: str):
             album_info["albums"].append(an_album_dict)
     # shuffles a list of albums to get random results
     random.shuffle(album_info["albums"])
+    album_id = 0
+    for album in album_info['albums']:
+        album['id'] = album_id
+        album_id += 1
     return album_info
 
 
