@@ -30,12 +30,19 @@ const submitInput = function() {
         /* main iteration */
         const totalAmountOfAlbums = response['albums'].length;
         let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
-        for (let i = 0; i < length; i++) {
+        for (var i = 0; i < length; i++) {
             let album = response['albums'][i];
             let title = response['albums'][i]['title'];
-            let image = response['albums'][i]['image'];
+            let imageURL = response['albums'][i]['image'];
             let id = response['albums'][i]['id']
-            $('#game-frame').append($('<img>', {src:`${image}`, alt:`${title}`, id: `art-${id}`}));
+
+            let img = $('<img />').attr({
+                'id': `art-${id}`,
+                'src': `${imageURL}`,
+                'alt': `${title}`,
+            })
+            $('<div />', {class: 'flex-item', id: `item-${i}`})
+                .wrapInner(img).appendTo("#game-frame");
         }
 
         if ($('.button.active').attr('id') == 'by_artist') {
