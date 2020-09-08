@@ -3,7 +3,7 @@ import os
 import discogs_client
 
 from uncover.helpers.lastfm_api import get_artist_correct_name
-from uncover.helpers.musicbrainz_api import get_artists_albums
+from uncover.helpers.musicbrainz_api import get_artists_albums, get_album_image_via_mb
 from uncover.helpers.utils import timeit
 
 discogs = discogs_client.Client('uncover', user_token=os.environ.get('DISCOGS_USER_TOKEN'))
@@ -15,6 +15,7 @@ def get_album_id(album: str, artist: str):
     :param album: album name
     :return: discogs ID for the album
     """
+    # TODO: fix a search with complex artist names like 'notorious b.i.g.'
     results = discogs.search(album, type='release', artist=artist)
     try:
         album_id = results[0].id
@@ -23,7 +24,16 @@ def get_album_id(album: str, artist: str):
     return album_id
 
 
-def get_album_image(album_id: str):
+def get_album_image(album_id: str, mbid=None):
+    """
+    :param mbid: optional mbid as a fallback in case of missing ids from discogs
+    :param album_id:
+    :return:
+    """
+    if mbid:
+        print('fallback function worked')
+        album_image = get_album_image_via_mb(mbid)
+        return album_image
     if not album_id:
         return None
     try:
@@ -44,6 +54,7 @@ def get_artist_top_albums_images_via_discogs(artist: str):
     correct_name = get_artist_correct_name(artist)
     if correct_name:
         artist = correct_name
+        print(f'the correct name is {correct_name}')
     try:
         # gets album titles
         albums = get_artists_albums(artist)
@@ -55,7 +66,10 @@ def get_artist_top_albums_images_via_discogs(artist: str):
     album_info = {"info": artist, "albums": []}
     for album in list(albums):
         album_id = get_album_id(album['title'], artist=artist)
-        album_image = get_album_image(album_id)
+        if not album_id:
+            album_image = get_album_image(album_id='', mbid=album['id'])
+        else:
+            album_image = get_album_image(album_id)
         if album_image:
             album['image'] = album_image
     for album in albums:
@@ -66,3 +80,7 @@ def get_artist_top_albums_images_via_discogs(artist: str):
         return None
     print(f'there are {len(album_info["albums"])} albums found with Discogs')
     return album_info
+
+
+print(get_album_id('born again', ''))
+print(get_album_image('88768'))
