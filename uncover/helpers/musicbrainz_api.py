@@ -198,14 +198,15 @@ def get_artists_top_albums_images_via_mb(artist):
         if album_image:
             album['image'] = album_image
     # print(f'there are {len(album_info["albums"])} cover art images!')
+    # get album ids right
+    album_id = 0
     for album in albums:
         if 'image' in album:
+            album['id'] = album_id
             album_info['albums'].append(album)
+            album_id += 1
     if not album_info["albums"]:
         # if the artist somehow has no albums to show
         print('error: no albums to show')
         return None
     return album_info
-
-
-get_artists_albums('David Bowie')

@@ -217,7 +217,7 @@ a:hover {
     transition: transform .1s ease;
     opacity: 0;
     animation: show-on-load 0.6s .2s cubic-bezier(0,1.6,.6,1) forwards,
-bounce 0.6s .2s cubic-bezier(0,1.6,.6,1) none;
+               bounce 0.6s .2s cubic-bezier(0,1.6,.6,1) none;
 
 }
 
@@ -240,39 +240,39 @@ bounce 0.6s .2s cubic-bezier(0,1.6,.6,1) none;
     }
 }
 
-#art-1 {
+#art-0 {
     animation: show-on-load 0.6s .25s cubic-bezier(0,1.6,.6,1) forwards,
-                animation: bounce 0.6s .25s cubic-bezier(0,1.6,.6,1) none;
+                bounce 0.6s .25s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-2 {
+#art-1 {
     animation: show-on-load 0.6s .3s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .3s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-3 {
+#art-2 {
     animation: show-on-load 0.6s .35s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .35s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-6 {
+#art-3 {
     animation: show-on-load 0.6s .4s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .4s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-5 {
+#art-4 {
     animation: show-on-load 0.6s .45s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .45s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-4 {
+#art-5 {
     animation: show-on-load 0.6s .5s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .5s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-7 {
+#art-6 {
     animation: show-on-load 0.6s .55s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .55s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-8 {
+#art-7 {
     animation: show-on-load 0.6s .6s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .6s cubic-bezier(0,1.6,.6,1) none;
 }
-#art-9 {
+#art-8 {
     animation: show-on-load 0.6s .65s cubic-bezier(0,1.6,.6,1) forwards,
                 bounce 0.6s .65s cubic-bezier(0,1.6,.6,1) none;
 }
@@ -400,7 +400,7 @@ a {
 
 /* a class for album covers that were guessed right */
 .guessed-right {
-    animation: blink 0.6s cubic-bezier(.23,-0.69,0,1.79) forwards;
+    animation: blink 0.6s cubic-bezier(.23,-0.69,0,1.79) forwards !important;
     outline: 1px dashed #fff;
     outline-offset: -10px;
     /* TODO: fix box-shadow */

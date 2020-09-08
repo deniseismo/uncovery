@@ -72,9 +72,12 @@ def get_artist_top_albums_images_via_discogs(artist: str):
             album_image = get_album_image(album_id)
         if album_image:
             album['image'] = album_image
+    album_id = 0
     for album in albums:
         if 'image' in album:
+            album['id'] = album_id
             album_info['albums'].append(album)
+            album_id += 1
     if not album_info['albums']:
         print('error: no albums to show')
         return None
