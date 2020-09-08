@@ -75,14 +75,18 @@ def get_artist_correct_name(artist: str):
         'method': 'artist.getCorrection',
         'artist': artist
     })
+    print(response.json())
     # in case of an error, return None
     if response.status_code != 200:
         return None
     try:
         correct_name = response.json()["corrections"]["correction"]["artist"]["name"]
-    except KeyError:
+    except (KeyError, TypeError):
         return None
     return correct_name
+
+
+get_artist_correct_name('slim sessna autoclub')
 
 
 def lookup_tags(artist: str):
