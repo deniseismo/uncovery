@@ -6,26 +6,35 @@ const submitInput = function() {
     // make 'play-button' disappear
     const playButton = document.querySelector("#play-button");
     playButton.classList.remove("visible");
+    // make info at the bottom disappear
+    const responseInfo = document.querySelector("#response-info");
+    if (responseInfo) {
+        responseInfo.remove();
+    };
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
     const desiredMethod = $(".method.active").attr('id');
-    // add spinner while waiting for the response
     const gameFrame = document.querySelector("#game-frame");
+    // empty html
     removeAllChildNodes(gameFrame);
+    // add spinner while waiting for the response
     loadSpinner(gameFrame);
     // posts to the flask's route /by_username
     $.post(`/${desiredMethod}`, {
             "qualifier": $('#text-field').val(),
             "option": $('#select-options').val()
     }).done(function(response) {
-        // when done, removes current pictures from the frame, adds new ones
-        console.log(response);
         /* storing album info in a global object */
         albums = response['albums'];
-
-        $('#game-frame').empty();
+        // restores a 'valid' form style
+        const textField = document.querySelector("#text-field");
+        textField.classList.remove("is-invalid");
+        // when done, removes current pictures from the frame, adds new ones
+        console.log(response);
+        const gameFrame = document.querySelector("#game-frame");
+        // empty html
+        removeAllChildNodes(gameFrame);
         /* adds a class 'loading' to block animation before all images are loaded */
-        $('#game-frame').addClass('loading');
-
+        gameFrame.classList.add('loading');
         /* main iteration */
         const totalAmountOfAlbums = response['albums'].length;
         let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
@@ -50,7 +59,6 @@ const submitInput = function() {
         // $('#text-field').val(response["info"]);
         // targets all images inside a #game-frame div, then gives them a 'cover-art' class
         $('#game-frame img').addClass('cover-art');
-        $('#text-field').removeClass('is-invalid'); // restores a 'valid' form style
 
         /* add a progress bar */
         $('#buttons-container').after($('<div>', {id: 'load-bar'}));
@@ -59,11 +67,14 @@ const submitInput = function() {
         /* remove progress bar once loaded */
             $('#load-bar').remove();
          /* remove 'loading' class that blocks animation of albums images */
-            $('#game-frame').removeClass('loading');
+            const gameFrame = document.querySelector("#game-frame");
+            gameFrame.classList.remove("loading");
 
-            $('#play-button').addClass('visible');
+            const playButton = document.querySelector("#play-button");
+            playButton.classList.add("visible");
+
             if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
-                $('#game-frame').after(`<div id="info">${response["info"]}</div>`);
+                $('#game-frame').after(`<div id="response-info">${response["info"]}</div>`);
             };
         }, function(loaded, count, success) {
         /* animate progress bar */
@@ -73,14 +84,16 @@ const submitInput = function() {
              bar1.set((loaded + 1 / count) * 100);
         });
     }).fail(function(response) {
-            console.log(response.responseJSON);
-          $('#text-field').addClass('is-invalid').val(response.responseJSON['message']); // show error message
-          $('#game-frame').html(`
-                <img src="${response.responseJSON['failure_art']}" id="failure-art"/>
-                <div class="text-block">
-                    <h1 class="text-light">someone made an oopsie!</h1>
-                </div>
-          `);
+          console.log(response.responseJSON);
+
+          const textField = document.querySelector("#text-field");
+          textField.classList.add("is-invalid");
+          //val(response.responseJSON['message']); // show error message
+          const gameFrame = document.querySelector("#game-frame");
+          const failureArtURL = response.responseJSON['failure_art'];
+
+          removeAllChildNodes(gameFrame);
+          loadFailureArt(gameFrame, failureArtURL);
     })
 };
 
@@ -99,7 +112,7 @@ $("#play-button").on('click', function() {
         $(this).val('GIVE UP');
         $('#ok-btn').hide();
         let input = document.querySelector('#play-field');
-        input.oninput = handleInput;
+        input.oninput = handleGuesses;
     }
     else {
         $('#play-field')
@@ -112,7 +125,7 @@ $("#play-button").on('click', function() {
 });
 
 
-function handleInput(e) {
+function handleGuesses(e) {
     // TODO: handle guessing the albums
     const options = {
     // isCaseSensitive: false,
@@ -179,13 +192,32 @@ $("#text-field, #select-options").focusin(function() {
 });
 
 
+function loadFailureArt(node, url) {
+    console.log(this);
+    const failureArt = document.createElement("img");
+    failureArt.src = url;
+    failureArt.id = "failure-art";
+
+    const failureArtBlock = document.createElement("div");
+    failureArtBlock.classList.add("failure-art-block");
+
+    const failureArtText = document.createElement("h1");
+    failureArtText.classList.add("text-light")
+    failureArtText.textContent = "someone made an oopsie!"
+
+    failureArtBlock.appendChild(failureArtText);
+
+    node.appendChild(failureArt);
+    node.appendChild(failureArtBlock);
+};
+
 
 function loadSpinner(node) {
     const spinner = document.createElement("img");
     const url = "static/images/loading/broken-1.1s-47px.gif"
     spinner.src = url;
     node.appendChild(spinner);
-}
+};
 
 
 function removeAllChildNodes(parent) {
