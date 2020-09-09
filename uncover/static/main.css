@@ -417,3 +417,46 @@ a {
         outline-offset: -30px;
     }
 }
+
+label.tooltipText {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+    color: #fff;
+    font-size: 1rem;
+    background: #3b444b;
+    border-radius: 3px;
+    padding: 5px 10px;
+    bottom: -5%;
+    line-height: 1em;
+    pointer-events: none;
+}
+
+label.tooltipText:after {
+    content: '';
+    display: block;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #3b444b;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -2.5px;
+}
+
+.info-tooltip {
+    position: relative;
+}
+
+.tooltipText {
+    margin-top: -.5em;
+    transition: .1s all linear;
+    opacity: 0;
+}
+
+.info-tooltip:focus>label,
+.info-tooltip:hover>label {
+    opacity: 1;
+    margin: 0;
+}

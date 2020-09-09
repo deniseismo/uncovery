@@ -1,9 +1,13 @@
-$(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();
+const tooltipElements = document.querySelectorAll('.info-tooltip')
+tooltipElements.forEach(function(el) {
+    const tooltip = document.createElement('label');
+    tooltip.classList.add('tooltipText');
+    tooltip.innerHTML = el.dataset.tooltip;
+    el.appendChild(tooltip);
 });
 
-let albums;
 
+let albums;
 /* main AJAX function */
 const submitInput = function() {
     "use strict";

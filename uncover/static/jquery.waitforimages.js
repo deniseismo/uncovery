@@ -1,6 +1,7 @@
 /*! waitForImages jQuery Plugin - v2.4.0 - 2018-02-13
 * https://github.com/alexanderdickson/waitForImages
 * Copyright (c) 2018 Alex Dickson; Licensed MIT */
+
 ;(function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
