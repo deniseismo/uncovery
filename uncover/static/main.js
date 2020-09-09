@@ -1,22 +1,17 @@
-const tooltipElements = document.querySelectorAll('.info-tooltip')
-tooltipElements.forEach(function(el) {
-    const tooltip = document.createElement('label');
-    tooltip.classList.add('tooltipText');
-    tooltip.innerHTML = el.dataset.tooltip;
-    el.appendChild(tooltip);
-});
-
-
+// main global object with all the info about albums & album covers
 let albums;
 /* main AJAX function */
 const submitInput = function() {
     "use strict";
-    $('#info').remove();
-    $('#play-button').removeClass('visible');
+    // make 'play-button' disappear
+    const playButton = document.querySelector("#play-button");
+    playButton.classList.remove("visible");
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
     const desiredMethod = $(".method.active").attr('id');
-    // spinner
-    $('#game-frame').html('<img src="static/images/loading/broken-1.1s-47px.gif"/>');
+    // add spinner while waiting for the response
+    const gameFrame = document.querySelector("#game-frame");
+    removeAllChildNodes(gameFrame);
+    loadSpinner(gameFrame);
     // posts to the flask's route /by_username
     $.post(`/${desiredMethod}`, {
             "qualifier": $('#text-field').val(),
@@ -181,4 +176,34 @@ $("#text-field, #select-options").focusin(function() {
     timerID = setTimeout(function() {
         $("#select-options").hide();
     }, 10);
+});
+
+
+
+function loadSpinner(node) {
+    const spinner = document.createElement("img");
+    const url = "static/images/loading/broken-1.1s-47px.gif"
+    spinner.src = url;
+    node.appendChild(spinner);
+}
+
+
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+};
+
+/* tooltips */
+// find all elements that need tooltips
+const tooltipElements = document.querySelectorAll('.info-tooltip')
+// loop through every such element
+tooltipElements.forEach(function(el) {
+    // add 'label' element
+    const tooltip = document.createElement('label');
+    // add class to it
+    tooltip.classList.add('tooltipText');
+    // change text of that element to the text from 'data-tooltip' of the element
+    tooltip.innerHTML = el.dataset.tooltip;
+    el.appendChild(tooltip);
 });
