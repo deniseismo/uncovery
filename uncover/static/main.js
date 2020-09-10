@@ -69,6 +69,10 @@ const submitInput = function() {
          /* remove 'loading' class that blocks animation of albums images */
             const gameFrame = document.querySelector("#game-frame");
             gameFrame.classList.remove("loading");
+            const itemsList = document.querySelectorAll(".flex-item");
+            itemsList.forEach(item => {
+                item.classList.add("loaded");
+            });
 
             const playButton = document.querySelector("#play-button");
             playButton.classList.add("visible");
