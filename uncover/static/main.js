@@ -19,10 +19,34 @@ const submitInput = function() {
     // add spinner while waiting for the response
     loadSpinner(gameFrame);
     // posts to the flask's route /by_username
-    $.post(`/${desiredMethod}`, {
-            "qualifier": $('#text-field').val(),
-            "option": $('#select-options').val()
-    }).done(function(response) {
+    fetch(`${desiredMethod}`, {
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify({
+                 "qualifier": $('#text-field').val(),
+                 "option": $('#select-options').val()
+            })
+    }).then(response => {
+        if (!response.ok) {
+          return response.json()
+          .then(response => {
+              console.log("this worked response not ok")
+              const textField = document.querySelector("#text-field");
+              textField.classList.add("is-invalid");
+              //val(response.responseJSON['message']); // show error message
+              const gameFrame = document.querySelector("#game-frame");
+              const failureArtURL = response['failure_art'];
+
+              removeAllChildNodes(gameFrame);
+              loadFailureArt(gameFrame, failureArtURL);
+          });
+        }
+
+           return response.json();
+
+    }).then(response => {
         /* storing album info in a global object */
         albums = response['albums'];
         // restores a 'valid' form style
@@ -46,20 +70,25 @@ const submitInput = function() {
 
             let img = $('<img />').attr({
                 'id': `art-${id}`,
+                'class': 'cover-art',
                 'src': `${imageURL}`,
                 'alt': `${title}`,
-            })
+            });
+            let catImg = $('<img />').attr({
+                'class': 'cat-image',
+                'id': `cat-${id}`,
+                'src': 'static/images/cat-success.png',
+                'alt': 'el gato',
+            });
             $('<div />', {class: 'flex-item', id: `item-${i}`})
                 .wrapInner(img).appendTo("#game-frame");
+            catImg.appendTo(`#item-${i}`);
         }
 
         if ($('.button.active').attr('id') == 'by_artist') {
             $('#text-field').val(response["info"]);
         };
         // $('#text-field').val(response["info"]);
-        // targets all images inside a #game-frame div, then gives them a 'cover-art' class
-        $('#game-frame img').addClass('cover-art');
-
         /* add a progress bar */
         $('#buttons-container').after($('<div>', {id: 'load-bar'}));
         /* waiting for all images to load before showing them up*/
@@ -87,18 +116,10 @@ const submitInput = function() {
              });
              bar1.set((loaded + 1 / count) * 100);
         });
-    }).fail(function(response) {
-          console.log(response.responseJSON);
-
-          const textField = document.querySelector("#text-field");
-          textField.classList.add("is-invalid");
-          //val(response.responseJSON['message']); // show error message
-          const gameFrame = document.querySelector("#game-frame");
-          const failureArtURL = response.responseJSON['failure_art'];
-
-          removeAllChildNodes(gameFrame);
-          loadFailureArt(gameFrame, failureArtURL);
-    })
+    }).catch((error) => {
+        // Handle the error
+        console.log(`error is ${error}`);
+  });
 };
 
 /* play button */
@@ -156,6 +177,7 @@ function handleGuesses(e) {
     console.log(pattern);
     console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
     $(`#art-${id}`).addClass('guessed-right');
+//    $(`#cat-${id}`).addClass('visible');
   }
 };
 
@@ -240,6 +262,6 @@ tooltipElements.forEach(function(el) {
     // add class to it
     tooltip.classList.add('tooltipText');
     // change text of that element to the text from 'data-tooltip' of the element
-    tooltip.innerHTML = el.dataset.tooltip;
+    tooltip.textContent = el.dataset.tooltip;
     el.appendChild(tooltip);
 });

@@ -416,6 +416,7 @@ a {
     outline-offset: -10px;
     /* TODO: fix box-shadow */
     box-shadow:inset 0 0 20px rgba(237, 102, 99, 0.6);
+    filter: hue-rotate(45deg);
 }
 
 @keyframes blink {
@@ -470,4 +471,16 @@ label.tooltipText:after {
 .info-tooltip:hover>label {
     opacity: 1;
     margin: 0;
+}
+
+.cat-image {
+    position: absolute;
+    visibility: hidden;
+    width: 200px;
+    height: 200px;
+}
+
+.cat-image.visible {
+    visibility: visible;
+    opacity: 0.75;
 }

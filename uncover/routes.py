@@ -25,8 +25,13 @@ def get_albums_by_username():
     """
     # TODO: validator on input (e.g. not having spaces in the username)
     # input's values from the form
-    username = request.form["qualifier"]
-    time_period = request.form["option"]
+    content = request.get_json()
+    print(f'content is {content}')
+
+    # username = request.form["qualifier"]
+    # time_period = request.form["option"]
+    username = content['qualifier']
+    time_period = content['option']
     if not username:
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = display_failure_art(get_failure_images())
@@ -56,7 +61,9 @@ def get_albums_by_artist():
     :return: jsonified dictionary {album_name: cover_art}
     """
     # input's value from the form
-    artist = request.form["qualifier"]
+    content = request.get_json()
+    # artist = request.form["qualifier"]
+    artist = content["qualifier"]
     if not artist:
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = display_failure_art(get_failure_images())
@@ -92,7 +99,9 @@ def get_albums_by_spotify():
     :return: jsonified dictionary {album_name: cover_art}
     """
     # input's value from the form
-    playlist_id = request.form["qualifier"]
+    # playlist_id = request.form["qualifier"]
+    content = request.get_json()
+    playlist_id = content["qualifier"]
     if not playlist_id:
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = display_failure_art(get_failure_images())

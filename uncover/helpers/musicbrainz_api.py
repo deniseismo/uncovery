@@ -138,7 +138,7 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
         rating = get_album_info(correct_title, artist)
         an_album_dict = {
             "title": correct_title,
-            "names": [release['title'].lower()],
+            "names": [correct_title],
             "id": release['id'],
             "rating": rating if rating else 0
         }
