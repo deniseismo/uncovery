@@ -168,7 +168,14 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
     # in case of an error, return None
     if response.status_code != 200:
         return None
-
+    if shuffle and time_period != "overall" and not response.json()['topalbums']['album']:
+        print('no albums found, making it overall')
+        time_period = "overall"
+        response = lastfm_get_response({
+            'method': 'user.getTopAlbums',
+            'username': username,
+            'period': time_period
+        })
     # initialize a dict to avoid KeyErrors
     album_info = {
         "info": f"{username}'s top albums {time_period_table[time_period]}",
@@ -201,3 +208,4 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
         album['id'] = album_id
         album_id += 1
     return album_info
+
