@@ -134,11 +134,12 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
         # add an id of an album to the dict
         alternative_name = get_album_alternative_name(release['id'])
         # rating = get_album_rating(release['id'])
+        full_title = release['title'].replace("’", "'")
         correct_title = release['title'].lower().replace("’", "'")
         rating = get_album_info(correct_title, artist)
         an_album_dict = {
             "title": correct_title,
-            "names": [correct_title],
+            "names": [full_title],
             "id": release['id'],
             "rating": rating if rating else 0
         }

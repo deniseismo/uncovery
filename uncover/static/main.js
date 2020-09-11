@@ -151,11 +151,13 @@ function handleGuesses(e) {
     const pattern = e.target.value;
     if (fuse.search(pattern).length > 0) {
         let id = fuse.search(pattern)[0]['item']['id'];
-        console.log(id);
-        console.log(pattern);
         console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
-        $(`#art-${id}`).addClass('guessed-right');
-        $(`#success-${id}`).addClass('visible');
+        const guessedAlbum = document.querySelector(`#art-${id}`);
+        const title = albums[id]['names'][0];
+        guessedAlbum.classList.add("guessed-right");
+        guessedAlbum.alt = title;
+        const successIcon = document.querySelector(`#success-${id}`);
+        successIcon.classList.add('visible');
     }
 };
 
@@ -201,7 +203,6 @@ function loadCoverArt(data) {
     let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
     for (var i = 0; i < length; i++) {
         const album = data['albums'][i];
-        const title = data['albums'][i]['title'];
         const imageURL = data['albums'][i]['image'];
         const id = data['albums'][i]['id']
 
@@ -209,7 +210,6 @@ function loadCoverArt(data) {
             'id': `art-${id}`,
             'class': 'cover-art',
             'src': `${imageURL}`,
-            'alt': `${title}`,
         });
         const successIcon = $('<img />').attr({
             'id': `success-${id}`,
