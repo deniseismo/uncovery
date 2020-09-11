@@ -6,8 +6,8 @@ const submitInput = function() {
     // make 'play-button' disappear
     const playButton = document.querySelector("#play-button");
     playButton.classList.remove("visible");
-    // make info at the bottom disappear
-    const responseInfo = document.querySelector("#response-info");
+    // make info at the bottom disappear (if exists)
+    const responseInfo = document.querySelector("#data-info");
     if (responseInfo) {
         responseInfo.remove();
     };
@@ -20,84 +20,63 @@ const submitInput = function() {
     loadSpinner(gameFrame);
     // posts to the flask's route /by_username
     fetch(`${desiredMethod}`, {
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            }),
-            body: JSON.stringify({
-                 "qualifier": $('#text-field').val(),
-                 "option": $('#select-options').val()
-            })
+        method: 'POST',
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+            "qualifier": $('#text-field').val(),
+            "option": $('#select-options').val()
+        })
     }).then(response => {
+        // if response is not ok (status ain't no 200)
         if (!response.ok) {
-          return response.json()
-          .then(response => {
-              console.log("this worked response not ok")
-              const textField = document.querySelector("#text-field");
-              textField.classList.add("is-invalid");
-              //val(response.responseJSON['message']); // show error message
-              const gameFrame = document.querySelector("#game-frame");
-              const failureArtURL = response['failure_art'];
-
-              removeAllChildNodes(gameFrame);
-              loadFailureArt(gameFrame, failureArtURL);
-          });
+            // we get json with the 'failure' info
+            return response.json()
+                .then(failData => {
+                    const textField = document.querySelector("#text-field");
+                    textField.classList.add("is-invalid");
+                    //val(failData.failDataJSON['message']); // show error message
+                    const gameFrame = document.querySelector("#game-frame");
+                    removeAllChildNodes(gameFrame);
+                    loadFailureArt(gameFrame, failData);
+                });
         }
 
-           return response.json();
+        return response.json();
 
-    }).then(response => {
+    }).then(data => {
         /* storing album info in a global object */
-        albums = response['albums'];
+        albums = data['albums'];
         // restores a 'valid' form style
         const textField = document.querySelector("#text-field");
         textField.classList.remove("is-invalid");
         // when done, removes current pictures from the frame, adds new ones
-        console.log(response);
+        console.log(data);
         const gameFrame = document.querySelector("#game-frame");
         // empty html
         removeAllChildNodes(gameFrame);
         /* adds a class 'loading' to block animation before all images are loaded */
         gameFrame.classList.add('loading');
-        /* main iteration */
-        const totalAmountOfAlbums = response['albums'].length;
-        let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
-        for (var i = 0; i < length; i++) {
-            let album = response['albums'][i];
-            let title = response['albums'][i]['title'];
-            let imageURL = response['albums'][i]['image'];
-            let id = response['albums'][i]['id']
-
-            let img = $('<img />').attr({
-                'id': `art-${id}`,
-                'class': 'cover-art',
-                'src': `${imageURL}`,
-                'alt': `${title}`,
-            });
-            let catImg = $('<img />').attr({
-                'class': 'cat-image',
-                'id': `cat-${id}`,
-                'src': 'static/images/cat-success.png',
-                'alt': 'el gato',
-            });
-            $('<div />', {class: 'flex-item', id: `item-${i}`})
-                .wrapInner(img).appendTo("#game-frame");
-            catImg.appendTo(`#item-${i}`);
-        }
+        /* load/add cover art images */
+        loadCoverArt(data);
 
         if ($('.button.active').attr('id') == 'by_artist') {
-            $('#text-field').val(response["info"]);
+            $('#text-field').val(data["info"]);
         };
-        // $('#text-field').val(response["info"]);
+        // $('#text-field').val(data["info"]);
         /* add a progress bar */
-        $('#buttons-container').after($('<div>', {id: 'load-bar'}));
+        const progressBar = document.createElement("div");
+        progressBar.id = "progress-bar";
+        const referenceNode = document.querySelector("#buttons-container");
+        referenceNode.after(progressBar);
         /* waiting for all images to load before showing them up*/
         $('#game-frame').waitForImages(function() {
-        /* remove progress bar once loaded */
-            $('#load-bar').remove();
-         /* remove 'loading' class that blocks animation of albums images */
-            const gameFrame = document.querySelector("#game-frame");
-            gameFrame.classList.remove("loading");
+            /* remove progress bar once loaded */
+            console.log(this);
+            progressBar.remove();
+            /* remove 'loading' class that blocks animation of albums images */
+            this.classList.remove("loading");
             const itemsList = document.querySelectorAll(".flex-item");
             itemsList.forEach(item => {
                 item.classList.add("loaded");
@@ -107,19 +86,19 @@ const submitInput = function() {
             playButton.classList.add("visible");
 
             if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
-                $('#game-frame').after(`<div id="response-info">${response["info"]}</div>`);
+                $('#game-frame').after(`<div id="data-info">${data["info"]}</div>`);
             };
         }, function(loaded, count, success) {
-        /* animate progress bar */
-             var bar1 = new ldBar("#load-bar", {
-                 'preset': 'line'
-             });
-             bar1.set((loaded + 1 / count) * 100);
+            /* animate progress bar */
+            var bar1 = new ldBar("#progress-bar", {
+                'preset': 'line'
+            });
+            bar1.set((loaded + 1 / count) * 100);
         });
     }).catch((error) => {
         // Handle the error
         console.log(`error is ${error}`);
-  });
+    });
 };
 
 /* play button */
@@ -127,22 +106,21 @@ $("#play-button").on('click', function() {
     console.log(albums);
     $(this).toggleClass('on off');
 
-    if($(this).hasClass('on')) {
+    if ($(this).hasClass('on')) {
         $('#text-field')
-                        .attr('id', 'play-field')
-                        .attr('placeholder', 'try guessing the albums')
-                        .val('');
+            .attr('id', 'play-field')
+            .attr('placeholder', 'try guessing the albums')
+            .val('');
         $("#select-options").hide();
         $(".method").hide();
         $(this).val('GIVE UP');
         $('#ok-btn').hide();
         let input = document.querySelector('#play-field');
         input.oninput = handleGuesses;
-    }
-    else {
+    } else {
         $('#play-field')
-                        .attr('id', 'text-field')
-                        .val('');
+            .attr('id', 'text-field')
+            .val('');
         $(".method").show();
         $(this).val('PLAY');
         $('#ok-btn').show();
@@ -153,75 +131,101 @@ $("#play-button").on('click', function() {
 function handleGuesses(e) {
     // TODO: handle guessing the albums
     const options = {
-    // isCaseSensitive: false,
-    // includeScore: false,
-    // shouldSort: true,
-    // includeMatches: false,
-    // findAllMatches: false,
-    minMatchCharLength: 12,
-    location: 2,
-    threshold: 0.03,
-    // distance: 100,
-    // useExtendedSearch: false,
-    // ignoreLocation: false,
-    // ignoreFieldNorm: false,
-    keys: [
-    "names",
-     ]
+        // isCaseSensitive: false,
+        // includeScore: false,
+        // shouldSort: true,
+        // includeMatches: false,
+        // findAllMatches: false,
+        minMatchCharLength: 12,
+        location: 2,
+        threshold: 0.03,
+        // distance: 100,
+        // useExtendedSearch: false,
+        // ignoreLocation: false,
+        // ignoreFieldNorm: false,
+        keys: [
+            "names",
+        ]
     };
-  const fuse = new Fuse(albums, options);
-  const pattern = e.target.value;
-  if (fuse.search(pattern).length > 0) {
-    let id = fuse.search(pattern)[0]['item']['id'];
-    console.log(id);
-    console.log(pattern);
-    console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
-    $(`#art-${id}`).addClass('guessed-right');
-//    $(`#cat-${id}`).addClass('visible');
-  }
+    const fuse = new Fuse(albums, options);
+    const pattern = e.target.value;
+    if (fuse.search(pattern).length > 0) {
+        let id = fuse.search(pattern)[0]['item']['id'];
+        console.log(id);
+        console.log(pattern);
+        console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
+        $(`#art-${id}`).addClass('guessed-right');
+    }
 };
 
 //$('#submit-btn').on('click' , submitInput);
 $(document).on("submit", "#submit-form", submitInput);
 
 /* 'activates' buttons */
-$('.button').on('click', function(){
+$('.button').on('click', function() {
     $('.button').removeClass('active');
     $(this).addClass('active');
 
     if ($('.button.active').attr('id') == 'by_username') {
-    $('#text-field').attr('placeholder', 'last.fm username');
-} else if ($('.button.active').attr('id') == 'by_artist') {
-     $('#text-field').attr(
-                        'placeholder',
-                        "artist name");
-} else {
-     $('#text-field').attr(
-                        'placeholder',
-                        "Spotify Playlist Link");
-};
-$('#text-field').val('');
+        $('#text-field').attr('placeholder', 'last.fm username');
+    } else if ($('.button.active').attr('id') == 'by_artist') {
+        $('#text-field').attr(
+            'placeholder',
+            "artist name");
+    } else {
+        $('#text-field').attr(
+            'placeholder',
+            "Spotify Playlist Link");
+    };
+    $('#text-field').val('');
 });
 
 /* displays 'options' menu when the input's focused  */
 var timerID;
 $("#text-field, #select-options").focusin(function() {
-  clearTimeout(timerID);
-  if ($('.button.active').attr('id') == 'by_username') {
-    /* makes sure it's only visible for user's top albums */
-    $("#select-options").show();
-  };
-}).focusout(function(){
+    clearTimeout(timerID);
+    if ($('.button.active').attr('id') == 'by_username') {
+        /* makes sure it's only visible for user's top albums */
+        $("#select-options").show();
+    };
+}).focusout(function() {
     timerID = setTimeout(function() {
         $("#select-options").hide();
     }, 10);
 });
 
 
-function loadFailureArt(node, url) {
+function loadCoverArt(data) {
+    const totalAmountOfAlbums = data['albums'].length;
+    let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
+    for (var i = 0; i < length; i++) {
+        let album = data['albums'][i];
+        let title = data['albums'][i]['title'];
+        let imageURL = data['albums'][i]['image'];
+        let id = data['albums'][i]['id']
+
+        let img = $('<img />').attr({
+            'id': `art-${id}`,
+            'class': 'cover-art',
+            'src': `${imageURL}`,
+            'alt': `${title}`,
+        });
+        $('<div />', {
+                class: 'flex-item',
+                id: `item-${i}`
+            })
+            .wrapInner(img).appendTo("#game-frame");
+    }
+};
+
+
+
+
+function loadFailureArt(node, failData) {
     console.log(this);
     const failureArt = document.createElement("img");
-    failureArt.src = url;
+    const failureArtURL = failData['failure_art'];
+    failureArt.src = failureArtURL;
     failureArt.id = "failure-art";
 
     const failureArtBlock = document.createElement("div");
