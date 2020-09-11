@@ -85,9 +85,9 @@ const submitInput = function() {
             const playButton = document.querySelector("#play-button");
             playButton.classList.add("visible");
 
-            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
+/*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
                 $('#game-frame').after(`<div id="data-info">${data["info"]}</div>`);
-            };
+            };*/
         }, function(loaded, count, success) {
             /* animate progress bar */
             var bar1 = new ldBar("#progress-bar", {
@@ -214,7 +214,7 @@ function loadCoverArt(data) {
         const successIcon = $('<img />').attr({
             'id': `success-${id}`,
             'class': 'success-icon',
-            'src': 'static/images/check-mark.png',
+            'src': 'static/images/check-mark-contrast.png',
             'alt': 'a pulsating vinyl record'
         });
         $('<div />', {
