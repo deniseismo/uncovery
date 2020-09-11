@@ -138,7 +138,7 @@ function handleGuesses(e) {
         // findAllMatches: false,
         minMatchCharLength: 12,
         location: 2,
-        threshold: 0.03,
+        threshold: 0.02,
         // distance: 100,
         // useExtendedSearch: false,
         // ignoreLocation: false,
@@ -155,6 +155,7 @@ function handleGuesses(e) {
         console.log(pattern);
         console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
         $(`#art-${id}`).addClass('guessed-right');
+        $(`#success-${id}`).addClass('visible');
     }
 };
 
@@ -199,22 +200,29 @@ function loadCoverArt(data) {
     const totalAmountOfAlbums = data['albums'].length;
     let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
     for (var i = 0; i < length; i++) {
-        let album = data['albums'][i];
-        let title = data['albums'][i]['title'];
-        let imageURL = data['albums'][i]['image'];
-        let id = data['albums'][i]['id']
+        const album = data['albums'][i];
+        const title = data['albums'][i]['title'];
+        const imageURL = data['albums'][i]['image'];
+        const id = data['albums'][i]['id']
 
-        let img = $('<img />').attr({
+        const coverArt = $('<img />').attr({
             'id': `art-${id}`,
             'class': 'cover-art',
             'src': `${imageURL}`,
             'alt': `${title}`,
         });
+        const successIcon = $('<img />').attr({
+            'id': `success-${id}`,
+            'class': 'success-icon',
+            'src': 'static/images/check-mark.png',
+            'alt': 'a pulsating vinyl record'
+        });
         $('<div />', {
                 class: 'flex-item',
                 id: `item-${i}`
             })
-            .wrapInner(img).appendTo("#game-frame");
+            .wrapInner(coverArt).appendTo("#game-frame");
+        successIcon.appendTo(`#item-${i}`);
     }
 };
 
