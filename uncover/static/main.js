@@ -1,5 +1,8 @@
 // main global object with all the info about albums & album covers
 let albums;
+let notGuessedAlbums;
+// a global variable that stores a number of albums guessed so far
+let guessedCount = 0;
 /* main AJAX function */
 const submitInput = function() {
     "use strict";
@@ -104,8 +107,9 @@ const submitInput = function() {
 /* play button */
 $("#play-button").on('click', function() {
     console.log(albums);
+    resetGame();
     $(this).toggleClass('on off');
-
+    const guessResultsContainer = document.querySelector('#guess-results-container');
     if ($(this).hasClass('on')) {
         $('#text-field')
             .attr('id', 'play-field')
@@ -113,17 +117,24 @@ $("#play-button").on('click', function() {
             .val('');
         $("#select-options").hide();
         $(".method").hide();
+        const totalAmountOfAlbums = albums.length;
+        const total = Math.min(totalAmountOfAlbums, 9);
+
+        guessResultsContainer.style.display = "block";
+        $('#guess-results-text').text("You haven't guessed any albums yet. 😟");
         $(this).val('GIVE UP');
         $('#ok-btn').hide();
         let input = document.querySelector('#play-field');
         input.oninput = handleGuesses;
     } else {
+        guessResultsContainer.style.display = "none";
         $('#play-field')
             .attr('id', 'text-field')
             .val('');
         $(".method").show();
         $(this).val('PLAY');
         $('#ok-btn').show();
+        $('#guess-results-container').hide();
     };
 });
 
@@ -147,7 +158,7 @@ function handleGuesses(e) {
             "names",
         ]
     };
-    const fuse = new Fuse(albums, options);
+    const fuse = new Fuse(albums.slice(0, 10), options);
     const pattern = e.target.value;
     if (fuse.search(pattern).length > 0) {
         let id = fuse.search(pattern)[0]['item']['id'];
@@ -158,6 +169,10 @@ function handleGuesses(e) {
         guessedAlbum.alt = title;
         const successIcon = document.querySelector(`#success-${id}`);
         successIcon.classList.add('visible');
+        const totalAmountOfAlbums = albums.length;
+        const total = Math.min(totalAmountOfAlbums, 9);
+        guessedCount++;
+        $('#guess-results-text').text(`Wowee! You've guessed ${guessedCount} out of ${total}`);
     }
 };
 
@@ -226,6 +241,19 @@ function loadCoverArt(data) {
     }
 };
 
+
+
+function resetGame() {
+    // resets game state
+    // reset a number of guessed albums
+    guessedCount = 0;
+    const successIconList = document.querySelectorAll('.success-icon');
+    // remove 'check mark' icons
+    successIconList.forEach(icon => icon.classList.remove('visible'));
+    // remove a description of the album
+    const coverArtList = document.querySelectorAll('.cover-art');
+    coverArtList.forEach(image => image.alt="");
+};
 
 
 
