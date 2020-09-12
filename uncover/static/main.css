@@ -226,12 +226,6 @@ a:hover {
     color: #3b444b;
 }
 
-
-
-
-
-
-
 .flex-item {
     display: flex;
     transition: box-shadow 1s ease-in-out 1s;
@@ -442,6 +436,7 @@ a {
 /*    box-shadow: inset 0 0 20px rgba(230, 165, 168, 0.34),
                 inset 0 32px 64px rgba(170, 203, 255, 0.52);*/
 }
+
 
 /* a class for album covers that were guessed right */
 .guessed-right {

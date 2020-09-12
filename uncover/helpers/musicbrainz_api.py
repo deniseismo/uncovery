@@ -5,7 +5,7 @@ import requests
 import requests_cache
 
 from uncover.helpers.lastfm_api import get_artist_correct_name, get_album_info
-from uncover.helpers.utils import timeit
+from uncover.helpers.utils import timeit, filter_album_name
 
 requests_cache.install_cache()
 
@@ -136,17 +136,17 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
         # rating = get_album_rating(release['id'])
         full_title = release['title'].replace("’", "'")
         correct_title = full_title.lower()
-        title_with_no_articles = correct_title.replace("the ", "")
         rating = get_album_info(correct_title, artist)
         an_album_dict = {
-            "title": correct_title,
-            "names": [full_title, title_with_no_articles],
+            "title": full_title,
+            "names": [correct_title] + filter_album_name(full_title),
             "id": release['id'],
             "rating": rating if rating else 0
         }
         if alternative_name:
-            an_album_dict["names"].append(alternative_name)
-            an_album_dict["names"].append(alternative_name.lower().replace("the ", ""))
+            an_album_dict["names"] += alternative_name
+            an_album_dict["names"] += filter_album_name(alternative_name)
+        an_album_dict['names'] = list(set(an_album_dict['names']))
         if an_album_dict['title'] not in a_set_of_titles:
             a_set_of_titles.add(an_album_dict['title'])
             albums.append(an_album_dict)

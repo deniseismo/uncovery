@@ -108,32 +108,12 @@ const submitInput = function() {
 $("#play-button").on('click', function() {
     resetGame();
     $(this).toggleClass('on off');
-    const guessResultsContainer = document.querySelector('#guess-results-container');
     if ($(this).hasClass('on')) {
-        $('#text-field')
-            .attr('id', 'play-field')
-            .attr('placeholder', 'try guessing the albums')
-            .val('');
-        $("#select-options").hide();
-        $(".method").hide();
-        const totalAmountOfAlbums = albums.length;
-        const total = Math.min(totalAmountOfAlbums, 9);
-
-        guessResultsContainer.style.display = "block";
-        $('#guess-results-text').text("You haven't guessed any albums yet. 😟");
-        $(this).val('GIVE UP');
-        $('#ok-btn').hide();
+        prepareGame();
         let input = document.querySelector('#play-field');
         input.oninput = handleGuesses;
     } else {
-        guessResultsContainer.style.display = "none";
-        $('#play-field')
-            .attr('id', 'text-field')
-            .val('');
-        $(".method").show();
-        $(this).val('PLAY');
-        $('#ok-btn').show();
-        $('#guess-results-container').hide();
+        cancelGame();
     };
 });
 
@@ -163,7 +143,7 @@ function handleGuesses(e) {
         let id = fuse.search(pattern)[0]['item']['id'];
         console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
         const guessedAlbum = document.querySelector(`#art-${id}`);
-        const title = albums[id]['names'][0];
+        const title = albums[id]['title'];
         guessedAlbum.classList.add("guessed-right");
         guessedAlbum.alt = title;
         const successIcon = document.querySelector(`#success-${id}`);
@@ -255,6 +235,43 @@ function removeGuessedAlbum(albumID) {
         }
     }
 }
+
+
+function prepareGame() {
+    const guessResultsContainer = document.querySelector('#guess-results-container');
+    const textField = document.querySelector("#text-field");
+    textField.id = 'play-field';
+    textField.placeholder = 'try guessing the albums';
+    textField.value = ''
+    const submitForm = document.querySelector("#submit-form");
+    submitForm.id = 'guess-form';
+    const selectOptions = document.querySelector("#select-options");
+    selectOptions.style.display = 'none';
+    const methodButtonsList = document.querySelectorAll(".method");
+    methodButtonsList.forEach(button => button.style.display = 'none');
+    guessResultsContainer.style.display = "block";
+    const guessResultsText = document.querySelector("#guess-results-text");
+    guessResultsText.textContent = "You haven't guessed any albums yet. 😟"
+    playButton = document.querySelector("#play-button");
+    playButton.value = 'GIVE UP';
+    const okButton = document.querySelector("#ok-btn");
+    okButton.style.display = "none";
+};
+
+function cancelGame() {
+    const guessResultsContainer = document.querySelector('#guess-results-container');
+    guessResultsContainer.style.display = "none";
+    $('#play-field')
+        .attr('id', 'text-field')
+        .val('');
+    $("#guess-form").attr("id", "submit-form");
+    $(".method").show();
+    playButton = document.querySelector("#play-button");
+    playButton.value = 'PLAY';
+    $('#ok-btn').show();
+    $('#guess-results-container').hide();
+};
+
 
 function resetGame() {
     // resets game state

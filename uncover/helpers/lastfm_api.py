@@ -6,7 +6,7 @@ import time
 import requests
 import requests_cache
 
-from uncover.helpers.utils import timeit
+from uncover.helpers.utils import timeit, filter_album_name
 
 requests_cache.install_cache()
 
@@ -81,9 +81,6 @@ def get_artist_correct_name(artist: str):
     except (KeyError, TypeError, json.decoder.JSONDecodeError):
         return None
     return correct_name
-
-
-get_artist_correct_name('slim sessna autoclub')
 
 
 def lookup_tags(artist: str):
@@ -189,9 +186,10 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
             if album['image'][size]['#text']:
                 an_album_dict = {
                     "title": album['name'],
-                    "names": [album['name'], album['name'].lower().replace("the ", "")],
+                    "names": [album['name'].lower()] + filter_album_name(album['name']),
                     "image": album['image'][size]['#text'],
                 }
+                an_album_dict['names'] = list(set(an_album_dict['names']))
                 # appends an album dict with all the info to the list
                 album_info["albums"].append(an_album_dict)
     except KeyError:

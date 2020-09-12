@@ -5,6 +5,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 from uncover.helpers.lastfm_api import get_artist_correct_name
 from uncover.helpers.musicbrainz_api import get_artists_albums
+from uncover.helpers.utils import filter_album_name
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -30,10 +31,11 @@ def get_albums_by_playlist(playlist_id: str):
         name = track['track']['album']['name']
         an_album_dict = {
             "title": track['track']['album']['name'],
-            "names": [name, name.lower().replace("the ", "")],
+            "names": [name.lower()] + filter_album_name(name),
             "image": track["track"]["album"]["images"][0]["url"],
             "rating": track["track"]['popularity']
         }
+        an_album_dict['names'] = list(set(an_album_dict['names']))
         # filter duplicates:
         if an_album_dict['title'] not in list_of_titles:
             # append a title to a set of titles
