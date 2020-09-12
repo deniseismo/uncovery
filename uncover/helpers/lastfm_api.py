@@ -189,7 +189,7 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
             if album['image'][size]['#text']:
                 an_album_dict = {
                     "title": album['name'],
-                    "names": [album['name']],
+                    "names": [album['name'], album['name'].lower().replace("the ", "")],
                     "image": album['image'][size]['#text'],
                 }
                 # appends an album dict with all the info to the list

@@ -138,7 +138,7 @@ function handleGuesses(e) {
         // findAllMatches: false,
         minMatchCharLength: 12,
         location: 2,
-        threshold: 0.02,
+        threshold: 0.015,
         // distance: 100,
         // useExtendedSearch: false,
         // ignoreLocation: false,

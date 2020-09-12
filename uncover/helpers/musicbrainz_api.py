@@ -132,19 +132,21 @@ def get_artists_albums(artist: str, mbid=None, amount=9):
     for release in response.json()["release-groups"][:]:
         # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
         # add an id of an album to the dict
-        alternative_name = get_album_alternative_name(release['id'])
+        alternative_name = get_album_alternative_name(release['id']).replace("“", "").replace("”", "")
         # rating = get_album_rating(release['id'])
         full_title = release['title'].replace("’", "'")
-        correct_title = release['title'].lower().replace("’", "'")
+        correct_title = full_title.lower()
+        title_with_no_articles = correct_title.replace("the ", "")
         rating = get_album_info(correct_title, artist)
         an_album_dict = {
             "title": correct_title,
-            "names": [full_title],
+            "names": [full_title, title_with_no_articles],
             "id": release['id'],
             "rating": rating if rating else 0
         }
         if alternative_name:
             an_album_dict["names"].append(alternative_name)
+            an_album_dict["names"].append(alternative_name.lower().replace("the ", ""))
         if an_album_dict['title'] not in a_set_of_titles:
             a_set_of_titles.add(an_album_dict['title'])
             albums.append(an_album_dict)

@@ -27,9 +27,10 @@ def get_albums_by_playlist(playlist_id: str):
     list_of_titles = set()
     # iterate through tracks
     for track in playlist_info["tracks"]["items"]:
+        name = track['track']['album']['name']
         an_album_dict = {
             "title": track['track']['album']['name'],
-            "names": [track['track']['album']['name']],
+            "names": [name, name.lower().replace("the ", "")],
             "image": track["track"]["album"]["images"][0]["url"],
             "rating": track["track"]['popularity']
         }
