@@ -51,6 +51,7 @@ const submitInput = function() {
     }).then(data => {
         /* storing album info in a global object */
         albums = data['albums'];
+        notGuessedAlbums = albums.slice(0, 10);
         // restores a 'valid' form style
         const textField = document.querySelector("#text-field");
         textField.classList.remove("is-invalid");
@@ -158,7 +159,7 @@ function handleGuesses(e) {
             "names",
         ]
     };
-    const fuse = new Fuse(albums.slice(0, 10), options);
+    const fuse = new Fuse(notGuessedAlbums, options);
     const pattern = e.target.value;
     if (fuse.search(pattern).length > 0) {
         let id = fuse.search(pattern)[0]['item']['id'];
@@ -173,6 +174,7 @@ function handleGuesses(e) {
         const total = Math.min(totalAmountOfAlbums, 9);
         guessedCount++;
         $('#guess-results-text').text(`Wowee! You've guessed ${guessedCount} out of ${total}`);
+        removeGuessedAlbum(id);
     }
 };
 
@@ -242,6 +244,15 @@ function loadCoverArt(data) {
 };
 
 
+
+function removeGuessedAlbum(albumID) {
+    for (let i = 0; i < notGuessedAlbums.length; i++) {
+        if (notGuessedAlbums[i]['id'] === albumID) {
+            notGuessedAlbums.splice(i, 1);
+            return true;
+        }
+    }
+}
 
 function resetGame() {
     // resets game state
