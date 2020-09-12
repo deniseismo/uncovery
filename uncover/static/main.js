@@ -64,7 +64,6 @@ const submitInput = function() {
         gameFrame.classList.add('loading');
         /* load/add cover art images */
         loadCoverArt(data);
-
         if ($('.button.active').attr('id') == 'by_artist') {
             $('#text-field').val(data["info"]);
         };
@@ -107,7 +106,6 @@ const submitInput = function() {
 
 /* play button */
 $("#play-button").on('click', function() {
-    console.log(albums);
     resetGame();
     $(this).toggleClass('on off');
     const guessResultsContainer = document.querySelector('#guess-results-container');
@@ -173,7 +171,7 @@ function handleGuesses(e) {
         const totalAmountOfAlbums = albums.length;
         const total = Math.min(totalAmountOfAlbums, 9);
         guessedCount++;
-        $('#guess-results-text').text(`Wowee! You've guessed ${guessedCount} out of ${total}`);
+        $('#guess-results-text').text(`Wowee! You've guessed ${guessedCount} out of ${total}.`);
         removeGuessedAlbum(id);
     }
 };
@@ -182,7 +180,7 @@ function handleGuesses(e) {
 $(document).on("submit", "#submit-form", submitInput);
 
 /* 'activates' buttons */
-$('.button').on('click', function() {
+$('.method').on('click', function() {
     $('.button').removeClass('active');
     $(this).addClass('active');
 
@@ -192,10 +190,14 @@ $('.button').on('click', function() {
         $('#text-field').attr(
             'placeholder',
             "artist name");
-    } else {
+    } else if ($('.button.active').attr('id') == 'by_spotify') {
         $('#text-field').attr(
             'placeholder',
             "Spotify Playlist Link");
+    } else {
+        $('#text-field').attr(
+            'placeholder',
+            "Pick a method");
     };
     $('#text-field').val('');
 });
@@ -204,7 +206,7 @@ $('.button').on('click', function() {
 var timerID;
 $("#text-field, #select-options").focusin(function() {
     clearTimeout(timerID);
-    if ($('.button.active').attr('id') == 'by_username') {
+    if ($('.button.active').attr('id') == 'by_username' && !$('#play-button').hasClass("on")) {
         /* makes sure it's only visible for user's top albums */
         $("#select-options").show();
     };
