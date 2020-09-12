@@ -190,24 +190,22 @@ function loadCoverArt(data) {
         const album = data['albums'][i];
         const imageURL = data['albums'][i]['image'];
         const id = data['albums'][i]['id']
-
-        const coverArt = $('<img />').attr({
-            'id': `art-${id}`,
-            'class': 'cover-art',
-            'src': `${imageURL}`,
-        });
-        const successIcon = $('<img />').attr({
-            'id': `success-${id}`,
-            'class': 'success-icon',
-            'src': 'static/images/check-mark-contrast.png',
-            'alt': 'a pulsating vinyl record'
-        });
-        $('<div />', {
-                class: 'flex-item',
-                id: `item-${i}`
-            })
-            .wrapInner(coverArt).appendTo("#game-frame");
-        successIcon.appendTo(`#item-${i}`);
+        const coverArt = document.createElement("img");
+        coverArt.id = `art-${id}`;
+        coverArt.classList.add('cover-art');
+        coverArt.src = `${imageURL}`;
+        const successIcon = document.createElement('img');
+        successIcon.id = `success-${id}`;
+        successIcon.classList.add('success-icon');
+        successIcon.src = 'static/images/check-mark-contrast.png';
+        successIcon.alt = 'checkmark';
+        const flexItem = document.createElement('div');
+        flexItem.id = `item-${i}`;
+        flexItem.classList.add('flex-item');
+        flexItem.appendChild(coverArt);
+        flexItem.appendChild(successIcon);
+        const gameFrame = document.querySelector('#game-frame');
+        gameFrame.appendChild(flexItem);
     }
 };
 
@@ -222,23 +220,16 @@ function removeGuessedAlbum(albumID) {
     }
 }
 
-
-
 function setPlaceholder() {
-    if ($('.button.active').attr('id') == 'by_username') {
-        $('#text-field').attr('placeholder', 'last.fm username');
-    } else if ($('.button.active').attr('id') == 'by_artist') {
-        $('#text-field').attr(
-            'placeholder',
-            "artist name");
-    } else if ($('.button.active').attr('id') == 'by_spotify') {
-        $('#text-field').attr(
-            'placeholder',
-            "Spotify Playlist Link");
+    const activeButtonID = document.querySelector('.button.active').id;
+    console.log(activeButtonID);
+    const textField = document.querySelector('#text-field');
+    if (activeButtonID === 'by_username') {
+        textField.placeholder = 'last.fm username';
+    } else if (activeButtonID === 'by_artist') {
+        textField.placeholder = 'artist name';
     } else {
-        $('#text-field').attr(
-            'placeholder',
-            "Pick a method");
+        textField.placeholder = 'by_spotify';
     };
 }
 
