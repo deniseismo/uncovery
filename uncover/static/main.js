@@ -161,24 +161,10 @@ $(document).on("submit", "#submit-form", submitInput);
 
 /* 'activates' buttons */
 $('.method').on('click', function() {
-    $('.button').removeClass('active');
-    $(this).addClass('active');
-
-    if ($('.button.active').attr('id') == 'by_username') {
-        $('#text-field').attr('placeholder', 'last.fm username');
-    } else if ($('.button.active').attr('id') == 'by_artist') {
-        $('#text-field').attr(
-            'placeholder',
-            "artist name");
-    } else if ($('.button.active').attr('id') == 'by_spotify') {
-        $('#text-field').attr(
-            'placeholder',
-            "Spotify Playlist Link");
-    } else {
-        $('#text-field').attr(
-            'placeholder',
-            "Pick a method");
-    };
+    const methodButtonsList = document.querySelectorAll(".method");
+    methodButtonsList.forEach(button => button.classList.remove('active'));
+    this.classList.add('active');
+    setPlaceholder();
     $('#text-field').val('');
 });
 
@@ -237,6 +223,25 @@ function removeGuessedAlbum(albumID) {
 }
 
 
+
+function setPlaceholder() {
+    if ($('.button.active').attr('id') == 'by_username') {
+        $('#text-field').attr('placeholder', 'last.fm username');
+    } else if ($('.button.active').attr('id') == 'by_artist') {
+        $('#text-field').attr(
+            'placeholder',
+            "artist name");
+    } else if ($('.button.active').attr('id') == 'by_spotify') {
+        $('#text-field').attr(
+            'placeholder',
+            "Spotify Playlist Link");
+    } else {
+        $('#text-field').attr(
+            'placeholder',
+            "Pick a method");
+    };
+}
+
 function prepareGame() {
     const guessResultsContainer = document.querySelector('#guess-results-container');
     const textField = document.querySelector("#text-field");
@@ -261,15 +266,19 @@ function prepareGame() {
 function cancelGame() {
     const guessResultsContainer = document.querySelector('#guess-results-container');
     guessResultsContainer.style.display = "none";
-    $('#play-field')
-        .attr('id', 'text-field')
-        .val('');
-    $("#guess-form").attr("id", "submit-form");
-    $(".method").show();
+    const playField = document.querySelector("#play-field");
+    playField.id = 'text-field';
+    playField.placeholder = '';
+    playField.value = ''
+    const guessForm = document.querySelector("#guess-form");
+    guessForm.id = 'submit-form';
+    const methodButtonsList = document.querySelectorAll(".method");
+    methodButtonsList.forEach(button => button.style.display = 'block');
     playButton = document.querySelector("#play-button");
     playButton.value = 'PLAY';
-    $('#ok-btn').show();
-    $('#guess-results-container').hide();
+    const okButton = document.querySelector("#ok-btn");
+    okButton.style.display = "block";
+    setPlaceholder();
 };
 
 
