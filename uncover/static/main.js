@@ -73,6 +73,7 @@ const submitInput = function() {
         progressBar.id = "progress-bar";
         const referenceNode = document.querySelector("#buttons-container");
         referenceNode.after(progressBar);
+        $('.wave').addClass('falldown');
         /* waiting for all images to load before showing them up*/
         $('#game-frame').waitForImages(function() {
             /* remove progress bar once loaded */
@@ -151,7 +152,8 @@ function handleGuesses(e) {
         const totalAmountOfAlbums = albums.length;
         const total = Math.min(totalAmountOfAlbums, 9);
         guessedCount++;
-        $('#guess-results-text').text(`Wowee! You've guessed ${guessedCount} out of ${total}.`);
+        const guessResultsText = document.querySelector("#guess-results-text");
+        guessResultsText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
         removeGuessedAlbum(id);
     }
 };
@@ -229,7 +231,7 @@ function setPlaceholder() {
     } else if (activeButtonID === 'by_artist') {
         textField.placeholder = 'artist name';
     } else {
-        textField.placeholder = 'by_spotify';
+        textField.placeholder = 'Spotify Playlist Link';
     };
 }
 
