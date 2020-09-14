@@ -10,13 +10,14 @@ const submitInput = function() {
     const playButton = document.querySelector("#play-button");
     playButton.classList.remove("visible");
     // make info at the bottom disappear (if exists)
-    const responseInfo = document.querySelector("#data-info");
+    const responseInfo = document.querySelector(".data-info");
     if (responseInfo) {
         responseInfo.remove();
     };
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
     const desiredMethod = $(".method.active").attr('id');
     const gameFrame = document.querySelector("#game-frame");
+    gameFrame.classList.remove('shadow-main');
     // empty html
     removeAllChildNodes(gameFrame);
     // add spinner while waiting for the response
@@ -29,7 +30,7 @@ const submitInput = function() {
         }),
         body: JSON.stringify({
             "qualifier": $('#text-field').val(),
-            "option": $('#select-options').val()
+            "option": $('.select-options').val()
         })
     }).then(response => {
         // if response is not ok (status ain't no 200)
@@ -91,7 +92,7 @@ const submitInput = function() {
             playButton.classList.add("visible");
 
 /*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
-                $('#game-frame').after(`<div id="data-info">${data["info"]}</div>`);
+                $('#game-frame').after(`<class="data-info">${data["info"]}</div>`);
             };*/
         }, function(loaded, count, success) {
             /* animate progress bar */
@@ -144,7 +145,7 @@ function handleGuesses(e) {
     if (fuse.search(pattern).length > 0) {
         let id = fuse.search(pattern)[0]['item']['id'];
         console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
-        const guessedAlbum = document.querySelector(`#art-${id}`);
+        const guessedAlbum = document.querySelector(`.art-${id}`);
         const title = albums[id]['title'];
         guessedAlbum.classList.add("guessed-right");
         guessedAlbum.alt = title;
@@ -153,7 +154,7 @@ function handleGuesses(e) {
         const totalAmountOfAlbums = albums.length;
         const total = Math.min(totalAmountOfAlbums, 9);
         guessedCount++;
-        const guessResultsText = document.querySelector("#guess-results-text");
+        const guessResultsText = document.querySelector(".score-text");
         guessResultsText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
         removeGuessedAlbum(id);
     }
@@ -173,15 +174,15 @@ $('.method').on('click', function() {
 
 /* displays 'options' menu when the input's focused  */
 var timerID;
-$("#text-field, #select-options").focusin(function() {
+$("#text-field, .select-options").focusin(function() {
     clearTimeout(timerID);
     if ($('.button.active').attr('id') == 'by_username' && !$('#play-button').hasClass("on")) {
         /* makes sure it's only visible for user's top albums */
-        $("#select-options").show();
+        $(".select-options").show();
     };
 }).focusout(function() {
     timerID = setTimeout(function() {
-        $("#select-options").hide();
+        $(".select-options").hide();
     }, 10);
 });
 
@@ -194,7 +195,7 @@ function loadCoverArt(data) {
         const imageURL = data['albums'][i]['image'];
         const id = data['albums'][i]['id']
         const coverArt = document.createElement("img");
-        coverArt.id = `art-${id}`;
+        coverArt.classList.add(`art-${id}`);
         coverArt.classList.add('cover-art');
         coverArt.src = `${imageURL}`;
         const successIcon = document.createElement('img');
@@ -237,28 +238,28 @@ function setPlaceholder() {
 }
 
 function prepareGame() {
-    const guessResultsContainer = document.querySelector('#guess-results-container');
+    const guessResultsContainer = document.querySelector('.score-container');
     const textField = document.querySelector("#text-field");
     textField.id = 'play-field';
     textField.placeholder = 'try guessing the albums';
     textField.value = ''
     const submitForm = document.querySelector("#submit-form");
     submitForm.id = 'guess-form';
-    const selectOptions = document.querySelector("#select-options");
+    const selectOptions = document.querySelector(".select-options");
     selectOptions.style.display = 'none';
     const methodButtonsList = document.querySelectorAll(".method");
     methodButtonsList.forEach(button => button.style.display = 'none');
     guessResultsContainer.style.display = "block";
-    const guessResultsText = document.querySelector("#guess-results-text");
+    const guessResultsText = document.querySelector(".score-text");
     guessResultsText.textContent = "You haven't guessed any albums yet. 😟"
     playButton = document.querySelector("#play-button");
     playButton.value = 'GIVE UP';
-    const okButton = document.querySelector("#ok-btn");
+    const okButton = document.querySelector(".ok-btn");
     okButton.style.display = "none";
 };
 
 function cancelGame() {
-    const guessResultsContainer = document.querySelector('#guess-results-container');
+    const guessResultsContainer = document.querySelector('.score-container');
     guessResultsContainer.style.display = "none";
     const playField = document.querySelector("#play-field");
     playField.id = 'text-field';
@@ -270,7 +271,7 @@ function cancelGame() {
     methodButtonsList.forEach(button => button.style.display = 'block');
     playButton = document.querySelector("#play-button");
     playButton.value = 'PLAY';
-    const okButton = document.querySelector("#ok-btn");
+    const okButton = document.querySelector(".ok-btn");
     okButton.style.display = "block";
     setPlaceholder();
 };
@@ -291,14 +292,15 @@ function resetGame() {
 
 
 function loadFailureArt(node, failData) {
-    console.log(this);
+    const gameFrame = document.querySelector("#game-frame");
+    gameFrame.classList.add("shadow-main");
     const failureArt = document.createElement("img");
     const failureArtURL = failData['failure_art'];
     failureArt.src = failureArtURL;
-    failureArt.id = "failure-art";
+    failureArt.classList.add("failure-art");
 
     const failureArtBlock = document.createElement("div");
-    failureArtBlock.classList.add("failure-art-block");
+    failureArtBlock.classList.add("failure-art-block", "shadow-main");
 
     const failureArtText = document.createElement("h1");
     failureArtText.classList.add("text-light")
