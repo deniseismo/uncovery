@@ -35,6 +35,7 @@ const submitInput = function() {
         // if response is not ok (status ain't no 200)
         if (!response.ok) {
             // we get json with the 'failure' info
+            $('.wave').addClass('falldown');
             return response.json()
                 .then(failData => {
                     const textField = document.querySelector("#text-field");
