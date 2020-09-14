@@ -315,7 +315,8 @@ function loadFailureArt(node, failData) {
 
 function loadSpinner(node) {
     const spinner = document.createElement("img");
-    const url = "static/images/loading/broken-1.1s-47px.gif"
+    const url = "static/images/loading/spinner-vinyl-64.gif";
+    spinner.classList.add('spinner');
     spinner.src = url;
     node.appendChild(spinner);
 };
