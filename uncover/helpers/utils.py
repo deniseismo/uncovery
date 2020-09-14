@@ -1,5 +1,6 @@
 import json
 import random
+import re
 import time
 
 
@@ -33,6 +34,16 @@ def timeit(method):
     return timed
 
 
+def get_filtered_name(album_name):
+    a_correct_title = album_name.lower().replace("“", "") \
+        .replace("”", "").replace(":", "").replace("’", "'").replace("the ", "")
+    no_deluxe_pattern = r"((super)?\s?(deluxe)\s?).*"
+    no_weird_characters_pattern = r'[\(\)\":]'
+    no_deluxe = re.sub(no_deluxe_pattern, '', a_correct_title, flags=re.IGNORECASE)
+    ultimate_filtered_name = re.sub(no_weird_characters_pattern, '', no_deluxe)
+    return ultimate_filtered_name
+
+
 def filter_album_name(album_name):
     """
     filters out some articles, incorrect symbols & redundant words (e.g. Deluxe Edition)
@@ -40,11 +51,16 @@ def filter_album_name(album_name):
     :return: a list of filtered names
     """
     filtered_names = set()
-    a_correct_title = album_name.lower().replace("“", "").replace("”", "").replace(":", "")
+    a_correct_title = album_name.lower().replace("“", "").replace("”", "").replace(":", "").replace("’", "'")
+    no_articles = a_correct_title.replace("the ", "")
+    no_deluxe_pattern = r"((super)?\s?(deluxe)\s?).*"
+    no_weird_characters_pattern = r'[\(\)\":]'
+    no_deluxe = re.sub(no_deluxe_pattern, '', a_correct_title, flags=re.IGNORECASE)
+    after_regex = re.sub(no_weird_characters_pattern, '', no_deluxe)
     filtered_names.add(a_correct_title)
-    filtered_names.add(a_correct_title.replace("deluxe edition", ""))
-    filtered_names.add(a_correct_title.replace("deluxe version", ""))
-    filtered_names.add(a_correct_title.replace(" deluxe", ""))
-    filtered_names.add(a_correct_title.replace(" remastered", ""))
-    filtered_names.add(a_correct_title.replace("the ", ""))
+    filtered_names.add(no_articles)
+    filtered_names.add(after_regex)
     return list(filtered_names)
+
+
+print(filter_album_name('The Prodigy'))

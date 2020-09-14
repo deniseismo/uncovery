@@ -6,7 +6,7 @@ import time
 import requests
 import requests_cache
 
-from uncover.helpers.utils import timeit, filter_album_name
+from uncover.helpers.utils import timeit, filter_album_name, get_filtered_name
 
 requests_cache.install_cache()
 
@@ -181,9 +181,11 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
     if shuffle:
         album_info["info"] = f"{username} random albums {time_period_table[time_period]}"
     try:
+        a_set_of_titles = set()
         for album in response.json()['topalbums']['album'][:amount]:
             # checks for incorrect/broken images
             if album['image'][size]['#text']:
+                filtered_name = get_filtered_name(album['name'])
                 an_album_dict = {
                     "title": album['name'],
                     "names": [album['name'].lower()] + filter_album_name(album['name']),
@@ -191,7 +193,9 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
                 }
                 an_album_dict['names'] = list(set(an_album_dict['names']))
                 # appends an album dict with all the info to the list
-                album_info["albums"].append(an_album_dict)
+                if filtered_name not in a_set_of_titles:
+                    a_set_of_titles.add(filtered_name)
+                    album_info["albums"].append(an_album_dict)
     except KeyError:
         return None
     if not album_info["albums"]:
