@@ -111,7 +111,12 @@ const submitInput = function() {
 
 // event listener for a submit form and an 'ok' submit button
 const submitForm = document.querySelector('#submit-form');
-submitForm.addEventListener('submit', submitInput);
+submitForm.addEventListener('submit', () => {
+  // checks if the game is not on
+  if (!frequentElements.playButton.classList.contains('on')) {
+    submitInput();
+  };
+});
 
 // play button
 frequentElements.playButton.onclick = (e) => {
@@ -154,7 +159,8 @@ function handleGuesses(e) {
     console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
     highlightGuessedAlbum(albumID);
     updateScore();
-    removeGuessedAlbum(id);
+    removeGuessedAlbum(albumID);
+    frequentElements.textField.value ='';
   }
 };
 

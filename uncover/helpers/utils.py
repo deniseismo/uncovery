@@ -40,7 +40,7 @@ def get_filtered_name(album_name):
     no_deluxe_pattern = r"((super)?\s?(deluxe)\s?).*"
     no_weird_characters_pattern = r'[\(\)\":]'
     no_deluxe = re.sub(no_deluxe_pattern, '', a_correct_title, flags=re.IGNORECASE)
-    ultimate_filtered_name = re.sub(no_weird_characters_pattern, '', no_deluxe)
+    ultimate_filtered_name = re.sub(no_weird_characters_pattern, '', no_deluxe).strip()
     return ultimate_filtered_name
 
 
@@ -58,4 +58,3 @@ def get_filtered_names_list(album_name):
     filtered_names.add(no_articles)
     filtered_names.add(after_regex)
     return list(filtered_names)
-
