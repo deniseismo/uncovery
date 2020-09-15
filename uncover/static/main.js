@@ -7,14 +7,14 @@ let guessedCount = 0;
 
 const frequentElements = {
     gameFrame: document.querySelector('#game-frame'),
-    playButton: document.querySelector('#play-button')
+    playButton: document.querySelector('#play-button'),
+    textField: document.querySelector('#text-field')
 };
 
 const submitInput = function() {
     "use strict";
     // make 'play-button' disappear
-    const playButton = document.querySelector("#play-button");
-    playButton.classList.remove("visible");
+    frequentElements.playButton.classList.remove("visible");
     // make info at the bottom disappear (if exists)
     const responseInfo = document.querySelector(".data-info");
     if (responseInfo) {
@@ -22,12 +22,11 @@ const submitInput = function() {
     };
     // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
     const desiredMethod = document.querySelector('.method.active').id;
-    const gameFrame = document.querySelector("#game-frame");
-    gameFrame.classList.remove('shadow-main');
+    frequentElements.gameFrame.classList.remove('shadow-main');
     // empty html
-    removeAllChildNodes(gameFrame);
+    removeAllChildNodes(frequentElements.gameFrame);
     // add spinner while waiting for the response
-    loadSpinner(gameFrame);
+    loadSpinner(frequentElements.gameFrame);
     // posts to the flask's route /by_username
     fetch(`${desiredMethod}`, {
         method: 'POST',
@@ -46,12 +45,10 @@ const submitInput = function() {
             waves.forEach(wave => wave.classList.add('falldown'));
             return response.json()
                 .then(failData => {
-                    const textField = document.querySelector("#text-field");
-                    textField.classList.add("is-invalid");
+                    frequentElements.textField.classList.add("is-invalid");
                     //val(failData.failDataJSON['message']); // show error message
-                    const gameFrame = document.querySelector("#game-frame");
-                    removeAllChildNodes(gameFrame);
-                    loadFailureArt(gameFrame, failData);
+                    removeAllChildNodes(frequentElements.gameFrame);
+                    loadFailureArt(frequentElements.gameFrame, failData);
                 });
         }
 
@@ -62,15 +59,13 @@ const submitInput = function() {
         albums = data['albums'];
         notGuessedAlbums = albums.slice(0, 10);
         // restores a 'valid' form style
-        const textField = document.querySelector("#text-field");
-        textField.classList.remove("is-invalid");
+        frequentElements.textField.classList.remove("is-invalid");
         // when done, removes current pictures from the frame, adds new ones
         console.log(data);
-        const gameFrame = document.querySelector("#game-frame");
         // empty html
-        removeAllChildNodes(gameFrame);
+        removeAllChildNodes(frequentElements.gameFrame);
         /* adds a class 'loading' to block animation before all images are loaded */
-        gameFrame.classList.add('loading');
+        frequentElements.gameFrame.classList.add('loading');
         /* load/add cover art images */
         loadCoverArt(data);
         fixArtistName(data);
@@ -94,8 +89,7 @@ const submitInput = function() {
                 item.classList.add("loaded");
             });
 
-            const playButton = document.querySelector("#play-button");
-            playButton.classList.add("visible");
+            frequentElements.playButton.classList.add("visible");
 
 /*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
                 $('#game-frame').after(`<class="data-info">${data["info"]}</div>`);
@@ -118,12 +112,11 @@ const submitForm = document.querySelector('#submit-form');
 submitForm.addEventListener('submit', submitInput);
 
 // play button
-const playButton = document.querySelector('#play-button');
-playButton.onclick = () => {
+frequentElements.playButton.onclick = (e) => {
     // reset score, remove 'success' icons
     resetGame();
-    playButton.classList.toggle('on');
-    if (playButton.classList.contains('on')) {
+    e.target.classList.toggle('on');
+    if (e.target.classList.contains('on')) {
         prepareGame();
         const input = document.querySelector('#play-field');
         input.oninput = handleGuesses;
@@ -167,8 +160,8 @@ function handleGuesses(e) {
         const totalAmountOfAlbums = albums.length;
         const total = Math.min(totalAmountOfAlbums, 9);
         guessedCount++;
-        const guessResultsText = document.querySelector(".score-text");
-        guessResultsText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
+        const scoreText = document.querySelector(".score-text");
+        scoreText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
         removeGuessedAlbum(id);
     }
 };
@@ -187,8 +180,7 @@ buttonsContainer.addEventListener('click', (event) => {
     event.target.classList.add('active');
     // change placeholder to a correct one
     setPlaceholder();
-    const textField = document.querySelector("#text-field");
-    textField.value = '';
+    frequentElements.textField.value = '';
 });
 
 /* displays 'options' menu when the input's focused  */
@@ -207,9 +199,8 @@ $("#text-field, .select-options").focusin(function() {
 
 function fixArtistName(data) {
     const activeButtonID = document.querySelector('.button.active').id;
-    const textField = document.querySelector('#text-field');
     if (activeButtonID === 'by_artist') {
-        textField.value = data['info'];
+        frequentElements.textField.value = data['info'];
     };
 };
 
@@ -236,8 +227,7 @@ function loadCoverArt(data) {
         flexItem.classList.add('flex-item');
         flexItem.appendChild(coverArt);
         flexItem.appendChild(successIcon);
-        const gameFrame = document.querySelector('#game-frame');
-        gameFrame.appendChild(flexItem);
+        frequentElements.gameFrame.appendChild(flexItem);
     }
 };
 
@@ -254,42 +244,39 @@ function removeGuessedAlbum(albumID) {
 function setPlaceholder() {
     "use strict";
     const activeButtonID = document.querySelector('.button.active').id;
-    const textField = document.querySelector('#text-field');
     if (activeButtonID === 'by_username') {
-        textField.placeholder = 'last.fm username';
+        frequentElements.textField.placeholder = 'last.fm username';
     } else if (activeButtonID === 'by_artist') {
-        textField.placeholder = 'artist name';
+        frequentElements.textField.placeholder = 'artist name';
     } else {
-        textField.placeholder = 'Spotify Playlist Link';
+        frequentElements.textField.placeholder = 'Spotify Playlist Link';
     };
 }
 
 function prepareGame() {
     "use strict";
-    const guessResultsContainer = document.querySelector('.score-container');
-    const textField = document.querySelector("#text-field");
-    textField.id = 'play-field';
-    textField.placeholder = 'try guessing the albums';
-    textField.value = ''
+    const scoreContainer = document.querySelector('.score-container');
+    frequentElements.textField.id = 'play-field';
+    frequentElements.textField.placeholder = 'try guessing the albums';
+    frequentElements.textField.value = ''
     const submitForm = document.querySelector("#submit-form");
     submitForm.id = 'guess-form';
     const selectOptions = document.querySelector(".select-options");
     selectOptions.style.display = 'none';
     const methodButtonsList = document.querySelectorAll(".method");
     methodButtonsList.forEach(button => button.style.display = 'none');
-    guessResultsContainer.style.display = "block";
-    const guessResultsText = document.querySelector(".score-text");
-    guessResultsText.textContent = "You haven't guessed any albums yet. 😟"
-    const playButton = document.querySelector("#play-button");
-    playButton.value = 'GIVE UP';
+    scoreContainer.style.display = "block";
+    const scoreText = document.querySelector(".score-text");
+    scoreText.textContent = "You haven't guessed any albums yet. 😟"
+    frequentElements.playButton.value = 'GIVE UP';
     const okButton = document.querySelector(".ok-btn");
     okButton.style.display = "none";
 };
 
 function cancelGame() {
     "use strict";
-    const guessResultsContainer = document.querySelector('.score-container');
-    guessResultsContainer.style.display = "none";
+    const scoreContainer = document.querySelector('.score-container');
+    scoreContainer.style.display = "none";
     const playField = document.querySelector("#play-field");
     playField.id = 'text-field';
     playField.placeholder = '';
@@ -298,8 +285,7 @@ function cancelGame() {
     guessForm.id = 'submit-form';
     const methodButtonsList = document.querySelectorAll(".method");
     methodButtonsList.forEach(button => button.style.display = 'block');
-    const playButton = document.querySelector("#play-button");
-    playButton.value = 'PLAY';
+    frequentElements.playButton.value = 'PLAY';
     const okButton = document.querySelector(".ok-btn");
     okButton.style.display = "block";
     setPlaceholder();
@@ -323,8 +309,7 @@ function resetGame() {
 
 function loadFailureArt(node, failData) {
     "use strict";
-    const gameFrame = document.querySelector("#game-frame");
-    gameFrame.classList.add("shadow-main");
+    frequentElements.gameFrame.classList.add("shadow-main");
     const failureArt = document.createElement("img");
     const failureArtURL = failData['failure_art'];
     failureArt.src = failureArtURL;
