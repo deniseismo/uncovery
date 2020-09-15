@@ -120,6 +120,14 @@ $("#play-button").on('click', function() {
     };
 });
 
+/*
+const playButton = document.querySelector('#play-button');
+playButton.addEventListener('click', (e) => {
+    resetGame();
+    console.log(e.target);
+});
+*/
+
 
 function handleGuesses(e) {
     // TODO: handle guessing the albums
@@ -163,13 +171,22 @@ function handleGuesses(e) {
 //$('#submit-btn').on('click' , submitInput);
 $(document).on("submit", "#submit-form", submitInput);
 
-/* 'activates' buttons */
-$('.method').on('click', function() {
+// activate buttons
+const buttonsContainer = document.querySelector('#buttons-container');
+// add an event listener to a buttons wrapper (event bubbling)
+buttonsContainer.addEventListener('click', (event) => {
+    const isButton = event.target.nodeName === 'INPUT';
+    // check if a button was clicked, not the div
+    if (!isButton) {
+        return;
+    };
     const methodButtonsList = document.querySelectorAll(".method");
     methodButtonsList.forEach(button => button.classList.remove('active'));
-    this.classList.add('active');
+    event.target.classList.add('active');
+    // change placeholder to a correct one
     setPlaceholder();
-    $('#text-field').val('');
+    const textField = document.querySelector("#text-field");
+    textField.value = '';
 });
 
 /* displays 'options' menu when the input's focused  */
@@ -226,7 +243,6 @@ function removeGuessedAlbum(albumID) {
 
 function setPlaceholder() {
     const activeButtonID = document.querySelector('.button.active').id;
-    console.log(activeButtonID);
     const textField = document.querySelector('#text-field');
     if (activeButtonID === 'by_username') {
         textField.placeholder = 'last.fm username';
@@ -252,7 +268,7 @@ function prepareGame() {
     guessResultsContainer.style.display = "block";
     const guessResultsText = document.querySelector(".score-text");
     guessResultsText.textContent = "You haven't guessed any albums yet. 😟"
-    playButton = document.querySelector("#play-button");
+    const playButton = document.querySelector("#play-button");
     playButton.value = 'GIVE UP';
     const okButton = document.querySelector(".ok-btn");
     okButton.style.display = "none";
@@ -269,7 +285,7 @@ function cancelGame() {
     guessForm.id = 'submit-form';
     const methodButtonsList = document.querySelectorAll(".method");
     methodButtonsList.forEach(button => button.style.display = 'block');
-    playButton = document.querySelector("#play-button");
+    const playButton = document.querySelector("#play-button");
     playButton.value = 'PLAY';
     const okButton = document.querySelector(".ok-btn");
     okButton.style.display = "block";

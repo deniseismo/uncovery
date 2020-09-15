@@ -6,7 +6,7 @@ import time
 import requests
 import requests_cache
 
-from uncover.helpers.utils import timeit, filter_album_name, get_filtered_name
+from uncover.helpers.utils import timeit, get_filtered_names_list, get_filtered_name
 
 requests_cache.install_cache()
 
@@ -188,7 +188,7 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
                 filtered_name = get_filtered_name(album['name'])
                 an_album_dict = {
                     "title": album['name'],
-                    "names": [album['name'].lower()] + filter_album_name(album['name']),
+                    "names": [album['name'].lower()] + get_filtered_names_list(album['name']),
                     "image": album['image'][size]['#text'],
                 }
                 an_album_dict['names'] = list(set(an_album_dict['names']))
