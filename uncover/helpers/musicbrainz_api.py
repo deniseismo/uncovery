@@ -63,6 +63,21 @@ def get_artist_mbid(artist: str):
     try:
         mbid = response.json()["artists"][0]["id"]
     except (KeyError, IndexError):
+        mbid = get_artist_mbid_v2(artist)
+    if not mbid:
+        return None
+    return mbid
+
+
+def get_artist_mbid_v2(artist: str):
+    url = "http://musicbrainz.org/ws/2/artist/"
+    params = {"query": artist, "limit": "1", "fmt": "json"}
+    response = requests.get(url=url, params=params)
+    if response.status_code != 200:
+        return None
+    try:
+        mbid = response.json()["artists"][0]["id"]
+    except (KeyError, IndexError):
         return None
     return mbid
 
