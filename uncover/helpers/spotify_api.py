@@ -3,7 +3,7 @@ import random
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from uncover.helpers.lastfm_api import lastfm_get_artist_correct_name
+import uncover.helpers.lastfm_api as lastfm_api
 from uncover.helpers.musicbrainz_api import mb_get_artists_albums
 from uncover.helpers.utils import get_filtered_names_list, jprint
 
@@ -88,7 +88,7 @@ def spotify_get_artist_top_albums(artist: str):
     :return:
     """
     # try correcting some typos in artist's name
-    correct_name = lastfm_get_artist_correct_name(artist)
+    correct_name = lastfm_api.lastfm_get_artist_correct_name(artist)
     if correct_name:
         artist = correct_name
     try:

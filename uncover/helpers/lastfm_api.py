@@ -1,7 +1,6 @@
 import json
 import os
 import random
-import time
 
 import requests
 import requests_cache
@@ -82,56 +81,6 @@ def lastfm_get_artist_correct_name(artist: str):
     except (KeyError, TypeError, json.decoder.JSONDecodeError):
         return None
     return correct_name
-
-
-def lookup_tags(artist: str):
-    """
-    :param artist: musician/band
-    :return: top 3 tags from the given artist in the form of a string
-    """
-    response = lastfm_get_response({
-        'method': 'artist.getTopTags',
-        'artist': artist
-    })
-    # in case of an error, return None
-    if response.status_code != 200:
-        return None
-    tags = [tag['name'] for tag in response.json()['toptags']['tag'][:3]]
-
-    tags_string = ', '.join(tags)
-
-    # rate limiting
-    if not getattr(response, 'from_cache', False):
-        time.sleep(0.25)
-    return tags_string
-
-
-def lastfm_get_artist_top_albums(artist: str, size=3, amount=9):
-    """
-    :param amount: a number of albums, default = 9
-    :param size: 3 - large size (300x300)
-    :param artist: artist's name (musician, band, etc)
-    :return: a dict {album_name: album_image_url}
-    """
-    # try correcting some typos in artist's name
-    correct_name = lastfm_get_artist_correct_name(artist)
-    if correct_name:
-        artist = correct_name
-
-    response = lastfm_get_response({
-        'method': 'artist.getTopAlbums',
-        'artist': artist
-    })
-    # in case of an error, return None
-    if response.status_code != 200:
-        return None
-    try:
-        album_images = {
-            album['name']: album['image'][size]["#text"] for album in response.json()['topalbums']['album'][:amount]
-            if album['image'][size]["#text"]}
-    except KeyError:
-        return None
-    return album_images
 
 
 @timeit

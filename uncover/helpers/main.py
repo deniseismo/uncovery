@@ -1,5 +1,5 @@
-from uncover.helpers.discogs_api import get_album_discogs_id, discogs_get_album_image
-from uncover.helpers.lastfm_api import lastfm_get_artist_correct_name
+import uncover.helpers.discogs_api as discogs_api
+import uncover.helpers.lastfm_api as lastfm_api
 from uncover.helpers.musicbrainz_api import mb_get_album_image, mb_get_artists_albums
 from uncover.helpers.spotify_api import spotify_get_album_image
 from uncover.helpers.utils import timeit
@@ -29,9 +29,9 @@ def ultimate_album_image_finder(album_title=None, artist=None, mbid=None):
     # -- Discogs
     if not album_image:
         # find album's discogs id
-        discogs_id = get_album_discogs_id(album_title, artist)
+        discogs_id = discogs_api.get_album_discogs_id(album_title, artist)
         if discogs_id:
-            album_image = discogs_get_album_image(discogs_id)
+            album_image = discogs_api.discogs_get_album_image(discogs_id)
             print('finding through discogs')
 
     if not album_image:
@@ -48,7 +48,7 @@ def get_artists_top_albums_images(artist: str):
     :return:
     """
     # try correcting some typos in artist's name
-    correct_name = lastfm_get_artist_correct_name(artist)
+    correct_name = lastfm_api.lastfm_get_artist_correct_name(artist)
     if correct_name:
         artist = correct_name
         print(f'the correct name is {correct_name}')

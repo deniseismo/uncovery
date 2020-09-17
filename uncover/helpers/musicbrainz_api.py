@@ -4,7 +4,7 @@ import musicbrainzngs
 import requests
 import requests_cache
 
-from uncover.helpers.lastfm_api import lastfm_get_artist_correct_name, lastfm_get_album_listeners
+import uncover.helpers.lastfm_api as lastfm_api
 from uncover.helpers.utils import timeit, get_filtered_names_list, get_filtered_name
 
 requests_cache.install_cache()
@@ -146,7 +146,7 @@ def mb_get_artists_albums(artist: str, mbid=None, amount=9):
         alternative_name = mb_get_album_alternative_name(release['id']).replace("“", "").replace("”", "")
         full_title = release['title'].replace("’", "'")
         correct_title = full_title.lower()
-        rating = lastfm_get_album_listeners(correct_title, artist)
+        rating = lastfm_api.lastfm_get_album_listeners(correct_title, artist)
         filtered_name = get_filtered_name(full_title)
         an_album_dict = {
             "title": full_title,
@@ -193,40 +193,3 @@ def mb_get_album_image(mbid: str, size='large'):
     except (KeyError, IndexError):
         return None
     return image
-
-
-@timeit
-def get_artists_top_albums_images_via_mb(artist):
-    """
-    :param artist: artist's name
-    :return: a dict of album pictures {album_title: album_image_url}
-    """
-    # try correcting some typos in artist's name
-    correct_name = lastfm_get_artist_correct_name(artist)
-    if correct_name:
-        artist = correct_name
-    try:
-        albums = mb_get_artists_albums(artist)
-    except AttributeError:
-        print('attribute error')
-        return None
-    # initialize a dict to avoid KeyErrors
-    album_info = {"info": artist, "albums": []}
-
-    for album in list(albums):
-        album_image = mb_get_album_image(album['id'])
-        if album_image:
-            album['image'] = album_image
-    # print(f'there are {len(album_info["albums"])} cover art images!')
-    # get album ids right
-    album_id = 0
-    for album in albums:
-        if 'image' in album:
-            album['id'] = album_id
-            album_info['albums'].append(album)
-            album_id += 1
-    if not album_info["albums"]:
-        # if the artist somehow has no albums to show
-        print('error: no albums to show')
-        return None
-    return album_info
