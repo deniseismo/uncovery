@@ -5,7 +5,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 from uncover.helpers.lastfm_api import get_artist_correct_name
 from uncover.helpers.musicbrainz_api import get_artists_albums
-from uncover.helpers.utils import get_filtered_names_list
+from uncover.helpers.utils import get_filtered_names_list, jprint
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -63,21 +63,24 @@ def search_an_album(album: str, artist: str):
     """
     query = "album:" + album + " artist:" + artist
     try:
-        album_info = spotify.search(q=query, type="album", limit=1, market='SE')
+        album_info = spotify.search(q=query, type="album", limit=5, market='SE')
     except spotipy.exceptions.SpotifyException:
         return None
-
-    try:
-        album_image_url = album_info["albums"]["items"][0]["images"][0]["url"]
-    except IndexError:
+    print(f'album: {album}, artist {artist}')
+    jprint(album_info)
+    if not album_info:
+        return None
+    album_image_url = None
+    for item in album_info['albums']['items']:
+        if item['artists'][0]['name'] == artist:
+            try:
+                album_image_url = item['images'][0]['url']
+                break
+            except IndexError:
+                return None
+    if not album_image_url:
         return None
     return album_image_url
-
-# if "https://api.spotify.com/v1/search?query=album%3AComputerwelt+artist%3Akraftwerk&type=album&offset=0&limit=20" == "https://api.spotify.com/v1/search?query=album%3AComputerwelt+artist%3Akraftwerk&type=album&offset=0&limit=20":
-#     print("equal")
-#
-# jprint(search_an_album('Computerwelt', "Kraftwerk"))
-
 
 
 def get_artists_top_albums_images_via_spotify(artist: str):
@@ -106,18 +109,3 @@ def get_artists_top_albums_images_via_spotify(artist: str):
     print(f'there are {len(album_info["albums"])} albums found with Spotify')
     return album_info
 
-# G.O.O.D. Morning, G.O.O.D. Night
-# 808s & Heartbreak
-# Cruel Summer
-# Jesus Is King
-# Graduation
-# My Beautiful Dark Twisted Fantasy
-# The College Dropout
-# Yeezus
-# The Life of Pablo
-# ye
-# Late Registration
-
-# print(get_artists_top_albums_images_via_spotify('Pink Floyd'))
-
-# print(search_an_album('G.O.O.D. Morning, G.O.O.D. Night', 'Kanye West'))

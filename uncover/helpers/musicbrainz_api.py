@@ -190,7 +190,10 @@ def get_album_image_via_mb(mbid: str, size='large'):
     if response.status_code != 200:
         print("couldn't find an image :(")
         return None
-    image = response.json()['images'][0]['thumbnails'][size]
+    try:
+        image = response.json()['images'][0]['thumbnails'][size]
+    except (KeyError, IndexError):
+        return None
     return image
 
 

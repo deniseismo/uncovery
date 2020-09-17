@@ -2,6 +2,7 @@ import os
 
 import discogs_client
 
+from uncover.helpers.joint import ultimate_album_image_finder
 from uncover.helpers.lastfm_api import get_artist_correct_name
 from uncover.helpers.musicbrainz_api import get_artists_albums, get_album_image_via_mb
 from uncover.helpers.utils import timeit
@@ -9,7 +10,7 @@ from uncover.helpers.utils import timeit
 discogs = discogs_client.Client('uncover', user_token=os.environ.get('DISCOGS_USER_TOKEN'))
 
 
-def get_album_id(album: str, artist: str):
+def get_album_discogs_id(album: str, artist: str):
     """
     :param artist: artist's name
     :param album: album name
@@ -65,11 +66,13 @@ def get_artist_top_albums_images_via_discogs(artist: str):
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": []}
     for album in list(albums):
-        album_id = get_album_id(album['title'], artist=artist)
-        if not album_id:
-            album_image = get_album_image(album_id='', mbid=album['id'])
-        else:
-            album_image = get_album_image(album_id)
+        album_id = get_album_discogs_id(album['title'], artist=artist)
+        # if not album_id:
+        #     album_image = get_album_image(album_id='', mbid=album['id'])
+        # else:
+        #     album_image = get_album_image(album_id)
+        album_image = ultimate_album_image_finder(album_title=album['title'], artist=artist, mbid=album['id'],
+                                                  discogs_id=album_id)
         if album_image:
             album['image'] = album_image
     album_id = 0
