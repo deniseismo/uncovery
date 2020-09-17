@@ -3,15 +3,15 @@ import random
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from uncover.helpers.lastfm_api import get_artist_correct_name
-from uncover.helpers.musicbrainz_api import get_artists_albums
+from uncover.helpers.lastfm_api import lastfm_get_artist_correct_name
+from uncover.helpers.musicbrainz_api import mb_get_artists_albums
 from uncover.helpers.utils import get_filtered_names_list, jprint
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
 
-def get_albums_by_playlist(playlist_id: str):
+def spotify_get_users_playlist_albums(playlist_id: str):
     """
     :param playlist_id: spotify's playlist ID or a playlist's URL
     :return: a dict {album_title: album_image_url}
@@ -51,10 +51,7 @@ def get_albums_by_playlist(playlist_id: str):
     return album_info
 
 
-get_albums_by_playlist('https://open.spotify.com/playlist/2qoLvXr84mMas2tOEH8gEJ?si=YoHsJME-SNCmPKP-u8LJJQ')
-
-
-def search_an_album(album: str, artist: str):
+def spotify_get_album_image(album: str, artist: str):
     """
     search for an album with the query: q=album:gold%20artist:abba&type=album
     :param album: album's title
@@ -72,7 +69,8 @@ def search_an_album(album: str, artist: str):
         return None
     album_image_url = None
     for item in album_info['albums']['items']:
-        if item['artists'][0]['name'] == artist:
+        if item['artists'][0]['name'].lower() == artist.lower():
+            print(f"artist's name is equal! {artist}, album: {album}")
             try:
                 album_image_url = item['images'][0]['url']
                 break
@@ -83,19 +81,19 @@ def search_an_album(album: str, artist: str):
     return album_image_url
 
 
-def get_artists_top_albums_images_via_spotify(artist: str):
+def spotify_get_artist_top_albums(artist: str):
     """
     get artist's album images through Spotify's API
     :param artist: artist's name
     :return:
     """
     # try correcting some typos in artist's name
-    correct_name = get_artist_correct_name(artist)
+    correct_name = lastfm_get_artist_correct_name(artist)
     if correct_name:
         artist = correct_name
     try:
         # gets album titles
-        album_titles = get_artists_albums(artist).keys()
+        album_titles = mb_get_artists_albums(artist).keys()
     except AttributeError:
         return None
     if not album_titles:
@@ -103,7 +101,7 @@ def get_artists_top_albums_images_via_spotify(artist: str):
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": dict()}
     for album_title in album_titles:
-        album_image = search_an_album(album_title, artist)
+        album_image = spotify_get_album_image(album_title, artist)
         if album_image:
             album_info["albums"][album_title] = album_image
     print(f'there are {len(album_info["albums"])} albums found with Spotify')

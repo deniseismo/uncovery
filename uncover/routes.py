@@ -1,9 +1,9 @@
 from flask import render_template, request, jsonify, make_response, url_for
 
 from uncover import app
-from uncover.helpers.discogs_api import get_artist_top_albums_images_via_discogs
-from uncover.helpers.lastfm_api import get_users_top_albums
-from uncover.helpers.spotify_api import get_albums_by_playlist
+from uncover.helpers.lastfm_api import lastfm_get_users_top_albums
+from uncover.helpers.main import get_artists_top_albums_images
+from uncover.helpers.spotify_api import spotify_get_users_playlist_albums
 from uncover.helpers.utils import display_failure_art
 from uncover.info import get_failure_images
 
@@ -41,7 +41,7 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
-    albums = get_users_top_albums(username, time_period=time_period)
+    albums = lastfm_get_users_top_albums(username, time_period=time_period)
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())
@@ -74,10 +74,10 @@ def get_albums_by_artist():
         ),
             404)
 
-    # albums = get_artists_top_albums_via_lastfm(artist)  # through lastfm api
+    # albums = lastfm_get_artist_top_albums(artist)  # through lastfm api
     # albums = get_artists_top_albums_images_via_mb(artist)  # through musicbrainz
-    # albums = get_artists_top_albums_images_via_spotify(artist) # through Spotify
-    albums = get_artist_top_albums_images_via_discogs(artist)  # through Discogs
+    # albums = spotify_get_artist_top_albums(artist) # through Spotify
+    albums = get_artists_top_albums_images(artist)  # through Discogs
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())
@@ -112,7 +112,7 @@ def get_albums_by_spotify():
         ),
             404)
     # gets albums info through spotify's api based on playlist's id
-    albums = get_albums_by_playlist(playlist_id)
+    albums = spotify_get_users_playlist_albums(playlist_id)
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())

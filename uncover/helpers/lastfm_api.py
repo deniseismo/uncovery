@@ -6,6 +6,7 @@ import time
 import requests
 import requests_cache
 
+import uncover.helpers.main as joint
 from uncover.helpers.utils import timeit, get_filtered_names_list, get_filtered_name
 
 requests_cache.install_cache()
@@ -22,7 +23,7 @@ def lastfm_get_response(payload: dict):
     return response
 
 
-def get_album_info(album: str, artist: str):
+def lastfm_get_album_listeners(album: str, artist: str):
     """
 
     :param album: album's title
@@ -46,7 +47,7 @@ def get_album_info(album: str, artist: str):
     return int(album_listeners)
 
 
-def get_artist_info(artist: str):
+def lastfm_get_artist_mbid(artist: str):
     response = lastfm_get_response({
         'method': 'artist.getInfo',
         'artist': artist
@@ -63,7 +64,7 @@ def get_artist_info(artist: str):
     return artist_mbid
 
 
-def get_artist_correct_name(artist: str):
+def lastfm_get_artist_correct_name(artist: str):
     """
     Use the last.fm corrections data to check whether the supplied artist has a correction to a canonical artist
     :param artist: artist's name as is
@@ -105,7 +106,7 @@ def lookup_tags(artist: str):
     return tags_string
 
 
-def get_artists_top_albums_via_lastfm(artist: str, size=3, amount=9):
+def lastfm_get_artist_top_albums(artist: str, size=3, amount=9):
     """
     :param amount: a number of albums, default = 9
     :param size: 3 - large size (300x300)
@@ -113,7 +114,7 @@ def get_artists_top_albums_via_lastfm(artist: str, size=3, amount=9):
     :return: a dict {album_name: album_image_url}
     """
     # try correcting some typos in artist's name
-    correct_name = get_artist_correct_name(artist)
+    correct_name = lastfm_get_artist_correct_name(artist)
     if correct_name:
         artist = correct_name
 
@@ -134,9 +135,8 @@ def get_artists_top_albums_via_lastfm(artist: str, size=3, amount=9):
 
 
 @timeit
-def get_users_top_albums(username: str, size=3, time_period="overall", amount=25):
+def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", amount=25):
     """
-
     :param amount: amount ot albums
     :param time_period: (Optional) : overall | 7day | 1month | 3month | 6month | 12month | shuffle
                                     - The time period over which to retrieve top artists for.
@@ -165,8 +165,8 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
     # in case of an error, return None
     if response.status_code != 200:
         return None
+    # in case the user doesn't have any albums for a specific time period but perhaps does have for 'overall'
     if shuffle and time_period != "overall" and not response.json()['topalbums']['album']:
-        print('no albums found, making it overall')
         time_period = "overall"
         response = lastfm_get_response({
             'method': 'user.getTopAlbums',
@@ -183,20 +183,26 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
     try:
         a_set_of_titles = set()
         for album in response.json()['topalbums']['album'][:amount]:
+            # gets the correct artist's anme
+            artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
+            # gets the album image
+            album_image = joint.ultimate_album_image_finder(album_title=album['name'],
+                                                            artist=artist_correct_name)
             # checks for incorrect/broken images
-            if album['image'][size]['#text']:
+            if album_image:
                 filtered_name = get_filtered_name(album['name'])
                 an_album_dict = {
                     "title": album['name'],
                     "names": [album['name'].lower()] + get_filtered_names_list(album['name']),
-                    "image": album['image'][size]['#text'],
+                    "image": album_image
+                    # "image": album['image'][size]['#text'],
                 }
                 an_album_dict['names'] = list(set(an_album_dict['names']))
                 # appends an album dict with all the info to the list
                 if filtered_name not in a_set_of_titles:
                     a_set_of_titles.add(filtered_name)
                     album_info["albums"].append(an_album_dict)
-    except KeyError:
+    except (KeyError, IndexError):
         return None
     if not album_info["albums"]:
         print('user has nothing to show')
@@ -210,4 +216,3 @@ def get_users_top_albums(username: str, size=3, time_period="overall", amount=25
         album['id'] = album_id
         album_id += 1
     return album_info
-

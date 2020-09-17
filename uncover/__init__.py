@@ -1,5 +1,4 @@
 from flask import Flask
-import os
 
 app = Flask(__name__)
 # dicts passed to 'jsonify()' don't get reordered
