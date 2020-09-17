@@ -26,10 +26,6 @@ def get_albums_by_username():
     # TODO: validator on input (e.g. not having spaces in the username)
     # input's values from the form
     content = request.get_json()
-    print(f'content is {content}')
-
-    # username = request.form["qualifier"]
-    # time_period = request.form["option"]
     username = content['qualifier']
     time_period = content['option']
     if not username:
@@ -62,7 +58,6 @@ def get_albums_by_artist():
     """
     # input's value from the form
     content = request.get_json()
-    # artist = request.form["qualifier"]
     artist = content["qualifier"]
     if not artist:
         # if the input's empty, send an error message and a 'failure' image
@@ -73,11 +68,8 @@ def get_albums_by_artist():
                                     filename=failure_art_filename)}
         ),
             404)
-
-    # albums = lastfm_get_artist_top_albums(artist)  # through lastfm api
-    # albums = get_artists_top_albums_images_via_mb(artist)  # through musicbrainz
-    # albums = spotify_get_artist_top_albums(artist) # through Spotify
-    albums = get_artists_top_albums_images(artist)  # through Discogs
+    # get albums images
+    albums = get_artists_top_albums_images(artist)
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())
@@ -87,8 +79,6 @@ def get_albums_by_artist():
                                     filename=failure_art_filename)}
         ),
             404)
-    # slicing the dictionary to make it 9 albums long
-    # albums["albums"] = dict(itertools.islice(albums["albums"].items(), 9))
     return jsonify(albums)
 
 
@@ -99,7 +89,6 @@ def get_albums_by_spotify():
     :return: jsonified dictionary {album_name: cover_art}
     """
     # input's value from the form
-    # playlist_id = request.form["qualifier"]
     content = request.get_json()
     playlist_id = content["qualifier"]
     if not playlist_id:

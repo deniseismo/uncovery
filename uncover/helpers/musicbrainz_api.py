@@ -127,7 +127,6 @@ def mb_get_artists_albums(artist: str, mbid=None, amount=9):
         artist_mbid = mb_get_artist_mbid(artist)
     if not artist_mbid:
         # if nothing found
-        print("could't find correct mbid")
         return None
     album_query_filter = '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json'
     response = requests.get(
@@ -165,13 +164,10 @@ def mb_get_artists_albums(artist: str, mbid=None, amount=9):
         if filtered_name not in a_set_of_titles:
             a_set_of_titles.add(filtered_name)
             albums.append(an_album_dict)
-    print(f'there are {len(albums)} {artist} albums')
-    print(albums)
     if not albums:
         #  in case of some weird error with the mbid taken via lastfm make another attempt with v2
         albums = get_artists_albums_v2(artist)
     sorted_albums = sorted(albums, key=lambda item: item['rating'], reverse=True)
-    print(sorted_albums)
     return sorted_albums
 
 
@@ -181,15 +177,19 @@ def mb_get_album_image(mbid: str, size='large'):
     :param size: small, etc.
     :return: an album cover location
     """
+    # /release-group/{mbid}/front[-(250|500|1200)]
     if not mbid:
         return None
-    url = "http://coverartarchive.org/release-group/" + mbid
-    response = requests.get(url)
-    if response.status_code != 200:
-        print("couldn't find an image :(")
+    # url = "http://coverartarchive.org/release-group/" + mbid
+    # get what's supposed to be a 'front' cover
+    url = "http://coverartarchive.org/release-group/" + mbid + '/front'
+    # response = requests.get(url)
+    response = requests.head(url)
+    if response.status_code != 307:
         return None
     try:
-        image = response.json()['images'][0]['thumbnails'][size]
+        image = response.headers['location']
+        # image = response.json()['images'][0]['thumbnails'][size]
     except (KeyError, IndexError):
         return None
     return image

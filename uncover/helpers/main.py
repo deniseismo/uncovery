@@ -23,6 +23,7 @@ def ultimate_album_image_finder(album_title=None, artist=None, mbid=None):
     # -- MusicBrainz
     if not album_image:
         if mbid:
+            print(f'mbid: {mbid}, album: {album_title}')
             album_image = mb_get_album_image(mbid)
             print('finding through mb')
 

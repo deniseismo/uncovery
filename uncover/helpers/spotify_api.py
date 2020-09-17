@@ -5,7 +5,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 import uncover.helpers.lastfm_api as lastfm_api
 from uncover.helpers.musicbrainz_api import mb_get_artists_albums
-from uncover.helpers.utils import get_filtered_names_list, jprint
+from uncover.helpers.utils import get_filtered_names_list
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -63,14 +63,11 @@ def spotify_get_album_image(album: str, artist: str):
         album_info = spotify.search(q=query, type="album", limit=5, market='SE')
     except spotipy.exceptions.SpotifyException:
         return None
-    print(f'album: {album}, artist {artist}')
-    jprint(album_info)
     if not album_info:
         return None
     album_image_url = None
     for item in album_info['albums']['items']:
         if item['artists'][0]['name'].lower() == artist.lower():
-            print(f"artist's name is equal! {artist}, album: {album}")
             try:
                 album_image_url = item['images'][0]['url']
                 break
@@ -106,4 +103,3 @@ def spotify_get_artist_top_albums(artist: str):
             album_info["albums"][album_title] = album_image
     print(f'there are {len(album_info["albums"])} albums found with Spotify')
     return album_info
-
