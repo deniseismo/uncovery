@@ -1,8 +1,12 @@
 {% extends "layout.html" %}
 {% block content  %}
-<div class="flex-container splash">
-    <h1>Page Not Found</h1>
-    <p>What you were looking for is just not there.</p>
-    <h1><a href="{{ url_for('home') }}">go somewhere nice</a></h1>
+<div class="flex-container splash container-404">
+    <img src="{{ url_for('static', filename='images/background/background-404-broken.gif') }}"
+         class="broken-record-gif-404"/>
+    <div class="flex-container container-text-404 shadow-main">
+        <h1>Page Not Found</h1>
+        <p>You broke the record.</p>
+        <h2><a href="{{ url_for('home') }}" class="go-home-link">fix everything</a></h2>
+    </div>
 </div>
 {% endblock content %}

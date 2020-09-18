@@ -226,6 +226,40 @@ it encapsulates all the content with the navigation except 'waves'
     justify-content: center;
 }
 
+.container-404 {
+    background-image: url('images/background/background-404-broken.gif');
+    height: 100%;
+}
+
+.broken-record-gif-404 {
+    border: 15px solid #3B444B;
+    position: relative;
+    filter: hue-rotate(45deg);
+}
+
+.container-text-404 {
+    position: absolute;
+    top: 15%;
+    background-color: #3B4A3A;
+    color: #F0F2F3;
+    padding: 2rem;
+    flex-flow: column nowrap;
+}
+
+.go-home-link {
+    color: #F0F2F3;
+    padding: 0.55rem 0.55rem;
+    background-color: #111315;
+    text-decoration: none;
+    margin-left: 1rem;
+}
+
+.go-home-link:hover {
+    text-decoration: none;
+    color: #F0F2F3;
+    background-color: #493A4A;
+}
+
 /* UNCOVER TITLE */
 .uncover-title {
     float: left;
