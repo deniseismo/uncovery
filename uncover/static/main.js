@@ -18,6 +18,8 @@ const submitInput = function() {
   "use strict";
   // make 'play-button' disappear
   frequentElements.playButton.classList.remove("visible");
+  // make 'download-button' disappear
+  frequentElements.downloadButton.classList.remove("visible");
   // make info at the bottom disappear (if exists)
   const responseInfo = document.querySelector(".data-info");
   if (responseInfo) {
@@ -94,6 +96,8 @@ const submitInput = function() {
 
       frequentElements.playButton.classList.add("visible");
       frequentElements.downloadButton.classList.add("visible");
+      const collageURL = document.querySelector('#collage-link');
+      collageURL.href = data['collage'];
 
       /*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
                       $('#game-frame').after(`<class="data-info">${data["info"]}</div>`);
@@ -119,29 +123,6 @@ submitForm.addEventListener('submit', () => {
     submitInput();
   };
 });
-
-// event listener for download button
-//frequentElements.downloadButton.onclick = (e) => {
-//  fetch('download', {
-//    method: 'GET',
-//    headers: new Headers({
-//      'responseType': 'blob'
-//    })
-//  }).then(response => response.blob())
-//  .then(data => {
-//    var element = document.createElement('a');
-//    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-//    element.setAttribute('download', filename);
-//
-//    element.style.display = 'none';
-//    document.body.appendChild(element);
-//
-//    element.click();
-//
-//    document.body.removeChild(element);
-//  })
-//
-//}
 
 // play button
 frequentElements.playButton.onclick = (e) => {

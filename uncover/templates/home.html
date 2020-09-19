@@ -64,8 +64,11 @@
             <p class="lcd-by-anybody">by anybody.</p>
         </div>
     </div>
-    <input class="button btn shadow-main play-button" type="button" id="play-button" value="PLAY">
-    <a href="{{ url_for('download') }}" target="_blank"><input class="button btn shadow-main play-button" type="button"
-                                                               id="download-button" value="DOWNLOAD"></a>
+    <div class="flex-container">
+        <input class="button btn shadow-main play-button" type="button" id="play-button" value="PLAY">
+        <a href="" target="_blank" id="collage-link">
+            <input class="button btn shadow-main play-button" id="download-button" type="button" value="COLLAGE">
+        </a>
     </div>
+</div>
 {% endblock content %}
