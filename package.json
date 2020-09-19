@@ -1,0 +1,35 @@
+{
+  "name": "uncover",
+  "version": "0.0.5",
+  "description": "album cover collage generator & album guesser",
+  "main": "/static/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deniseismo/uncover.git"
+  },
+  "keywords": [
+    "album",
+    "cover",
+    "cover",
+    "art",
+    "collage",
+    "spotify",
+    "last.fm"
+  ],
+  "author": "Denis 'seismo' Kostarev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deniseismo/uncover/issues"
+  },
+  "homepage": "https://github.com/deniseismo/uncover#readme",
+  "dependencies": {
+    "bootstrap": "^4.5.2",
+    "fuse.js": "^6.4.1",
+    "jquery": "^3.5.1",
+    "jquery.waitforimages": "^2.4.0",
+    "popper.js": "^1.16.1"
+  }
+}

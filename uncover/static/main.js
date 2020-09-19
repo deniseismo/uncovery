@@ -8,6 +8,7 @@ let guessedCount = 0;
 const frequentElements = {
   gameFrame: document.querySelector('#game-frame'),
   playButton: document.querySelector('#play-button'),
+  downloadButton: document.querySelector('#download-button'),
   textField: document.querySelector('#text-field'),
   selectOptions: document.querySelector('.select-options'),
   activeButtonID() { return document.querySelector('.button.active').id }
@@ -92,6 +93,7 @@ const submitInput = function() {
       });
 
       frequentElements.playButton.classList.add("visible");
+      frequentElements.downloadButton.classList.add("visible");
 
       /*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
                       $('#game-frame').after(`<class="data-info">${data["info"]}</div>`);
@@ -117,6 +119,29 @@ submitForm.addEventListener('submit', () => {
     submitInput();
   };
 });
+
+// event listener for download button
+//frequentElements.downloadButton.onclick = (e) => {
+//  fetch('download', {
+//    method: 'GET',
+//    headers: new Headers({
+//      'responseType': 'blob'
+//    })
+//  }).then(response => response.blob())
+//  .then(data => {
+//    var element = document.createElement('a');
+//    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+//    element.setAttribute('download', filename);
+//
+//    element.style.display = 'none';
+//    document.body.appendChild(element);
+//
+//    element.click();
+//
+//    document.body.removeChild(element);
+//  })
+//
+//}
 
 // play button
 frequentElements.playButton.onclick = (e) => {

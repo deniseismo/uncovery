@@ -35,6 +35,11 @@ def timeit(method):
 
 
 def get_filtered_name(album_name):
+    """
+    :param album_name: an album name to filter
+    :return: a fitlered name
+    """
+    # TODO: (remaster) (limited edition) (remastered)
     a_correct_title = album_name.lower().replace("“", "") \
         .replace("”", "").replace(":", "").replace("’", "'").replace("the ", "")
     no_deluxe_pattern = r"((super)?\s?(deluxe)\s?).*"

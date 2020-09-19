@@ -1,6 +1,10 @@
-from flask import render_template, request, jsonify, make_response, url_for
+import os
+import secrets
+
+from flask import render_template, request, jsonify, make_response, url_for, send_from_directory
 
 from uncover import app
+from uncover.helpers.collage_creator import create_a_collage
 from uncover.helpers.lastfm_api import lastfm_get_users_top_albums
 from uncover.helpers.main import get_artists_top_albums_images
 from uncover.helpers.spotify_api import spotify_get_users_playlist_albums
@@ -47,6 +51,10 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
+    a_list_of_image_urls = [album['image'] for album in albums['albums']]
+    collage_filename = save_collage(a_list_of_image_urls[:9])
+    image_file = url_for('static', filename='collage/' + collage_filename)
+    albums['collage'] = image_file
     return jsonify(albums)
 
 
@@ -79,6 +87,11 @@ def get_albums_by_artist():
                                     filename=failure_art_filename)}
         ),
             404)
+
+    a_list_of_image_urls = [album['image'] for album in albums['albums']]
+    collage_filename = save_collage(a_list_of_image_urls[:9])
+    image_file = url_for('static', filename='collage/' + collage_filename)
+    albums['collage'] = image_file
     return jsonify(albums)
 
 
@@ -111,7 +124,24 @@ def get_albums_by_spotify():
                                     filename=failure_art_filename)}
         ),
             404)
+    a_list_of_image_urls = [album['image'] for album in albums['albums']]
+    collage_filename = save_collage(a_list_of_image_urls[:9])
+    image_file = url_for('static', filename='collage/' + collage_filename)
+    albums['collage'] = image_file
     return jsonify(albums)
+
+
+@app.route("/download")
+def download():
+    return send_from_directory(app.static_folder, 'images/cat-success.png', mimetype='image/jpg')
+
+
+def save_collage(a_list_of_album_images):
+    random_hex = secrets.token_hex(8)
+    collage_filename = random_hex
+    collage_path = os.path.join(app.root_path, 'static/collage', collage_filename)
+    create_a_collage(a_list_of_album_images, collage_path)
+    return collage_filename + '.png'
 
 
 @app.errorhandler(404)

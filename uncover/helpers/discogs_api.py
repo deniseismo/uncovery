@@ -36,6 +36,7 @@ def discogs_get_album_image(album_discogs_id: str, mbid=None):
         return None
     try:
         album_image = discogs.release(album_discogs_id).images[0]['uri']
+        print(discogs.release(album_discogs_id).images)
     except (IndexError, KeyError):
         return None
     return album_image

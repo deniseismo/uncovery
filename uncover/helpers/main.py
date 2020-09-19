@@ -33,7 +33,7 @@ def ultimate_album_image_finder(album_title=None, artist=None, mbid=None):
         discogs_id = discogs_api.get_album_discogs_id(album_title, artist)
         if discogs_id:
             album_image = discogs_api.discogs_get_album_image(discogs_id)
-            print('finding through discogs')
+            print(f'finding {album_title} through discogs')
 
     if not album_image:
         # No method helped :(
