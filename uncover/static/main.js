@@ -186,6 +186,8 @@ function updateScore() {
   const scoreText = document.querySelector(".score-text");
   if (guessedCount === total) {
     scoreText.textContent = `Incredible! Well done.`;
+     frequentElements.playButton.value = 'PLAY SOME MORE';
+     frequentElements.playButton.classList.add('won');
   } else {
     scoreText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
   }
