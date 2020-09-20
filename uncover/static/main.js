@@ -259,7 +259,51 @@ function loadCoverArt(data) {
     flexItem.appendChild(successIcon);
     frequentElements.gameFrame.appendChild(flexItem);
   }
+  resizeCoverArtImages(length);
 };
+
+function resizeCoverArtImages(amountOfAlbums) {
+  console.log(amountOfAlbums);
+  switch (amountOfAlbums) {
+    case 1:
+      const albumImage = document.querySelector(".cover-art");
+      albumImage.classList.add('cover-big');
+      break;
+    case 2:
+    case 4:
+      let albumImagesList = document.querySelectorAll(".cover-art");
+      albumImagesList = document.querySelectorAll(".cover-art");
+      albumImageList.forEach((image) => image.classList.add('cover-medium'));
+      break;
+    case 5:
+    case 8:
+      console.log(document.querySelector('.art-0'), document.querySelector('.art-1'));
+      [document.querySelector(".art-0"), document.querySelector(".art-1")]
+        .forEach((image) => image.classList.add('cover-medium'));
+      break;
+    case 7:
+      [document.querySelector(".art-0"), document.querySelector(".art-1"),
+      document.querySelector(".art-2")]
+        .forEach((image) => image.classList.add('cover-medium'));
+
+      [document.querySelector(".art-3"), document.querySelector(".art-4"),
+      document.querySelector(".art-5"), document.querySelector(".art-6")]
+        .forEach((image) => image.classList.add('cover-small'));
+      const referenceNode = document.querySelector('#item-2');
+      const specialContainer = document.createElement('div');
+      specialContainer.classList.add('seven-albums-special-container');
+      insertAfter(specialContainer, referenceNode);
+      [document.querySelector("#item-3"), document.querySelector("#item-4"),
+        document.querySelector("#item-5"), document.querySelector("#item-6")]
+        .forEach((item) => specialContainer.appendChild(item));
+      break;
+  }
+};
+
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+};
+
 
 // removes an album from the list of guessed albums so that it didn't count more than once
 function removeGuessedAlbum(albumID) {
