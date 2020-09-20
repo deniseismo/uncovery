@@ -117,6 +117,9 @@ body {
   visibility: hidden;
 }
 
+.lcd-quote:hover {
+  cursor: help;
+}
 /* animation for the LCD Soundsystem quote */
 @keyframes showUp {
   60% {
@@ -474,7 +477,7 @@ it encapsulates all the content with the navigation except 'waves'
 }
 
 .cover-art.cover-big:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 /* failure art width & height */

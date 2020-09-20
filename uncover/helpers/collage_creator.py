@@ -10,11 +10,12 @@ def resize_image(image, size):
     :param size: a new size
     :return:
     """
-    if size[0] <= image.width:
-        image.thumbnail(size, Image.ANTIALIAS)
-        return image
-    else:
-        return image.resize(size, Image.LANCZOS)
+    return image.resize(size, Image.LANCZOS)
+    # if size[0] <= image.width:
+    #     image.thumbnail(size, Image.ANTIALIAS)
+    #     return image
+    # else:
+    #     return image.resize(size, Image.LANCZOS)
 
 
 def arrange_the_images(a_list_of_image_urls: list, collage_image: Image, width: int, size: tuple, offset=(0, 0)):

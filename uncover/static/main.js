@@ -184,7 +184,11 @@ function updateScore() {
   const total = Math.min(totalAmountOfAlbums, 9);
   guessedCount++;
   const scoreText = document.querySelector(".score-text");
-  scoreText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
+  if (guessedCount === total) {
+    scoreText.textContent = `Incredible! Well done.`;
+  } else {
+    scoreText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
+  }
 }
 
 // activate buttons
@@ -271,9 +275,8 @@ function resizeCoverArtImages(amountOfAlbums) {
       break;
     case 2:
     case 4:
-      let albumImagesList = document.querySelectorAll(".cover-art");
-      albumImagesList = document.querySelectorAll(".cover-art");
-      albumImageList.forEach((image) => image.classList.add('cover-medium'));
+      const albumImagesList = document.querySelectorAll(".cover-art");
+      albumImagesList.forEach((image) => image.classList.add('cover-medium'));
       break;
     case 5:
     case 8:
@@ -331,7 +334,7 @@ function prepareGame() {
   "use strict";
   const scoreContainer = document.querySelector('.score-container');
   frequentElements.textField.id = 'play-field';
-  frequentElements.textField.placeholder = 'try guessing the albums';
+  frequentElements.textField.placeholder = 'Can you name all the albums?';
   frequentElements.textField.value = ''
   const submitForm = document.querySelector("#submit-form");
   submitForm.id = 'guess-form';
