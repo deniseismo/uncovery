@@ -62,7 +62,6 @@ const submitInput = function() {
   }).then(data => {
     /* storing album info in a global object */
     albums = data['albums'];
-    notGuessedAlbums = albums.slice(0, 10);
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
     // when done, removes current pictures from the frame, adds new ones
@@ -129,6 +128,7 @@ frequentElements.playButton.onclick = (e) => {
   // reset score, remove 'success' icons
   resetGame();
   e.target.classList.toggle('on');
+  e.target.classList.remove('won');
   if (e.target.classList.contains('on')) {
     prepareGame();
     const input = document.querySelector('#play-field');
@@ -170,28 +170,89 @@ function handleGuesses(e) {
   }
 };
 
+
+// highlights the guessed album with animation & puts the success icon over the image
 function highlightGuessedAlbum(albumID) {
   const guessedAlbum = document.querySelector(`.art-${albumID}`);
   const title = albums[albumID]['title'];
+
+  guessedAlbum.classList.remove("guessed-right");
+  /**
+   trigger a reflow in between removing and adding the class name © css-tricks.com
+   helps restarting animation & playing it again if needed
+  */
+  void guessedAlbum.offsetWidth;
   guessedAlbum.classList.add("guessed-right");
   guessedAlbum.alt = title;
   const successIcon = document.querySelector(`#success-${albumID}`);
   successIcon.classList.add('visible');
 };
 
+// updates score
 function updateScore() {
   const totalAmountOfAlbums = albums.length;
   const total = Math.min(totalAmountOfAlbums, 9);
   guessedCount++;
   const scoreText = document.querySelector(".score-text");
   if (guessedCount === total) {
-    scoreText.textContent = `Incredible! Well done.`;
-     frequentElements.playButton.value = 'PLAY SOME MORE';
-     frequentElements.playButton.classList.add('won');
+    // triggers winning function if all albums guessed
+    gameWon();
   } else {
+    // updates the message otherwise
     scoreText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
   }
-}
+};
+
+// handles winning
+function gameWon() {
+  const scoreText = document.querySelector(".score-text");
+  const randomIndex = Math.floor(Math.random() * winningMessage.length);
+  scoreText.textContent = winningMessage[randomIndex]["quote"];
+  const scoreContainer = document.querySelector('.score-container');
+  scoreContainer.classList.add('info-tooltip', 'score-game-won');
+  scoreContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
+  addTooltips();
+  frequentElements.playButton.value = 'PLAY SOME MORE';
+  frequentElements.playButton.classList.add('won');
+};
+
+// an array of winning messages (song lyrics, etc.)
+const winningMessage = [
+  {
+    'quote': "I wanna be adored!",
+    'credits': "© The Stone Roses — I Wanna be Adored"
+  },
+  {
+    'quote': "I'm worth a million in prizes!",
+    'credits': "© Iggy Pop — Lust for Life"
+  },
+  {
+    'quote': "You are invited by anyone to do anything!",
+    'credits': "© Dismemberment Plan — You are Invited"
+  },
+  {
+    'quote': "I'm on a roll this time",
+    'credits': "© Radiohead — Lucky"
+  },
+  {
+    'quote': "And you may ask yourself, well, how did I get here?",
+    'credits': "© Talking Heads — Once in a Lifetime"
+  },
+  {
+    'quote': "I'm a genius, a prodigy, a demon at Maths & Science, I'm up for a prize!",
+    'credits': "© Belle and Sebastian — Act of the Apostle II"
+  },
+  {
+    'quote': "I've never been wrong",
+    'credits': "© LCD Soundsystem — Losing My Edge"
+  },
+  {
+    'quote': "Get a drink, have a good time now. Welcome to paradise, paradise, paradise",
+    'credits': "The Avalanches — Since I Left you"
+  }
+];
+
+
 
 // activate buttons
 const buttonsContainer = document.querySelector('#buttons-container');
@@ -349,6 +410,7 @@ function prepareGame() {
   frequentElements.playButton.value = 'GIVE UP';
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "none";
+  notGuessedAlbums = albums.slice(0, 10);
 };
 
 function cancelGame() {
@@ -363,7 +425,7 @@ function cancelGame() {
   guessForm.id = 'submit-form';
   const methodButtonsList = document.querySelectorAll(".method");
   methodButtonsList.forEach(button => button.style.display = 'block');
-  frequentElements.playButton.value = 'PLAY';
+  frequentElements.playButton.value = 'GUESS ALBUMS';
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "block";
   setPlaceholder();
@@ -379,7 +441,9 @@ function resetGame() {
   successIconList.forEach(icon => icon.classList.remove('visible'));
   // remove a description of the album
   const coverArtList = document.querySelectorAll('.cover-art');
-  coverArtList.forEach(image => image.alt = "");
+  coverArtList.forEach(image => {
+    image.alt = "";
+  });
 };
 
 function loadFailureArt(node, failData) {
@@ -420,7 +484,7 @@ function removeAllChildNodes(parent) {
 
 /* tooltips */
 // find all elements that need tooltips
-const tooltipElements = document.querySelectorAll('.info-tooltip')
+const tooltipElements = document.querySelectorAll('.info-tooltip');
 // loop through every such element
 tooltipElements.forEach(function(el) {
   // add 'label' element
@@ -431,3 +495,13 @@ tooltipElements.forEach(function(el) {
   tooltip.textContent = el.dataset.tooltip;
   el.appendChild(tooltip);
 });
+
+function addTooltips() {
+  const tooltippedElements = document.querySelectorAll('.info-tooltip')
+  tooltippedElements.forEach((element) => {
+    const tooltip = document.createElement('label');
+    tooltip.classList.add('tooltipText');
+    tooltip.textContent = element.dataset.tooltip;
+    element.appendChild(tooltip);
+  });
+};

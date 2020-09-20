@@ -2,6 +2,8 @@ import urllib.request
 
 from PIL import Image
 
+from uncover.helpers.utils import timeit
+
 
 def resize_image(image, size):
     """
@@ -36,6 +38,7 @@ def arrange_the_images(a_list_of_image_urls: list, collage_image: Image, width: 
                              offset[1] + (counter // to_fit) * resized.height))
 
 
+@timeit
 def create_a_collage(a_list_of_images, filename_path):
     DIMENSIONS = {
         1: (600, 600),
