@@ -688,3 +688,23 @@ label.tooltipText:after {
 .success-icon.visible {
   opacity: 1;
 }
+
+.copyright {
+  position: absolute;
+  font-size: 1rem;
+  background-color: #ebecf1;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  opacity: 0.75;
+}
+
+.copyright > p {
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.italic {
+  font-style: italic;
+}
