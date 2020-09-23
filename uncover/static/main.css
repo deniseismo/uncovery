@@ -538,11 +538,11 @@ it encapsulates all the content with the navigation except 'waves'
   margin-right: 0.35rem;
 }
 
-.logo:hover {
+/*.logo:hover {
   border: 0.5px solid #1D2225;
   margin-right: calc(0.35rem - 2px);
   border-radius: 50%;
-}
+}*/
 
 .loading *,
 .loading *:before,
@@ -692,7 +692,6 @@ label.tooltipText:after {
 .copyright {
   position: absolute;
   font-size: 1rem;
-  background-color: #ebecf1;
   width: 100%;
   left: 0;
   bottom: 0;

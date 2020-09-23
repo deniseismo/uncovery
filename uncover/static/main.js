@@ -398,7 +398,8 @@ function prepareGame() {
   const scoreContainer = document.querySelector('.score-container');
   frequentElements.textField.id = 'play-field';
   frequentElements.textField.placeholder = 'Can you name all the albums?';
-  frequentElements.textField.value = ''
+  frequentElements.textField.value = '';
+  frequentElements.textField.focus();
   const submitForm = document.querySelector("#submit-form");
   submitForm.id = 'guess-form';
   frequentElements.selectOptions.style.display = 'none';

@@ -40,7 +40,7 @@ def get_filtered_name(album_name):
     :param album_name: an album name to filter
     :return: a fitlered name
     """
-    # TODO: (mono/stereo)
+    # TODO: (mono/stereo) &/and
 
     # replace some weird characters with normal ones
     a_correct_title = album_name.lower().replace("’", "'")

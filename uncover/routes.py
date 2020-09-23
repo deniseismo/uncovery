@@ -51,10 +51,10 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
-    a_list_of_image_urls = [album['image'] for album in albums['albums']]
-    collage_filename = save_collage(a_list_of_image_urls[:9])
-    image_file = url_for('static', filename='collage/' + collage_filename)
-    albums['collage'] = image_file
+    # a_list_of_image_urls = [album['image'] for album in albums['albums']]
+    # collage_filename = save_collage(a_list_of_image_urls[:9])
+    # image_file = url_for('static', filename='collage/' + collage_filename)
+    # albums['collage'] = image_file
     return jsonify(albums)
 
 
