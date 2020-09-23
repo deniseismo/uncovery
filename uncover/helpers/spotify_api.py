@@ -5,12 +5,13 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 import uncover.helpers.lastfm_api as lastfm_api
 from uncover.helpers.musicbrainz_api import mb_get_artists_albums
-from uncover.helpers.utils import get_filtered_names_list
+from uncover.helpers.utils import get_filtered_names_list, timeit
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
 
+@timeit
 def spotify_get_users_playlist_albums(playlist_id: str):
     """
     :param playlist_id: spotify's playlist ID or a playlist's URL

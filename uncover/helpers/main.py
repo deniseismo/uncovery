@@ -1,27 +1,26 @@
 import uncover.helpers.discogs_api as discogs_api
 import uncover.helpers.lastfm_api as lastfm_api
-from uncover.helpers.musicbrainz_api import mb_get_album_image, mb_get_artists_albums
+from uncover.helpers.musicbrainz_api import mb_get_album_image, mb_get_artists_albums, mb_get_album_mbid
 from uncover.helpers.spotify_api import spotify_get_album_image
 from uncover.helpers.utils import timeit
 
 
 @timeit
-def ultimate_album_image_finder(album_title=None, artist=None, mbid=None):
+def ultimate_album_image_finder(album_title: str, artist: str):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
-    :param album_title:
-    :param artist:
-    :param mbid:
+    :param album_title: album's title
+    :param artist: artist's name
     :return:
     """
     album_image = None
 
     # try getting the image through Spotify's API
-    if album_title and artist:
-        album_image = spotify_get_album_image(album_title, artist)
-
+    album_image = spotify_get_album_image(album_title, artist)
+    print(album_title)
     # -- MusicBrainz
     if not album_image:
+        mbid = mb_get_album_mbid(album_title, artist)
         if mbid:
             print(f'mbid: {mbid}, album: {album_title}')
             album_image = mb_get_album_image(mbid)

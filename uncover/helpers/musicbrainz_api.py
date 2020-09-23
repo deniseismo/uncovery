@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 import musicbrainzngs
 import requests
 import requests_cache
@@ -9,9 +7,6 @@ from uncover.helpers.utils import timeit, get_filtered_names_list, get_filtered_
 
 requests_cache.install_cache()
 
-# Tell musicbrainz what your app is, and how to contact you
-# (this step is required, as per the webservice access rules
-# at http://wiki.musicbrainz.org/XML_Web_Service/Rate_Limiting )
 musicbrainzngs.set_useragent("albumguesser", "0.1", "denisseismo@gmail.com")
 
 
@@ -70,6 +65,11 @@ def mb_get_artist_mbid(artist: str):
 
 
 def mb_get_artist_mbid_v2(artist: str):
+    """
+    a backup search for an artist's mbid
+    :param artist: artist's name
+    :return: mbid
+    """
     url = "http://musicbrainz.org/ws/2/artist/"
     params = {"query": artist, "limit": "1", "fmt": "json"}
     response = requests.get(url=url, params=params)
@@ -82,49 +82,33 @@ def mb_get_artist_mbid_v2(artist: str):
     return mbid
 
 
-def get_artists_albums_v2(artist: str):
+def mb_get_album_mbid(album: str, artist: str):
     """
-    reserve function in case of some failures
-    gets artist's albums by getting mbid directly through MusicBrainz
-    (in case there was some error with mbid taken via lastfm)
-    :param artist:
-    :return:
+    search for an album's mbid on MusicBrainz
+    :param album: album's name
+    :param artist: artist's name (e.g. MGMT, The Prodigy, etc.)
+    :return: mbid (MusicBrainz ID)
     """
-    artist_mbid = mb_get_artist_mbid(artist)
-    if not artist_mbid:
-        return None
-    response = requests.get(
-        'https://musicbrainz.org/ws/2/release-group?query=arid:'
-        + artist_mbid
-        + '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json')
+    url = "http://musicbrainz.org/ws/2/release-group/?query=release:"
+    album_query_filter = f'%20AND%20artist:{artist}%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json'
+    response = requests.get(url + album + album_query_filter)
     if response.status_code != 200:
         return None
-    albums = defaultdict(dict)
-    for release in response.json()["release-groups"][:]:
-        # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
-        # add an id of an album to the dict
-        albums[release['title'].lower()]['id'] = release['id']
-        # get album rating
-        rating = mb_get_album_rating(release['id'])
-        # add rating if exists
-        albums[release['title'].lower()]['rating'] = rating if rating else 0
-    return albums
+    try:
+        mbid = response.json()["release-groups"][0]["id"]
+    except (KeyError, IndexError):
+        return None
+    return mbid
 
 
 @timeit
-def mb_get_artists_albums(artist: str, mbid=None, amount=9):
+def mb_get_artists_albums(artist: str):
     """
     :param artist: artist's name
-    :param mbid: MusicBrainz id (overrides artist's name if present)
-    :param amount: a number of albums
     :return:
     """
-    if mbid:
-        # if mbid is already provided
-        artist_mbid = mbid
-    else:
-        # find mbid directly through MB
-        artist_mbid = mb_get_artist_mbid(artist)
+    artist_mbid = mb_get_artist_mbid(artist)
+
     if not artist_mbid:
         # if nothing found
         return None
@@ -164,9 +148,7 @@ def mb_get_artists_albums(artist: str, mbid=None, amount=9):
         if filtered_name not in a_set_of_titles:
             a_set_of_titles.add(filtered_name)
             albums.append(an_album_dict)
-    if not albums:
-        #  in case of some weird error with the mbid taken via lastfm make another attempt with v2
-        albums = get_artists_albums_v2(artist)
+
     sorted_albums = sorted(albums, key=lambda item: item['rating'], reverse=True)
     return sorted_albums
 
@@ -193,3 +175,4 @@ def mb_get_album_image(mbid: str, size='large'):
     except (KeyError, IndexError):
         return None
     return image
+

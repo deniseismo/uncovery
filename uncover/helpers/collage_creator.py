@@ -5,6 +5,7 @@ from PIL import Image
 from uncover.helpers.utils import timeit
 
 
+@timeit
 def resize_image(image, size):
     """
 
@@ -20,6 +21,7 @@ def resize_image(image, size):
     #     return image.resize(size, Image.LANCZOS)
 
 
+@timeit
 def arrange_the_images(a_list_of_image_urls: list, collage_image: Image, width: int, size: tuple, offset=(0, 0)):
     """
     :param a_list_of_image_urls: a list of Pillow Image objects

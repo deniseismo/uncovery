@@ -5,7 +5,7 @@ import random
 import requests
 import requests_cache
 
-import uncover.helpers.main as joint
+import uncover.helpers.main as main
 from uncover.helpers.utils import timeit, get_filtered_names_list, get_filtered_name
 
 requests_cache.install_cache()
@@ -132,11 +132,11 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     try:
         a_set_of_titles = set()
         for album in response.json()['topalbums']['album'][:amount]:
-            # gets the correct artist's anme
+            # gets the correct artist's name
             artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
             # gets the album image
-            album_image = joint.ultimate_album_image_finder(album_title=album['name'],
-                                                            artist=artist_correct_name)
+            album_image = main.ultimate_album_image_finder(album_title=album['name'],
+                                                           artist=artist_correct_name)
             # checks for incorrect/broken images
             if album_image:
                 filtered_name = get_filtered_name(album['name'])
