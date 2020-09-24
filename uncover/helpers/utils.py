@@ -34,7 +34,6 @@ def timeit(method):
     return timed
 
 
-@timeit
 def get_filtered_name(album_name):
     """
     :param album_name: an album name to filter

@@ -124,9 +124,8 @@ def mb_get_artists_albums(artist: str):
     albums = []
     # initialize a set of titles used to filter duplicate titles
     a_set_of_titles = set()
-    for release in response.json()["release-groups"][:]:
-        # ADDITIONAL CHECK-UP(?): if release['artist-credit'][0]['artist']['id'] == artist_mbid
-        alternative_name = mb_get_album_alternative_name(release['id']).replace("“", "").replace("”", "")
+    for release in response.json()["release-groups"]:
+        alternative_name = mb_get_album_alternative_name(release['id'])
         full_title = release['title'].replace("’", "'")
         correct_title = full_title.lower()
         rating = lastfm_api.lastfm_get_album_listeners(correct_title, artist)
@@ -139,6 +138,8 @@ def mb_get_artists_albums(artist: str):
         }
         # add an alternative album name if exists
         if alternative_name:
+            alternative_name = alternative_name.replace("“", "").replace("”", "")
+            an_album_dict['altenative_name'] = alternative_name
             an_album_dict["names"] += alternative_name
             an_album_dict["names"] += get_filtered_names_list(alternative_name)
 
@@ -176,3 +177,5 @@ def mb_get_album_image(mbid: str, size='large'):
         return None
     return image
 
+
+print(mb_get_album_image('944dea40-9bb4-4454-8291-ed627cf77532'))
