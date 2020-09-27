@@ -181,8 +181,12 @@ def mb_get_album_image(mbid: str, size='large', fast=False):
         # a faster way (lower resolution)
         url = "http://coverartarchive.org/release-group/" + mbid
         response = requests.get(url)
+        if response.status_code != 200:
+            return None
         try:
-            image = response.json()['images'][0]['thumbnails'][size]
+            images = response.json()
+            if images:
+                image = images['images'][0]['thumbnails'][size]
         except (KeyError, IndexError):
             return None
     else:
