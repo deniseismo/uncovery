@@ -1,5 +1,7 @@
 import os
 
 
-API_KEY = os.environ.get('API_KEY')
-USER_AGENT = os.environ.get('USER_AGENT')
+class Config:
+    SERVER_NAME = '192.168.1.62:5000'
+    JSON_SORT_KEYS = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')

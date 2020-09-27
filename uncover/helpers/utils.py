@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import random
 import re
 import time
@@ -11,6 +12,14 @@ def display_failure_art(list_of_images):
     :return: a 'failure' cover art location
     """
     return random.choice(list_of_images)
+
+
+def get_failure_images():
+    images_folder = 'uncover/static/images/fail'
+    failure_art_list = [os.path.join('images/fail/', f)
+                        for f in os.listdir(images_folder)
+                        if os.path.isfile(os.path.join(images_folder, f))]
+    return failure_art_list
 
 
 def jprint(obj):
@@ -95,3 +104,4 @@ def log_artist_missing_from_db(artist_name: str):
         writer = csv.writer(file)
         writer.writerow([artist_name])
         return True
+

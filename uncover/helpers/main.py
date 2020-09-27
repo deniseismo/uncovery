@@ -27,7 +27,7 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
         mbid = mb_get_album_mbid(album_title, artist)
     if mbid and not album_image:
         print(f'mbid: {mbid}, album: {album_title}')
-        album_image = mb_get_album_image(mbid)
+        album_image = mb_get_album_image(mbid, fast=fast)
         print('finding through mb')
 
     if not album_image and not fast:
@@ -135,6 +135,7 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     if not artist:
         # no such artist found
         print('no artist found')
+        log_artist_missing_from_db(artist_name=artist_name)
         return None
     print('artist found')
     album_entries = Album.query.filter_by(artist=artist).all()

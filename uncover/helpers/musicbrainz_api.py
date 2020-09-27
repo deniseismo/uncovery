@@ -165,8 +165,9 @@ def mb_get_artists_albums(artist: str):
     return sorted_albums
 
 
-def mb_get_album_image(mbid: str, size='large'):
+def mb_get_album_image(mbid: str, size='large', fast=False):
     """
+    :param fast: a faster way to get the cover image
     :param mbid: mbid for an album release on MusicBrainz
     :param size: small, etc.
     :return: an album cover location
@@ -175,16 +176,24 @@ def mb_get_album_image(mbid: str, size='large'):
     # /release-group/{mbid}/front[-(250|500|1200)]
     if not mbid:
         return None
-    # url = "http://coverartarchive.org/release-group/" + mbid
-    # get what's supposed to be a 'front' cover
-    url = "http://coverartarchive.org/release-group/" + mbid + '/front'
-    # response = requests.get(url)
-    response = requests.head(url, headers=headers)
-    if response.status_code != 307:
-        return None
-    try:
-        image = response.headers['location']
-        # image = response.json()['images'][0]['thumbnails'][size]
-    except (KeyError, IndexError):
-        return None
+
+    if fast:
+        # a faster way (lower resolution)
+        url = "http://coverartarchive.org/release-group/" + mbid
+        response = requests.get(url)
+        try:
+            image = response.json()['images'][0]['thumbnails'][size]
+        except (KeyError, IndexError):
+            return None
+    else:
+        # get what's supposed to be a 'front' cover (slower but most likely gets higher quality)
+        url = "http://coverartarchive.org/release-group/" + mbid + '/front'
+        # response = requests.get(url)
+        response = requests.head(url, headers=headers)
+        if response.status_code != 307:
+            return None
+        try:
+            image = response.headers['location']
+        except (KeyError, IndexError):
+            return None
     return image

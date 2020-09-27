@@ -3,8 +3,8 @@ import secrets
 import urllib.request
 
 from PIL import Image
+from flask import current_app
 
-from uncover import app
 from uncover.helpers.utils import timeit
 
 
@@ -97,6 +97,6 @@ def create_a_collage(a_list_of_images, filename_path):
 def save_collage(a_list_of_album_images):
     random_hex = secrets.token_hex(8)
     collage_filename = random_hex
-    collage_path = os.path.join(app.root_path, 'static/collage', collage_filename)
+    collage_path = os.path.join(current_app.root_path, 'static/collage', collage_filename)
     create_a_collage(a_list_of_album_images, collage_path)
     return collage_filename + '.png'

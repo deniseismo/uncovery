@@ -1,15 +1,30 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
-# dicts passed to 'jsonify()' don't get reordered
-app.config['SERVER_NAME'] = '192.168.1.62:5000'
-app.config['JSON_SORT_KEYS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///uncover.db'
+from uncover.config import Config
 
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 
-from uncover import routes
-from uncover import helpers
-from uncover import models
+def create_app(config_class=Config):
+    """
+    creates an instance of an app
+    :param config_class: Config class file with all the configuration
+    :return: app
+    """
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    # pass the app to the database (initialize the app)
+    db.init_app(app)
+
+    from uncover.personal.routes import personal
+    from uncover.explore.routes import explore
+    from uncover.main.routes import main
+
+    # register all blueprints
+    app.register_blueprint(personal)
+    app.register_blueprint(explore)
+    app.register_blueprint(main)
+
+    return app

@@ -143,7 +143,8 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
 
             if not album_image:
                 album_image = main.ultimate_album_image_finder(album_title=album_name,
-                                                               artist=artist_correct_name)
+                                                               artist=artist_correct_name, fast=True)
+
             # checks for incorrect/broken images
             if album_image:
                 filtered_name = get_filtered_name(album['name'])
