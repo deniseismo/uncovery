@@ -20,6 +20,7 @@ const submitInput = function() {
   frequentElements.playButton.classList.remove("visible");
   // make 'download-button' disappear
   frequentElements.downloadButton.classList.remove("visible");
+  console.log(frequentElements.downloadButton);
   // make info at the bottom disappear (if exists)
   const responseInfo = document.querySelector(".data-info");
   if (responseInfo) {

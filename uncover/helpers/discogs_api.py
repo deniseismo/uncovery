@@ -28,6 +28,7 @@ def discogs_get_album_image(album_discogs_id: str, mbid=None):
     :param album_discogs_id: album's discogs id
     :return:
     """
+    album_image = None
     if mbid:
         print('fallback function worked')
         album_image = mb_get_album_image(mbid)
@@ -35,8 +36,9 @@ def discogs_get_album_image(album_discogs_id: str, mbid=None):
     if not album_discogs_id:
         return None
     try:
-        album_image = discogs.release(album_discogs_id).images[0]['uri']
-        print(discogs.release(album_discogs_id).images)
-    except (IndexError, KeyError):
+        album_images = discogs.release(album_discogs_id).images
+        if album_images:
+            album_image = album_images[0]['uri']
+    except (IndexError, KeyError, TypeError):
         return None
     return album_image

@@ -1,3 +1,4 @@
+import csv
 import json
 import random
 import re
@@ -78,3 +79,19 @@ def get_filtered_names_list(album_name):
     filtered_names.add(after_regex_no_articles)
     return list(filtered_names)
 
+
+def log_artist_missing_from_db(artist_name: str):
+    """
+    logs artist's name to the csv file of all the artists not yet found in db
+    :param artist_name: artist's name
+    """
+    with open('uncover/logging/artists_missing_from_db.csv', 'r', newline='', encoding='utf-8') as file:
+        contents = file.read()
+    if artist_name in contents:
+        print(f"{artist_name}'s already there")
+        # no need to add the artist
+        return None
+    with open('uncover/logging/artists_missing_from_db.csv', 'a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow([artist_name])
+        return True

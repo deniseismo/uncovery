@@ -1,7 +1,10 @@
+import os
+import secrets
 import urllib.request
 
 from PIL import Image
 
+from uncover import app
 from uncover.helpers.utils import timeit
 
 
@@ -32,7 +35,22 @@ def arrange_the_images(a_list_of_image_urls: list, collage_image: Image, width: 
     :return:
     """
     for counter, image_url in enumerate(a_list_of_image_urls):
-        an_image = Image.open(urllib.request.urlopen(image_url))
+        try:
+            an_image = Image.open(urllib.request.urlopen(image_url))
+        except ValueError:
+            try:
+                print(f'image_url: {image_url}')
+                print(f'current: {os.getcwd()}')
+                parent_directory = os.path.dirname(os.getcwd())
+                print(f'parent: {parent_directory}')
+                path = os.getcwd() + '/uncover/' + image_url
+                print(f'path: {path}')
+                an_image = Image.open(path)
+            except Exception:
+                print('Exception :(')
+                return None
+
+        # an_image = Image.open(os.path.dirname(os.getcwd()) + '/static/' + image_url)
         resized = resize_image(an_image, size)
         to_fit = (width - offset[0]) // resized.width
         collage_image.paste(resized,
@@ -80,3 +98,20 @@ def create_a_collage(a_list_of_images, filename_path):
         arrange_the_images(album_images[2:], collage_image, width, IMAGE_SIZE['default'], (0, 900))
 
     collage_image.save(f'{filename_path}.png')
+
+
+def save_collage(a_list_of_album_images):
+    random_hex = secrets.token_hex(8)
+    collage_filename = random_hex
+    collage_path = os.path.join(app.root_path, 'static/collage', collage_filename)
+    create_a_collage(a_list_of_album_images, collage_path)
+    return collage_filename + '.png'
+
+# my_list = ['cover_art_images/650612481a0a73ed.png', 'cover_art_images/0c5da09c5176c445.png',
+#            'cover_art_images/a107ccc18cdaac88.png', 'cover_art_images/d6884d532d117edf.png',
+#            'cover_art_images/814884b469fb86c4.png', 'cover_art_images/f3b153e13a87c2f3.png',
+#            'cover_art_images/eaeea84fbd084542.png', 'cover_art_images/d4d95f713ceaf3ff.png',
+#            'cover_art_images/229bc98595232eb4.png']
+#
+#
+# create_a_collage(my_list, os.path.dirname(os.getcwd()) + '/static/collage/' + 'some_collage')

@@ -1,3 +1,6 @@
+import os
+import time
+
 import musicbrainzngs
 import requests
 import requests_cache
@@ -15,9 +18,10 @@ def mb_get_album_alternative_name(album_id: str):
     :param album_id: album_id from MusicBrainz
     :return: alternative name for an album
     """
+    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"inc": "ratings", "fmt": "json"}
-    response = requests.get(url=url, params=params)
+    response = requests.get(url=url, params=params, headers=headers)
     if response.status_code != 200:
         return None
     try:
@@ -27,21 +31,24 @@ def mb_get_album_alternative_name(album_id: str):
     return alternative
 
 
-def mb_get_album_rating(album_id: str):
+def mb_get_album_release_date(album_id: str):
     """
     :param album_id: album_id from MusicBrainz
-    :return: rating (float)
+    :return: album release date
     """
+    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
-    params = {"inc": "ratings", "fmt": "json"}
-    response = requests.get(url=url, params=params)
+    params = {"fmt": "json"}
+    response = requests.get(url=url, params=params, headers=headers)
     if response.status_code != 200:
         return None
     try:
-        rating = response.json()['rating']['value']
-    except (KeyError, IndexError):
+        release_date = response.json()['first-release-date']
+    except (KeyError, IndexError, TypeError):
         return None
-    return rating
+    if not getattr(response, 'from_cache', False):
+        time.sleep(1)
+    return release_date
 
 
 def mb_get_artist_mbid(artist: str):
@@ -50,9 +57,10 @@ def mb_get_artist_mbid(artist: str):
     :param artist: artist's name (e.g. MGMT, The Prodigy, etc.)
     :return: mbid (MusicBrainz ID)
     """
+    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     url = "http://musicbrainz.org/ws/2/artist/"
     params = {"query": "artist:" + artist, "limit": "1", "fmt": "json"}
-    response = requests.get(url=url, params=params)
+    response = requests.get(url=url, params=params, headers=headers)
     if response.status_code != 200:
         return None
     try:
@@ -89,9 +97,10 @@ def mb_get_album_mbid(album: str, artist: str):
     :param artist: artist's name (e.g. MGMT, The Prodigy, etc.)
     :return: mbid (MusicBrainz ID)
     """
+    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     url = "http://musicbrainz.org/ws/2/release-group/?query=release:"
     album_query_filter = f'%20AND%20artist:{artist}%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json'
-    response = requests.get(url + album + album_query_filter)
+    response = requests.get(url + album + album_query_filter, headers=headers)
     if response.status_code != 200:
         return None
     try:
@@ -107,6 +116,7 @@ def mb_get_artists_albums(artist: str):
     :param artist: artist's name
     :return:
     """
+    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     artist_mbid = mb_get_artist_mbid(artist)
 
     if not artist_mbid:
@@ -116,7 +126,8 @@ def mb_get_artists_albums(artist: str):
     response = requests.get(
         'https://musicbrainz.org/ws/2/release-group?query=arid:'
         + artist_mbid
-        + album_query_filter)
+        + album_query_filter,
+        headers=headers)
     # in case of an error, return None
     if response.status_code != 200:
         return None
@@ -160,6 +171,7 @@ def mb_get_album_image(mbid: str, size='large'):
     :param size: small, etc.
     :return: an album cover location
     """
+    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     # /release-group/{mbid}/front[-(250|500|1200)]
     if not mbid:
         return None
@@ -167,7 +179,7 @@ def mb_get_album_image(mbid: str, size='large'):
     # get what's supposed to be a 'front' cover
     url = "http://coverartarchive.org/release-group/" + mbid + '/front'
     # response = requests.get(url)
-    response = requests.head(url)
+    response = requests.head(url, headers=headers)
     if response.status_code != 307:
         return None
     try:
@@ -176,6 +188,3 @@ def mb_get_album_image(mbid: str, size='large'):
     except (KeyError, IndexError):
         return None
     return image
-
-
-print(mb_get_album_image('944dea40-9bb4-4454-8291-ed627cf77532'))

@@ -224,7 +224,7 @@ it encapsulates all the content with the navigation except 'waves'
 */
 .splash {
     width: 100%;
-    padding-top: 2%;
+   /* padding-top: 2%;*/
     flex-direction: column;
     justify-content: center;
 }
@@ -615,8 +615,6 @@ it encapsulates all the content with the navigation except 'waves'
   background-color: #7A911A;
 }
 
-
-/* TODO: fix animation fow when a person plays the same pictures again */
 /* a class for album covers that were guessed right */
 .guessed-right {
   animation: blink 0.6s cubic-bezier(.23,-0.69,0,1.79) forwards !important;
