@@ -48,10 +48,6 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
-    a_list_of_image_urls = [album['image'] for album in albums['albums']]
-    collage_filename = save_collage(a_list_of_image_urls[:9])
-    image_file = url_for('static', filename='collage/' + collage_filename)
-    albums['collage'] = image_file
     return jsonify(albums)
 
 
@@ -87,13 +83,6 @@ def sql_get_albums_by_artist():
                                     filename=failure_art_filename)}
         ),
             404)
-    # a_list_of_image_urls = [
-    #     url_for('static', filename='cover_art_images/' + os.path.basename(album['image']))
-    #     for album in albums['albums']]
-    # print(a_list_of_image_urls)
-    # collage_filename = save_collage(a_list_of_image_urls[:9])
-    # image_file = url_for('static', filename='collage/' + collage_filename)
-    # albums['collage'] = image_file
     return jsonify(albums)
 
 
@@ -163,29 +152,24 @@ def get_albums_by_spotify():
                                     filename=failure_art_filename)}
         ),
             404)
-    a_list_of_image_urls = [album['image'] for album in albums['albums']]
-    collage_filename = save_collage(a_list_of_image_urls[:9])
-    image_file = url_for('static', filename='collage/' + collage_filename)
-    albums['collage'] = image_file
     return jsonify(albums)
 
 
-@app.route("/save_collage")
-def save_collage():
+@app.route("/save_collage", methods=["POST"])
+def get_collage():
     """
     gets album pictures list to create a collage from
     :return: a URL to the saved collage
     """
     content = request.get_json()
-    album_pictures = content['images']
+    album_pictures = content['images'][:9]
+    print(album_pictures)
     collage_filename = save_collage(album_pictures)
     image_file = url_for('static', filename='collage/' + collage_filename)
-    return image_file
-
+    return jsonify(image_file)
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found():
     # note that we set the 404 status explicitly
     return render_template('404.html', title='Page Not Found'), 404
-

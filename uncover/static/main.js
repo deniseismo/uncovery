@@ -96,8 +96,8 @@ const submitInput = function() {
 
       frequentElements.playButton.classList.add("visible");
       frequentElements.downloadButton.classList.add("visible");
-      const collageURL = document.querySelector('#collage-link');
-      collageURL.href = data['collage'];
+//      const collageURL = document.querySelector('#collage-link');
+//      collageURL.href = data['collage'];
 
       /*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
                       $('#game-frame').after(`<class="data-info">${data["info"]}</div>`);
@@ -123,6 +123,29 @@ submitForm.addEventListener('submit', () => {
     submitInput();
   };
 });
+
+
+frequentElements.downloadButton.addEventListener('click', () => {
+  "use strict";
+  frequentElements.downloadButton.value = "WAIT FOR IT…";
+  fetch("save_collage", {
+    method: 'POST',
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    }),
+    body: JSON.stringify({
+      "images": albums.map(album => album.image)
+    })
+  }).then(response => response.json()).then(data => {
+    const myLink = document.createElement('a');
+    myLink.href = data;
+    myLink.target = "_blank";
+    document.body.appendChild(myLink);
+    myLink.click();
+    frequentElements.downloadButton.value = "SAVE COLLAGE";
+  });
+});
+
 
 // play button
 frequentElements.playButton.onclick = (e) => {
