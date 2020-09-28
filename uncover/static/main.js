@@ -530,3 +530,122 @@ function addTooltips() {
     element.appendChild(tooltip);
   });
 };
+
+
+const exploreButton = document.querySelector("#explore");
+exploreButton.addEventListener("click", (event) => {
+  // empty html
+  removeAllChildNodes(frequentElements.gameFrame);
+  const flexContainer = document.createElement("div");
+  flexContainer.id = "form";
+  const bar = document.createElement("div");
+  bar.class = "bar";
+  const label = document.createElement("div");
+  label.class = "label";
+  const slider = document.createElement("div");
+  slider.id = "r-slider";
+  bar.appendChild(label);
+  bar.appendChild(slider);
+  flexContainer.appendChild(bar);
+  frequentElements.gameFrame.appendChild(flexContainer);
+  createSlider();
+})
+
+
+
+function createSlider() {
+    const priceSlider = document.getElementById('r-slider');
+
+    noUiSlider.create(priceSlider, {
+        start: [1967, 2015],
+        tooltips: true,
+        connect: true,
+        padding: 0,
+        step: 1,
+        range: {
+            'min': 1950,
+            'max': 2020
+        },
+        pips: {
+            mode: 'values',
+            values: [1965, 1985, 2010],
+            density: 10
+        },
+        format: {
+            to: function (value) {
+                return parseInt(value);
+            },
+            from: function (value) {
+                return parseInt(value);
+            }
+        }
+    });
+
+    priceSlider.noUiSlider.on('change', (values, handle) => {
+        console.log(priceSlider.noUiSlider.get());
+    });
+
+
+    // ======== Slider set
+
+    const params = new URLSearchParams(window.location.search);
+    const minDiscount = params.get("mindiscount");
+    const priceRange = params.get("pricerange");
+
+    if (minDiscount) {
+        discountSlider.noUiSlider.set(parseInt(minDiscount));
+    }
+    if (priceRange) {
+        priceSlider.noUiSlider.set(priceRange.split(','));
+    }
+
+};
+
+//document.addEventListener("DOMContentLoaded", () => {
+//
+//
+//    const priceSlider = document.getElementById('r-slider');
+//
+//    noUiSlider.create(priceSlider, {
+//        start: [1967, 2015],
+//        tooltips: true,
+//        connect: true,
+//        padding: 0,
+//        step: 1,
+//        range: {
+//            'min': 1950,
+//            'max': 2020
+//        },
+//        pips: {
+//            mode: 'values',
+//            values: [1965, 1985, 2010],
+//            density: 10
+//        },
+//        format: {
+//            to: function (value) {
+//                return parseInt(value);
+//            },
+//            from: function (value) {
+//                return parseInt(value);
+//            }
+//        }
+//    });
+//
+//    priceSlider.noUiSlider.on('change', (values, handle) => {
+//        console.log(priceSlider.noUiSlider.get());
+//    });
+//
+//
+//    // ======== Slider set
+//
+//    const params = new URLSearchParams(window.location.search);
+//    const minDiscount = params.get("mindiscount");
+//    const priceRange = params.get("pricerange");
+//
+//    if (minDiscount) {
+//        discountSlider.noUiSlider.set(parseInt(minDiscount));
+//    }
+//    if (priceRange) {
+//        priceSlider.noUiSlider.set(priceRange.split(','));
+//    }
+//});

@@ -82,6 +82,22 @@ body {
   animation: fallDown 1000ms cubic-bezier(0.23, 1, 0.32, 1) forwards !important;
 }
 
+header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: #3b444b;
+  color: white !important;
+  height: 60px;
+}
+
+.logo-title-container {
+  margin-right: 230px;
+  display: flex;
+  align-items: flex-start;
+  width: 230px;
+}
+
 /* a default style for all the fields, forms & buttons */
 .default-field {
   height: calc(2.25rem + 2px);
@@ -107,6 +123,14 @@ body {
   border-color: #F0F2F3;
   border-radius: 0;
   width: 200px;
+}
+
+.navigation-bar > .button {
+  color: white;
+  background-color: #3b444b;
+  line-height: 60px;
+  padding: 0;
+  border: 0;
 }
 
 /* default text style for the LCD Soundsystem quote */
@@ -265,7 +289,6 @@ it encapsulates all the content with the navigation except 'waves'
 
 /* UNCOVER TITLE */
 .uncover-title {
-    float: left;
     position: relative;
     font-size: 2.5rem;
     font-weight: 800;
@@ -330,7 +353,7 @@ it encapsulates all the content with the navigation except 'waves'
 }
 
 .title-link {
-  color: #3b444b;
+  color: white;
 }
 .title-link:hover {
   text-decoration: none;
@@ -534,7 +557,6 @@ it encapsulates all the content with the navigation except 'waves'
 
 .logo {
   margin-top: 0.75rem;
-  float: left;
   margin-right: 0.35rem;
 }
 
@@ -704,4 +726,28 @@ label.tooltipText:after {
 
 .italic {
   font-style: italic;
+}
+/* SLIDER BELOW */
+#form {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    margin-bottom: 2rem;
+}
+.bar {
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+/* noUiSlider styles */
+.noUi-tooltip {
+    display: none;
+}
+.noUi-active .noUi-tooltip {
+    display: block;
+}
+.noUi-connect {
+    background: #911A1A;
 }
