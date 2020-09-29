@@ -4,6 +4,8 @@ let notGuessedAlbums;
 // a global variable that stores a number of albums guessed so far
 let guessedCount = 0;
 /* main AJAX function */
+let timeSpan;
+let tagsPicked = [];
 
 const frequentElements = {
   gameFrame: document.querySelector('#game-frame'),
@@ -11,6 +13,7 @@ const frequentElements = {
   downloadButton: document.querySelector('#download-button'),
   textField: document.querySelector('#text-field'),
   selectOptions: document.querySelector('.select-options'),
+  searchAndOptionsContainer: document.querySelector('.search-and-options-container'),
   activeButtonID() { return document.querySelector('.button.active').id }
 };
 
@@ -20,7 +23,6 @@ const submitInput = function() {
   frequentElements.playButton.classList.remove("visible");
   // make 'download-button' disappear
   frequentElements.downloadButton.classList.remove("visible");
-  console.log(frequentElements.downloadButton);
   // make info at the bottom disappear (if exists)
   const responseInfo = document.querySelector(".data-info");
   if (responseInfo) {
@@ -34,14 +36,24 @@ const submitInput = function() {
   // add spinner while waiting for the response
   loadSpinner(frequentElements.gameFrame);
   // posts to the flask's route /by_username
+  let qualifier = '';
+  let option = frequentElements.selectOptions.value
+  if (desiredMethod === "explore") {
+    option = {
+      "genres": ['jazz', 'metal'],
+      "time_span": timeSpan
+    }
+  } else {
+    qualifier = document.querySelector('#text-field').value;
+  };
   fetch(`${desiredMethod}`, {
     method: 'POST',
     headers: new Headers({
       'Content-Type': 'application/json'
     }),
     body: JSON.stringify({
-      "qualifier": document.querySelector('#text-field').value,
-      "option": frequentElements.selectOptions.value
+      "qualifier": qualifier,
+      "option": option
     })
   }).then(response => {
     // if response is not ok (status ain't no 200)
@@ -66,7 +78,6 @@ const submitInput = function() {
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
     // when done, removes current pictures from the frame, adds new ones
-    console.log(data);
     // empty html
     removeAllChildNodes(frequentElements.gameFrame);
     /* adds a class 'loading' to block animation before all images are loaded */
@@ -85,7 +96,6 @@ const submitInput = function() {
     /* waiting for all images to load before showing them up*/
     $('#game-frame').waitForImages(function() {
       /* remove progress bar once loaded */
-      console.log(this);
       progressBar.remove();
       /* remove 'loading' class that blocks animation of albums images */
       this.classList.remove("loading");
@@ -119,9 +129,9 @@ const submitInput = function() {
 const submitForm = document.querySelector('#submit-form');
 submitForm.addEventListener('submit', () => {
   // checks if the game is not on
-  if (!frequentElements.playButton.classList.contains('on')) {
+  if (submitForm.id === 'submit-form') {
     submitInput();
-  };
+  }
 });
 
 
@@ -287,13 +297,18 @@ buttonsContainer.addEventListener('click', (event) => {
   if (!isButton) {
     return;
   };
-  console.log(frequentElements.activeButtonID());
   const methodButtonsList = document.querySelectorAll(".method");
   methodButtonsList.forEach(button => button.classList.remove('active'));
   event.target.classList.add('active');
   // change placeholder to a correct one
   setPlaceholder();
   frequentElements.textField.value = '';
+  const sliderContainer = document.querySelector('.slider-container');
+  if (!(event.target.id === "explore")) {
+    if (sliderContainer) {
+      sliderContainer.remove();
+    };
+  };
 });
 
 /* displays 'options' menu when the input's focused  */
@@ -303,7 +318,6 @@ let timerID;
     clearTimeout(timerID);
     // make sure the button's 'username' and the game is off
     if (frequentElements.activeButtonID() === 'by_username' && !(frequentElements.playButton.classList.contains('on'))) {
-      console.log('showing');
       frequentElements.selectOptions.style.display = 'block';
     };
   });
@@ -312,7 +326,6 @@ let timerID;
 [frequentElements.textField, frequentElements.selectOptions].forEach(item => {
   item.addEventListener('focusout', () => {
     timerID = setTimeout(function() {
-       console.log('hiding');
       $(".select-options").hide();
   }, 10);
   });
@@ -412,8 +425,8 @@ function setPlaceholder() {
     frequentElements.textField.placeholder = 'last.fm username';
   } else if (frequentElements.activeButtonID() === 'by_artist') {
     frequentElements.textField.placeholder = 'artist name';
-  } else {
-    frequentElements.textField.placeholder = 'Spotify Playlist Link';
+  } else if (frequentElements.activeButtonID() === 'explore'){
+    frequentElements.textField.placeholder = 'music tags/genres';
   };
 }
 
@@ -534,29 +547,50 @@ function addTooltips() {
 
 const exploreButton = document.querySelector("#explore");
 exploreButton.addEventListener("click", (event) => {
-  // empty html
-  removeAllChildNodes(frequentElements.gameFrame);
-  const flexContainer = document.createElement("div");
-  flexContainer.id = "form";
-  const bar = document.createElement("div");
-  bar.class = "bar";
-  const label = document.createElement("div");
-  label.class = "label";
-  const slider = document.createElement("div");
-  slider.id = "r-slider";
-  bar.appendChild(label);
-  bar.appendChild(slider);
-  flexContainer.appendChild(bar);
-  frequentElements.gameFrame.appendChild(flexContainer);
-  createSlider();
+  if (!(frequentElements.activeButtonID() === 'explore')) {
+    createSliderContainer();
+    createSlider();
+    frequentElements.textField.id = "tag-field";
+    const submitForm = document.querySelector("#submit-form");
+    submitForm.id = 'tags-form';
+  }
+  const tagsSearchInput = document.querySelector('#tag-field');
+  tagsSearchInput.oninput = handleTags;
 })
+
+
+function createSliderContainer() {
+  const okButton = document.querySelector(".ok-btn");
+  okButton.value = 'ADD';
+  okButton.disabled = true;
+  const sliderContainer = document.createElement("div");
+  sliderContainer.classList.add('slider-container');
+  const sliderBar = document.createElement("div");
+  sliderBar.classList.add('slider-bar');
+  const sliderLabel = document.createElement("div");
+  sliderLabel.classList.add('slider-label');
+  sliderLabel.textContent = "The Times They Are A-Changin'"
+  const slider = document.createElement("div");
+  slider.id = "time-span-slider";
+  sliderBar.appendChild(sliderLabel);
+  sliderBar.appendChild(slider);
+  const filterButton = document.createElement('input');
+  filterButton.id = 'submit-filter';
+  filterButton.type = 'submit';
+  filterButton.value = 'uncover';
+  filterButton.classList.add('btn', 'button', 'shadow-main', 'play-button', 'visible');
+  filterButton.addEventListener('click', submitInput);
+  sliderContainer.appendChild(sliderBar);
+  sliderContainer.appendChild(filterButton);
+  frequentElements.searchAndOptionsContainer.appendChild(sliderContainer);
+}
 
 
 
 function createSlider() {
-    const priceSlider = document.getElementById('r-slider');
+    const timeSpanSlider = document.getElementById('time-span-slider');
 
-    noUiSlider.create(priceSlider, {
+    noUiSlider.create(timeSpanSlider, {
         start: [1967, 2015],
         tooltips: true,
         connect: true,
@@ -581,71 +615,41 @@ function createSlider() {
         }
     });
 
-    priceSlider.noUiSlider.on('change', (values, handle) => {
-        console.log(priceSlider.noUiSlider.get());
+    timeSpanSlider.noUiSlider.on('change', (values, handle) => {
+        timeSpan = timeSpanSlider.noUiSlider.get();
     });
-
-
-    // ======== Slider set
-
-    const params = new URLSearchParams(window.location.search);
-    const minDiscount = params.get("mindiscount");
-    const priceRange = params.get("pricerange");
-
-    if (minDiscount) {
-        discountSlider.noUiSlider.set(parseInt(minDiscount));
-    }
-    if (priceRange) {
-        priceSlider.noUiSlider.set(priceRange.split(','));
-    }
-
 };
 
-//document.addEventListener("DOMContentLoaded", () => {
-//
-//
-//    const priceSlider = document.getElementById('r-slider');
-//
-//    noUiSlider.create(priceSlider, {
-//        start: [1967, 2015],
-//        tooltips: true,
-//        connect: true,
-//        padding: 0,
-//        step: 1,
-//        range: {
-//            'min': 1950,
-//            'max': 2020
-//        },
-//        pips: {
-//            mode: 'values',
-//            values: [1965, 1985, 2010],
-//            density: 10
-//        },
-//        format: {
-//            to: function (value) {
-//                return parseInt(value);
-//            },
-//            from: function (value) {
-//                return parseInt(value);
-//            }
-//        }
-//    });
-//
-//    priceSlider.noUiSlider.on('change', (values, handle) => {
-//        console.log(priceSlider.noUiSlider.get());
-//    });
-//
-//
-//    // ======== Slider set
-//
-//    const params = new URLSearchParams(window.location.search);
-//    const minDiscount = params.get("mindiscount");
-//    const priceRange = params.get("pricerange");
-//
-//    if (minDiscount) {
-//        discountSlider.noUiSlider.set(parseInt(minDiscount));
-//    }
-//    if (priceRange) {
-//        priceSlider.noUiSlider.set(priceRange.split(','));
-//    }
-//});
+
+
+const tags_list = ['Progressive rock', 'experimental', 'rock', 'indie pop', 'Lo-Fi', 'chillwave', 'rnb', 'jazz', 'Hip-Hop', 'emo', 'rap', 'electronic', 'seen live', 'future garage', 'House', 'dance', 'folk', 'indie', 'folk rock', 'trap', 'alternative', 'punk rock', 'pop punk', 'hip hop', 'post-punk', 'new wave', '80s', 'Grunge', 'alternative rock', 'classic rock', 'singer-songwriter', 'psychedelic pop', 'psychedelic', 'pop', 'rickroll', 'metalcore', 'metal', 'hardcore', 'french', 'synthpop', 'thrash metal', 'punk', 'chillout', 'Grime', 'dubstep', 'Progressive House', 'Canadian', 'Nu Metal', 'rapcore', 'k-pop', 'female vocalists', 'heavy metal', 'hard rock', 'britpop', 'british', 'Soundtrack', 'Game Music', 'instrumental', 'dream pop', 'soft rock', 'ska', 'bedroom pop', 'new rave', 'Psychedelic Rock', 'soul', 'estonian', 'Gangsta Rap', 'trip hop', 'pop rock', 'acoustic', 'funk', 'rhythm and blues', 'indie rock', 'Classical', 'piano', 'Impressionist', 'boybands', '90s', 'Korean', 'Kpop', 'downtempo', 'australian', 'Drum and bass', 'mierda', 'Brutal Death Metal', 'shit', 'latin', 'Reggaeton', 'ambient', 'underground hip-hop', 'melodic hardcore', 'glam rock', 'Crunk', 'Disney', 'jangle pop', 'vaporwave', 'death metal', 'Technical Death Metal', 'progressive death metal', '60s', 'Dirty South', 'Bossa Nova', 'saxophone', 'country', 'Southern Rock', 'EDM', 'groove metal', 'motown', 'powerpop', 'surf rock', 'blues', 'indie folk', 'idm', 'Disco', 'cloud rap', 'alternative rnb', 'ambient pop', 'big beat', 'post-hardcore', 'screamo', 'meek mill', 'ofwgkta', 'Melodic Death Metal', 'coldwave', 'swing', 'hair metal', 'trumpet', 'cool jazz', 'post-rock', 'dreamville', 'american', 'freak folk', 'reggae', 'dancehall', 'swedish', 'romantic', '70s', 'brazilian', 'composers', 'Progressive metal', 'musical', 'glee', 'irish', 'minimal', 'electropop', 'shoegaze', 'italian', 'deep house', 'electro', 'emo as fuck and makes me wanna die', 'math rock', 'trip-hop', 'baroque', 'sad', 'africa', 'brazil', 'symphonic metal', 'Power metal', 'Gothic Metal', 'experimental hip hop', 'girl group', 'tropical house', 'industrial metal', 'industrial', 'USA', 'Alabama', 'chill', 'league of legends', 'breakcore', 'oldies', 'composer', 'Drum n Bass', 'free jazz', 'latin pop', 'ethereal', 'russian', 'proto-punk', 'Garage Rock', 'Flamenco', 'spanish', 'Cat Stevens', 'under 2000 listeners', 'drill', 'west coast', 'hardcore punk', 'Rock and Roll', 'norwegian', 'contemporary classical', 'neoclassical', 'instrumental hip-hop', 'phonk', 'country rap', 'bubblegum bass', 'eurobeat', 'Neo-Soul', 'Stoner Rock', 'male vocalists', 'black metal', 'justin bieber', 'NWOBHM', 'j-pop', 'industrial rock', 'icelandic', 'electro house', 'easy listening', 'sesh', 'japanese', 'JPop', 'danish', 'german', 'baile funk', 'australia', 'best of 2017', 'k-rnb', 'chinese', 'C-pop', 'comedy', 'drone', 'puerto rico', 'one direction', 'pedophilia', 'atlanta', 'horror punk', 'Gothic Rock', 'pc music', 'louisiana', 'synth', 'underground rap', 'nu-jazz', 'Fusion', 'nepal', 'r&b', 'synthwave', 'retro electro', 'acid jazz', 'rock n roll', 'Jazz Rock', 'Broadway', 'musicals', 'psychedelic folk', 'Experimental Rock', 'alternative metal', 'blues rock', 'trance', 'mpb', 'Chris Brown', 'Avant-Garde', 'treble', 'youngstar', 'jazz rap', 'progressive trance', 'cuba', 'madchester', 'better than selena gomez', 'urban', 'female rapper', 'belgian', 'nu disco', 'french touch', 'hypnagogic pop', 'future bass', 'roots reggae', 'alternative rap', 'rockabilly', 'Cleveland', 'exo', 'doom metal', 'deathcore', 'country pop', 'art pop', 'ireland', 'autotune', 'k-rock', 'electro hop', 'glitch hop', 'RBD', 'jonas brothers', '8-bit', 'emo rap', 'Gothic', 'shinee', 'cpop', 'Alt-country', 'experimental rap', 'space rock', 'Sludge', 'new york', 'emocore', 'christian rock', 'techno', 'Eminem', 'turntablism', 'electronica', 'bomba', 'gralha', 'yuke']
+
+
+function handleTags(e) {
+  "use strict";
+  const options = {
+    // isCaseSensitive: false,
+    // includeScore: false,
+    // shouldSort: true,
+    // includeMatches: false,
+    // findAllMatches: false,
+    minMatchCharLength: 12,
+    location: 2,
+    threshold: 0.015,
+    // distance: 100,
+    // useExtendedSearch: false,
+    // ignoreLocation: false,
+    // ignoreFieldNorm: false,
+    keys: [
+      "names",
+    ]
+  };
+  const fuse = new Fuse(tags_list, options);
+  const pattern = e.target.value;
+  const results = fuse.search(pattern).length;
+  if (results > 0) {
+    console.log(fuse.search(pattern));
+    const okButton = document.querySelector(".ok-btn");
+    okButton.disabled = false;
+  }
+};

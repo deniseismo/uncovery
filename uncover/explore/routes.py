@@ -49,8 +49,25 @@ def get_albums_by_filter():
     :return:
     """
     content = request.get_json()
-    genres = content['genres']
-    time_span = content['time_span']
+    print(content)
+    genres = None
+    time_span = None
+    try:
+        genres = content['option']['genres']
+    except KeyError:
+        pass
+    try:
+        time_span = content['option']['time_span']
+    except KeyError:
+        pass
     albums = explore_filtered_albums(genres=genres, time_span=time_span)
-
-    pass
+    if not albums:
+        # if the given username has no albums or the username's incorrect
+        failure_art_filename = display_failure_art(get_failure_images())
+        return make_response(jsonify(
+            {'message': f"couldn't find albums; try picking some other filters",
+             'failure_art': url_for('static',
+                                    filename=failure_art_filename)}
+        ),
+            404)
+    return jsonify(albums)

@@ -11,12 +11,13 @@ def explore_filtered_albums(genres: list, time_span: list):
     :return:
     """
     if not genres and not time_span:
+        print('no filters used')
         # no filter used
         return None
-    genres = ['underground hip-hop']
     start_year = '1950-01-01'
     end_year = '2020-01-01'
     if time_span:
+
         start_year = str(time_span[0]) + "-01-01"
         end_year = str(time_span[1]) + "-01-01"
 
@@ -37,10 +38,9 @@ def explore_filtered_albums(genres: list, time_span: list):
     filter_query = filter_query.order_by(func.random()).limit(9)
 
     album_entries = filter_query.all()
-    first_album = filter_query.first()
-    print(first_album.artist.name)
     # build an album info dict
-
+    if not album_entries:
+        return None
     album_info = {"info": f"Albums from {start_year} to {end_year}, {genres}", "albums": []}
     counter = 0
     for album_entry in album_entries:
@@ -49,7 +49,7 @@ def explore_filtered_albums(genres: list, time_span: list):
             "id": counter,
             "title": album_entry.title,
             "names": [album_entry.title.lower()] + get_filtered_names_list(album_name),
-            "image": album_entry.cover_art,
+            "image": 'static/cover_art_images/' + album_entry.cover_art + ".png",
             "artist_name": album_entry.artist.name
         }
         album_info["albums"].append(an_album_dict)

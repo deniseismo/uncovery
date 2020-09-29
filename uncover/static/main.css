@@ -728,18 +728,20 @@ label.tooltipText:after {
   font-style: italic;
 }
 /* SLIDER BELOW */
-#form {
+.slider-container {
     margin: auto;
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 800px;
-    padding: 20px;
-    margin-bottom: 2rem;
+    align-items: center;
 }
-.bar {
-    margin-bottom: 20px;
+.slider-bar {
+    margin-bottom: 40px;
     padding: 10px 0;
+    width: 600px;
+}
+.slider-label {
+  margin-bottom: 1rem;
 }
 /* noUiSlider styles */
 .noUi-tooltip {
