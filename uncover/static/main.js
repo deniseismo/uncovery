@@ -307,10 +307,16 @@ buttonsContainer.addEventListener('click', (event) => {
   setPlaceholder();
   frequentElements.textField.value = '';
   const sliderContainer = document.querySelector('.slider-container');
+  const musicGenresContainer = document.querySelector('.music-genres-container');
   if (!(event.target.id === "explore")) {
     if (sliderContainer) {
       sliderContainer.remove();
+      musicGenresContainer.remove();
     };
+    const tagsForm = document.querySelector('#tags-form');
+    if (tagsForm) {
+      tagsForm.id = 'submit-form';
+    }
   };
 });
 
@@ -420,7 +426,7 @@ function removeGuessedAlbum(albumID) {
       return true;
     }
   }
-}
+};
 
 function setPlaceholder() {
   "use strict";
@@ -441,10 +447,19 @@ function prepareGame() {
   frequentElements.textField.value = '';
   frequentElements.textField.focus();
   const submitForm = document.querySelector("#submit-form");
-  submitForm.id = 'guess-form';
+  if (submitForm) {
+    submitForm.id = 'guess-form';
+  } else {
+  const tagsForm = document.querySelector("#tags-form");
+    if (tagsForm) {
+      tagsForm.id = 'tags-form';
+    }
+  };
   frequentElements.selectOptions.style.display = 'none';
-  const methodButtonsList = document.querySelectorAll(".method");
-  methodButtonsList.forEach(button => button.style.display = 'none');
+  const sliderContainer = document.querySelector('.slider-container');
+  if (sliderContainer) {
+    sliderContainer.style.display = 'none';
+  };
   scoreContainer.style.display = "block";
   const scoreText = document.querySelector(".score-text");
   scoreText.textContent = "You haven't guessed any albums yet. 😟"
@@ -463,7 +478,15 @@ function cancelGame() {
   playField.placeholder = '';
   playField.value = ''
   const guessForm = document.querySelector("#guess-form");
-  guessForm.id = 'submit-form';
+  let defaultForm = 'submit-form';
+  if (frequentElements.activeButtonID() === 'explore') {
+    defaultForm = 'tags-form';
+    const sliderContainer = document.querySelector('.slider-container');
+    if (sliderContainer) {
+      sliderContainer.style.display = 'flex';
+    };
+  };
+  guessForm.id = defaultForm;
   const methodButtonsList = document.querySelectorAll(".method");
   methodButtonsList.forEach(button => button.style.display = 'block');
   frequentElements.playButton.value = 'GUESS ALBUMS';
@@ -550,9 +573,11 @@ function addTooltips() {
 
 const exploreButton = document.querySelector("#explore");
 exploreButton.addEventListener("click", (event) => {
+
   if (!(frequentElements.activeButtonID() === 'explore')) {
     createSliderContainer();
     createSlider();
+    createMusicGenresContainer();
     frequentElements.textField.id = "tag-field";
     const submitForm = document.querySelector("#submit-form");
     submitForm.id = 'tags-form';
@@ -598,6 +623,7 @@ function addMusicTags() {
     };
     if (!(tagsPicked.includes(currentMusicGenre))) {
       tagsPicked.push(currentMusicGenre);
+      createMusicGenreElement(currentMusicGenre);
       console.log(`${currentMusicGenre} was successfully added to the tags.`);
       console.log(tagsPicked);
     } else {
@@ -605,7 +631,44 @@ function addMusicTags() {
       return false;
     };
   }
-}
+};
+
+function createMusicGenresContainer() {
+  const musicGenresContainer = document.createElement('div');
+  musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
+  const selectedFilters = document.createElement('h1');
+  selectedFilters.textContent = "FILTERS SELECTED";
+  const timeSpanElement = document.createElement('p');
+  timeSpanElement.classList.add('time-span');
+  const timeSpanSlider = document.querySelector('#time-span-slider');
+  const timeSpan = timeSpanSlider.noUiSlider.get();
+  timeSpanElement.textContent = `${timeSpan[0]}—${timeSpan[1]}`;
+  musicGenresContainer.appendChild(selectedFilters);
+  musicGenresContainer.appendChild(timeSpanElement);
+  document.querySelector('main').appendChild(musicGenresContainer);
+};
+
+
+function createMusicGenreElement(musicGenre) {
+  const musicGenreElement = document.createElement('p');
+  musicGenreElement.classList.add('music-genre-element', 'shadow-main');
+  musicGenreElement.id = musicGenre;
+  musicGenreElement.textContent = `${musicGenre}`;
+  const musicGenresContainer = document.querySelector('.music-genres-container');
+  musicGenresContainer.appendChild(musicGenreElement);
+  document.querySelectorAll('.music-genre-element').forEach(genre => {
+    genre.addEventListener('click', (e) => {
+          for (let i = 0; i < tagsPicked.length; i++) {
+        if (tagsPicked[i] === e.target.id) {
+          tagsPicked.splice(i, 1);
+        };
+      };
+      e.target.remove();
+    });
+
+  });
+};
+
 
 function createSlider() {
     const timeSpanSlider = document.getElementById('time-span-slider');
@@ -637,6 +700,8 @@ function createSlider() {
 
     timeSpanSlider.noUiSlider.on('change', (values, handle) => {
         timeSpan = timeSpanSlider.noUiSlider.get();
+        const timeSpanElement = document.querySelector('.time-span');
+        timeSpanElement.textContent = `${timeSpan[0]}–${timeSpan[1]}`;
     });
 };
 
@@ -681,3 +746,4 @@ async function fetchTags() {
   const tags = await response.json();
   return tags;
 }
+

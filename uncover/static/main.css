@@ -753,3 +753,25 @@ label.tooltipText:after {
 .noUi-connect {
     background: #911A1A;
 }
+
+
+.music-genres-container {
+  display: flex;
+  flex-flow: column nowrap;
+  position: absolute;
+  top: 40%;
+  margin-left: 10%;
+  padding: 1rem;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+.music-genre-element {
+  text-align: center;
+  padding: 0.25rem;
+  border: 1px solid black;
+}
+
+.music-genre-element:hover {
+  cursor: pointer;
+}
