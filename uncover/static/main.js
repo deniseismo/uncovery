@@ -92,8 +92,8 @@ const submitInput = function() {
     /* add a progress bar */
     const progressBar = document.createElement("div");
     progressBar.id = "progress-bar";
-    const referenceNode = document.querySelector("#buttons-container");
-    referenceNode.after(progressBar);
+    const referenceNode = document.querySelector(".search-and-options-container");
+    insertAfter(progressBar, referenceNode);
     const waves = document.querySelectorAll('.wave');
     waves.forEach(wave => wave.classList.add('falldown'));
     /* waiting for all images to load before showing them up*/
