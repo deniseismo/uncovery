@@ -19,6 +19,8 @@
         <script type="text/javascript"
                 src="{{ url_for('static', filename='loading-bar/loading-bar.min.js') }}"></script>
         <link href="{{ url_for('static', filename='nouislider/nouislider.min.css') }}" rel="stylesheet">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@7.2.0/dist/css/autoComplete.min.css">
         <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet">
         {% if title %}
         <title>uncover — {{ title }}</title>
@@ -32,6 +34,7 @@
             {% block content %}{% endblock %}
         </main>
         <script src="{{ url_for('static', filename='nouislider/nouislider.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@7.2.0/dist/js/autoComplete.min.js"></script>
         <script src="{{ url_for('static', filename='main.js') }}">
         </script>
     </body>

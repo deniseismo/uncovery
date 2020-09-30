@@ -6,6 +6,7 @@ let guessedCount = 0;
 /* main AJAX function */
 let timeSpan;
 let tagsPicked = [];
+let currentMusicGenre = '';
 
 const frequentElements = {
   gameFrame: document.querySelector('#game-frame'),
@@ -39,9 +40,11 @@ const submitInput = function() {
   let qualifier = '';
   let option = frequentElements.selectOptions.value
   if (desiredMethod === "explore") {
+    const timeSpanSlider = document.getElementById('time-span-slider');
+
     option = {
-      "genres": ['jazz', 'metal'],
-      "time_span": timeSpan
+      "genres": tagsPicked,
+      "time_span": timeSpanSlider.noUiSlider.get()
     }
   } else {
     qualifier = document.querySelector('#text-field').value;
@@ -563,6 +566,7 @@ function createSliderContainer() {
   const okButton = document.querySelector(".ok-btn");
   okButton.value = 'ADD';
   okButton.disabled = true;
+  okButton.addEventListener('click', addMusicTags);
   const sliderContainer = document.createElement("div");
   sliderContainer.classList.add('slider-container');
   const sliderBar = document.createElement("div");
@@ -585,7 +589,23 @@ function createSliderContainer() {
   frequentElements.searchAndOptionsContainer.appendChild(sliderContainer);
 }
 
-
+function addMusicTags() {
+  if (frequentElements.activeButtonID() === 'explore') {
+    const tagsSearchInput = document.querySelector('#tag-field');
+    if (tagsPicked.length > 2) {
+      console.log('too many tags to filter');
+      return false;
+    };
+    if (!(tagsPicked.includes(currentMusicGenre))) {
+      tagsPicked.push(currentMusicGenre);
+      console.log(`${currentMusicGenre} was successfully added to the tags.`);
+      console.log(tagsPicked);
+    } else {
+      console.log(`${currentMusicGenre} already exists.`);
+      return false;
+    };
+  }
+}
 
 function createSlider() {
     const timeSpanSlider = document.getElementById('time-span-slider');
@@ -621,11 +641,7 @@ function createSlider() {
 };
 
 
-
-const tags_list = ['Progressive rock', 'experimental', 'rock', 'indie pop', 'Lo-Fi', 'chillwave', 'rnb', 'jazz', 'Hip-Hop', 'emo', 'rap', 'electronic', 'seen live', 'future garage', 'House', 'dance', 'folk', 'indie', 'folk rock', 'trap', 'alternative', 'punk rock', 'pop punk', 'hip hop', 'post-punk', 'new wave', '80s', 'Grunge', 'alternative rock', 'classic rock', 'singer-songwriter', 'psychedelic pop', 'psychedelic', 'pop', 'rickroll', 'metalcore', 'metal', 'hardcore', 'french', 'synthpop', 'thrash metal', 'punk', 'chillout', 'Grime', 'dubstep', 'Progressive House', 'Canadian', 'Nu Metal', 'rapcore', 'k-pop', 'female vocalists', 'heavy metal', 'hard rock', 'britpop', 'british', 'Soundtrack', 'Game Music', 'instrumental', 'dream pop', 'soft rock', 'ska', 'bedroom pop', 'new rave', 'Psychedelic Rock', 'soul', 'estonian', 'Gangsta Rap', 'trip hop', 'pop rock', 'acoustic', 'funk', 'rhythm and blues', 'indie rock', 'Classical', 'piano', 'Impressionist', 'boybands', '90s', 'Korean', 'Kpop', 'downtempo', 'australian', 'Drum and bass', 'mierda', 'Brutal Death Metal', 'shit', 'latin', 'Reggaeton', 'ambient', 'underground hip-hop', 'melodic hardcore', 'glam rock', 'Crunk', 'Disney', 'jangle pop', 'vaporwave', 'death metal', 'Technical Death Metal', 'progressive death metal', '60s', 'Dirty South', 'Bossa Nova', 'saxophone', 'country', 'Southern Rock', 'EDM', 'groove metal', 'motown', 'powerpop', 'surf rock', 'blues', 'indie folk', 'idm', 'Disco', 'cloud rap', 'alternative rnb', 'ambient pop', 'big beat', 'post-hardcore', 'screamo', 'meek mill', 'ofwgkta', 'Melodic Death Metal', 'coldwave', 'swing', 'hair metal', 'trumpet', 'cool jazz', 'post-rock', 'dreamville', 'american', 'freak folk', 'reggae', 'dancehall', 'swedish', 'romantic', '70s', 'brazilian', 'composers', 'Progressive metal', 'musical', 'glee', 'irish', 'minimal', 'electropop', 'shoegaze', 'italian', 'deep house', 'electro', 'emo as fuck and makes me wanna die', 'math rock', 'trip-hop', 'baroque', 'sad', 'africa', 'brazil', 'symphonic metal', 'Power metal', 'Gothic Metal', 'experimental hip hop', 'girl group', 'tropical house', 'industrial metal', 'industrial', 'USA', 'Alabama', 'chill', 'league of legends', 'breakcore', 'oldies', 'composer', 'Drum n Bass', 'free jazz', 'latin pop', 'ethereal', 'russian', 'proto-punk', 'Garage Rock', 'Flamenco', 'spanish', 'Cat Stevens', 'under 2000 listeners', 'drill', 'west coast', 'hardcore punk', 'Rock and Roll', 'norwegian', 'contemporary classical', 'neoclassical', 'instrumental hip-hop', 'phonk', 'country rap', 'bubblegum bass', 'eurobeat', 'Neo-Soul', 'Stoner Rock', 'male vocalists', 'black metal', 'justin bieber', 'NWOBHM', 'j-pop', 'industrial rock', 'icelandic', 'electro house', 'easy listening', 'sesh', 'japanese', 'JPop', 'danish', 'german', 'baile funk', 'australia', 'best of 2017', 'k-rnb', 'chinese', 'C-pop', 'comedy', 'drone', 'puerto rico', 'one direction', 'pedophilia', 'atlanta', 'horror punk', 'Gothic Rock', 'pc music', 'louisiana', 'synth', 'underground rap', 'nu-jazz', 'Fusion', 'nepal', 'r&b', 'synthwave', 'retro electro', 'acid jazz', 'rock n roll', 'Jazz Rock', 'Broadway', 'musicals', 'psychedelic folk', 'Experimental Rock', 'alternative metal', 'blues rock', 'trance', 'mpb', 'Chris Brown', 'Avant-Garde', 'treble', 'youngstar', 'jazz rap', 'progressive trance', 'cuba', 'madchester', 'better than selena gomez', 'urban', 'female rapper', 'belgian', 'nu disco', 'french touch', 'hypnagogic pop', 'future bass', 'roots reggae', 'alternative rap', 'rockabilly', 'Cleveland', 'exo', 'doom metal', 'deathcore', 'country pop', 'art pop', 'ireland', 'autotune', 'k-rock', 'electro hop', 'glitch hop', 'RBD', 'jonas brothers', '8-bit', 'emo rap', 'Gothic', 'shinee', 'cpop', 'Alt-country', 'experimental rap', 'space rock', 'Sludge', 'new york', 'emocore', 'christian rock', 'techno', 'Eminem', 'turntablism', 'electronica', 'bomba', 'gralha', 'yuke']
-
-
-function handleTags(e) {
+async function handleTags(e) {
   "use strict";
   const options = {
     // isCaseSensitive: false,
@@ -644,12 +660,24 @@ function handleTags(e) {
       "names",
     ]
   };
+  const tags_list = await fetchTags();
   const fuse = new Fuse(tags_list, options);
   const pattern = e.target.value;
   const results = fuse.search(pattern).length;
   if (results > 0) {
     console.log(fuse.search(pattern));
     const okButton = document.querySelector(".ok-btn");
+    currentMusicGenre = fuse.search(pattern)[0]['item'];
     okButton.disabled = false;
-  }
+  } else {
+    const okButton = document.querySelector(".ok-btn");
+    okButton.disabled = true;
+  };
 };
+
+
+async function fetchTags() {
+  const response = await fetch('get_tags');
+  const tags = await response.json();
+  return tags;
+}

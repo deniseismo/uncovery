@@ -20,7 +20,7 @@ def explore_filtered_albums(genres: list, time_span: list):
 
         start_year = str(time_span[0]) + "-01-01"
         end_year = str(time_span[1]) + "-01-01"
-
+    print(f'time_span: {time_span}, genres: {genres}')
     print(start_year, end_year)
 
     filter_query = Album.query.join(Artist, Artist.id == Album.artist_id) \
@@ -30,7 +30,8 @@ def explore_filtered_albums(genres: list, time_span: list):
     # if genres:
     #     for genre in genres:
     # filter_query = filter_query.filter((Tag.tag_name == "electronic") | (Tag.tag_name == "jazz"))
-    filter_query = filter_query.filter(Tag.tag_name.in_(genres))
+    if genres:
+        filter_query = filter_query.filter(Tag.tag_name.in_(genres))
     print(filter_query.all())
     print(len(filter_query.all()))
 

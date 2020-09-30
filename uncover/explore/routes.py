@@ -1,3 +1,5 @@
+import json
+
 from flask import request, url_for, Blueprint, make_response, jsonify
 
 from uncover.helpers.filter_albums import explore_filtered_albums
@@ -71,3 +73,10 @@ def get_albums_by_filter():
         ),
             404)
     return jsonify(albums)
+
+
+@explore.route("/get_tags", methods=["GET"])
+def get_tags_list():
+    with open('uncover/static/data/genres_list.json') as jsonfile:
+        tags_list = json.load(jsonfile)
+    return jsonify(tags_list)

@@ -1,5 +1,7 @@
 import random
+import time
 
+import requests_cache
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -10,6 +12,7 @@ from uncover.helpers.utils import get_filtered_names_list, timeit
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
+requests_cache.install_cache()
 
 @timeit
 def spotify_get_users_playlist_albums(playlist_id: str):
@@ -104,3 +107,45 @@ def spotify_get_artist_top_albums(artist: str):
             album_info["albums"][album_title] = album_image
     print(f'there are {len(album_info["albums"])} albums found with Spotify')
     return album_info
+
+
+def spotify_get_artist_id(artist_name: str):
+    """
+    search for an artist's id
+    :param artist_name: artist's name
+    :return: album_image_url
+    """
+    try:
+        artist_info = spotify.search(q=artist_name, type="artist", limit=5, market='SE')
+    except spotipy.exceptions.SpotifyException:
+        return None
+    if not artist_info:
+        return None
+    artist_id = None
+    for item in artist_info['artists']['items']:
+        print(item['name'].lower(), artist_name.lower())
+        if item['name'].lower() == artist_name.lower():
+            try:
+                print('artists name are equal!')
+                artist_id = item['id']
+                break
+            except KeyError:
+                return None
+    return artist_id
+
+
+def spotify_get_artists_genres(artist_id: str):
+    """
+    gets artist's top music genres
+    :return:
+    """
+    artist_info = spotify.artist(artist_id)
+    if not artist_info:
+        return None
+    try:
+        genres = artist_info['genres']
+    except KeyError:
+        return None
+    if not getattr(artist_info, 'from_cache', False):
+        time.sleep(0.2)
+    return genres
