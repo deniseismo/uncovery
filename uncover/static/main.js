@@ -386,12 +386,41 @@ function removeGuessedAlbum(albumID) {
 function setPlaceholder() {
   if (frequentElements.activeButtonID() === 'by_username') {
     frequentElements.textField.placeholder = 'last.fm username';
+    setWavesColors('by_username');
   } else if (frequentElements.activeButtonID() === 'by_artist') {
     frequentElements.textField.placeholder = 'artist name';
+    setWavesColors('by_artist');
   } else if (frequentElements.activeButtonID() === 'explore'){
     frequentElements.textField.placeholder = 'music tags/genres';
+    setWavesColors('explore');
+  } else if (frequentElements.activeButtonID() === 'by_spotify'){
+    setWavesColors('by_spotify');
+    frequentElements.textField.placeholder = 'Spotify Playlist Link';
   };
-}
+};
+
+
+function setWavesColors(methodType) {
+      const wavePathOne = document.querySelector("#wave-path-1");
+      const wavePathTwo = document.querySelector("#wave-path-2");
+      const wavePathThree = document.querySelector("#wave-path-3");
+
+  switch(methodType) {
+    case 'by_spotify':
+      wavePathTwo.setAttribute("style", "fill: #1DB954");
+      wavePathThree.setAttribute("style", "fill: #191414");
+      break;
+    case "by_username":
+      wavePathTwo.setAttribute("style", "fill: #d51007");
+      wavePathThree.setAttribute("style", "fill: #000");
+      break;
+    default:
+      wavePathTwo.setAttribute("style", "fill: #95A2AC");
+      wavePathThree.setAttribute("style", "fill: #95A2AC");
+  }
+};
+
+
 
 function prepareGame() {
   const scoreContainer = document.querySelector('.score-container');
@@ -535,12 +564,8 @@ function createSliderContainer() {
   sliderContainer.classList.add('slider-container');
   const sliderBar = document.createElement("div");
   sliderBar.classList.add('slider-bar');
-  const sliderLabel = document.createElement("div");
-  sliderLabel.classList.add('slider-label');
-  sliderLabel.textContent = "The Times They Are A-Changin'"
   const slider = document.createElement("div");
   slider.id = "time-span-slider";
-  sliderBar.appendChild(sliderLabel);
   sliderBar.appendChild(slider);
   const filterButton = document.createElement('input');
   filterButton.id = 'submit-filter';
