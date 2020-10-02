@@ -1,25 +1,23 @@
 // main global object with all the info about albums & album covers
-let albums;
-let notGuessedAlbums;
+export let albums;
+export let notGuessedAlbums;
 // a global variable that stores a number of albums guessed so far
-let guessedCount = 0;
+export let guessedCount = 0;
 /* main AJAX function */
-let timeSpan;
-let tagsPicked = [];
-let currentMusicGenre = '';
+export let timeSpan;
+export let tagsPicked = [];
+export let currentMusicGenre = '';
 
-const frequentElements = {
-  gameFrame: document.querySelector('#game-frame'),
-  playButton: document.querySelector('#play-button'),
-  downloadButton: document.querySelector('#download-button'),
-  textField: document.querySelector('#text-field'),
-  selectOptions: document.querySelector('.select-options'),
-  searchAndOptionsContainer: document.querySelector('.search-and-options-container'),
-  activeButtonID() { return document.querySelector('.button.active').id }
-};
+import {frequentElements, insertAfter, addTooltips} from './utils.js'
+import {winningMessage} from './info.js'
+import {MusicFilter} from './musicFilter.js'
+
+const musicFilters = new MusicFilter({
+  tags: ['hip-hop', 'jazz'],
+  timeSpan: [1967, 2015]
+})
 
 const submitInput = function() {
-  "use strict";
   // make 'play-button' disappear
   frequentElements.playButton.classList.remove("visible");
   // make 'download-button' disappear
@@ -78,6 +76,7 @@ const submitInput = function() {
   }).then(data => {
     /* storing album info in a global object */
     albums = data['albums'];
+    console.log(albums);
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
     // when done, removes current pictures from the frame, adds new ones
@@ -139,7 +138,6 @@ submitForm.addEventListener('submit', () => {
 
 
 frequentElements.downloadButton.addEventListener('click', () => {
-  "use strict";
   frequentElements.downloadButton.value = "WAIT FOR IT…";
   fetch("save_collage", {
     method: 'POST',
@@ -159,7 +157,6 @@ frequentElements.downloadButton.addEventListener('click', () => {
   });
 });
 
-
 // play button
 frequentElements.playButton.onclick = (e) => {
   // reset score, remove 'success' icons
@@ -175,8 +172,8 @@ frequentElements.playButton.onclick = (e) => {
   };
 };
 
+
 function handleGuesses(e) {
-  "use strict";
   const options = {
     // isCaseSensitive: false,
     // includeScore: false,
@@ -253,42 +250,6 @@ function gameWon() {
   frequentElements.playButton.classList.add('won');
 };
 
-// an array of winning messages (song lyrics, etc.)
-const winningMessage = [
-  {
-    'quote': "I wanna be adored!",
-    'credits': "© The Stone Roses — I Wanna be Adored"
-  },
-  {
-    'quote': "I'm worth a million in prizes!",
-    'credits': "© Iggy Pop — Lust for Life"
-  },
-  {
-    'quote': "You are invited by anyone to do anything!",
-    'credits': "© Dismemberment Plan — You are Invited"
-  },
-  {
-    'quote': "I'm on a roll this time",
-    'credits': "© Radiohead — Lucky"
-  },
-  {
-    'quote': "And you may ask yourself, well, how did I get here?",
-    'credits': "© Talking Heads — Once in a Lifetime"
-  },
-  {
-    'quote': "I'm a genius, a prodigy, a demon at Maths & Science, I'm up for a prize!",
-    'credits': "© Belle and Sebastian — Act of the Apostle II"
-  },
-  {
-    'quote': "I've never been wrong",
-    'credits': "© LCD Soundsystem — Losing My Edge"
-  },
-  {
-    'quote': "Get a drink, have a good time now. Welcome to paradise, paradise, paradise",
-    'credits': "The Avalanches — Since I Left you"
-  }
-];
-
 
 
 // activate buttons
@@ -349,7 +310,6 @@ function fixArtistName(data) {
 
 // loads cover art images to the main game frame
 function loadCoverArt(data) {
-  "use strict";
   const totalAmountOfAlbums = data['albums'].length;
   let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
   for (var i = 0; i < length; i++) {
@@ -412,14 +372,9 @@ function resizeCoverArtImages(amountOfAlbums) {
   }
 };
 
-function insertAfter(newNode, referenceNode) {
-    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-};
-
 
 // removes an album from the list of guessed albums so that it didn't count more than once
 function removeGuessedAlbum(albumID) {
-  "use strict";
   for (let i = 0; i < notGuessedAlbums.length; i++) {
     if (notGuessedAlbums[i]['id'] === albumID) {
       notGuessedAlbums.splice(i, 1);
@@ -429,7 +384,6 @@ function removeGuessedAlbum(albumID) {
 };
 
 function setPlaceholder() {
-  "use strict";
   if (frequentElements.activeButtonID() === 'by_username') {
     frequentElements.textField.placeholder = 'last.fm username';
   } else if (frequentElements.activeButtonID() === 'by_artist') {
@@ -440,7 +394,6 @@ function setPlaceholder() {
 }
 
 function prepareGame() {
-  "use strict";
   const scoreContainer = document.querySelector('.score-container');
   frequentElements.textField.id = 'play-field';
   frequentElements.textField.placeholder = 'Can you name all the albums?';
@@ -452,7 +405,7 @@ function prepareGame() {
   } else {
   const tagsForm = document.querySelector("#tags-form");
     if (tagsForm) {
-      tagsForm.id = 'tags-form';
+      tagsForm.id = 'guess-form';
     }
   };
   frequentElements.selectOptions.style.display = 'none';
@@ -462,7 +415,7 @@ function prepareGame() {
   };
   scoreContainer.style.display = "block";
   const scoreText = document.querySelector(".score-text");
-  scoreText.textContent = "You haven't guessed any albums yet. 😟"
+  scoreText.textContent = "You haven't guessed any albums yet. 😟";
   frequentElements.playButton.value = 'GIVE UP';
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "none";
@@ -470,7 +423,6 @@ function prepareGame() {
 };
 
 function cancelGame() {
-  "use strict";
   const scoreContainer = document.querySelector('.score-container');
   scoreContainer.style.display = "none";
   const playField = document.querySelector("#play-field");
@@ -496,7 +448,6 @@ function cancelGame() {
 };
 
 function resetGame() {
-  "use strict";
   // resets game state
   // reset a number of guessed albums
   guessedCount = 0;
@@ -511,7 +462,6 @@ function resetGame() {
 };
 
 function loadFailureArt(node, failData) {
-  "use strict";
   frequentElements.gameFrame.classList.add("shadow-main");
   const failureArt = document.createElement("img");
   const failureArtURL = failData['failure_art'];
@@ -532,7 +482,6 @@ function loadFailureArt(node, failData) {
 };
 
 function loadSpinner(node) {
-  "use strict";
   const spinner = document.createElement("img");
   const url = "static/images/loading/spinner-vinyl-64.gif";
   spinner.classList.add('spinner');
@@ -559,16 +508,6 @@ tooltipElements.forEach(function(el) {
   tooltip.textContent = el.dataset.tooltip;
   el.appendChild(tooltip);
 });
-
-function addTooltips() {
-  const tooltippedElements = document.querySelectorAll('.info-tooltip')
-  tooltippedElements.forEach((element) => {
-    const tooltip = document.createElement('label');
-    tooltip.classList.add('tooltipText');
-    tooltip.textContent = element.dataset.tooltip;
-    element.appendChild(tooltip);
-  });
-};
 
 
 const exploreButton = document.querySelector("#explore");
@@ -612,65 +551,10 @@ function createSliderContainer() {
   sliderContainer.appendChild(sliderBar);
   sliderContainer.appendChild(filterButton);
   frequentElements.searchAndOptionsContainer.appendChild(sliderContainer);
-}
-
-function addMusicTags() {
-  if (frequentElements.activeButtonID() === 'explore') {
-    const tagsSearchInput = document.querySelector('#tag-field');
-    if (tagsPicked.length > 2) {
-      console.log('too many tags to filter');
-      return false;
-    };
-    if (!(tagsPicked.includes(currentMusicGenre))) {
-      tagsPicked.push(currentMusicGenre);
-      createMusicGenreElement(currentMusicGenre);
-      console.log(`${currentMusicGenre} was successfully added to the tags.`);
-      console.log(tagsPicked);
-    } else {
-      console.log(`${currentMusicGenre} already exists.`);
-      return false;
-    };
-  }
 };
 
-function createMusicGenresContainer() {
-  const musicGenresContainer = document.createElement('div');
-  musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
-  const selectedFilters = document.createElement('h1');
-  selectedFilters.textContent = "FILTERS SELECTED";
-  const timeSpanElement = document.createElement('p');
-  timeSpanElement.classList.add('time-span');
-  const timeSpanSlider = document.querySelector('#time-span-slider');
-  const timeSpan = timeSpanSlider.noUiSlider.get();
-  timeSpanElement.textContent = `${timeSpan[0]}—${timeSpan[1]}`;
-  musicGenresContainer.appendChild(selectedFilters);
-  musicGenresContainer.appendChild(timeSpanElement);
-  document.querySelector('main').appendChild(musicGenresContainer);
-};
-
-
-function createMusicGenreElement(musicGenre) {
-  const musicGenreElement = document.createElement('p');
-  musicGenreElement.classList.add('music-genre-element', 'shadow-main');
-  musicGenreElement.id = musicGenre;
-  musicGenreElement.textContent = `${musicGenre}`;
-  const musicGenresContainer = document.querySelector('.music-genres-container');
-  musicGenresContainer.appendChild(musicGenreElement);
-  document.querySelectorAll('.music-genre-element').forEach(genre => {
-    genre.addEventListener('click', (e) => {
-          for (let i = 0; i < tagsPicked.length; i++) {
-        if (tagsPicked[i] === e.target.id) {
-          tagsPicked.splice(i, 1);
-        };
-      };
-      e.target.remove();
-    });
-
-  });
-};
-
-
-function createSlider() {
+/* activates/creates a Slider object (range slider) */
+export function createSlider() {
     const timeSpanSlider = document.getElementById('time-span-slider');
 
     noUiSlider.create(timeSpanSlider, {
@@ -706,8 +590,13 @@ function createSlider() {
 };
 
 
-async function handleTags(e) {
-  "use strict";
+export async function fetchTags() {
+  const response = await fetch('get_tags');
+  const tags = await response.json();
+  return tags;
+}
+
+export async function handleTags(e) {
   const options = {
     // isCaseSensitive: false,
     // includeScore: false,
@@ -740,10 +629,62 @@ async function handleTags(e) {
   };
 };
 
+export function addMusicTags() {
+  if (frequentElements.activeButtonID() === 'explore') {
+    const tagsSearchInput = document.querySelector('#tag-field');
+    if (tagsPicked.length > 2) {
+      console.log('too many tags to filter');
+      return false;
+    };
+    if (!(tagsPicked.includes(currentMusicGenre))) {
+      tagsPicked.push(currentMusicGenre);
+      createMusicGenreElement(currentMusicGenre);
+      console.log(`${currentMusicGenre} was successfully added to the tags.`);
+      console.log(tagsPicked);
+    } else {
+      console.log(`${currentMusicGenre} already exists.`);
+      return false;
+    };
+  }
+};
 
-async function fetchTags() {
-  const response = await fetch('get_tags');
-  const tags = await response.json();
-  return tags;
-}
+export function createMusicGenresContainer() {
+  const musicGenresContainer = document.createElement('div');
+  musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
+  const selectedFilters = document.createElement('h1');
+  selectedFilters.textContent = "FILTERS SELECTED";
+  const timeSpanElement = document.createElement('p');
+  timeSpanElement.classList.add('time-span');
+  const timeSpanSlider = document.querySelector('#time-span-slider');
+  const timeSpan = timeSpanSlider.noUiSlider.get();
+  timeSpanElement.textContent = `${timeSpan[0]}—${timeSpan[1]}`;
+  musicGenresContainer.appendChild(selectedFilters);
+  musicGenresContainer.appendChild(timeSpanElement);
+  document.querySelector('main').appendChild(musicGenresContainer);
+};
+
+export function createMusicGenreElement(musicGenre) {
+  const musicGenreElement = document.createElement('p');
+  musicGenreElement.classList.add('music-genre-element', 'shadow-main');
+  musicGenreElement.id = musicGenre;
+  musicGenreElement.textContent = `${musicGenre}`;
+  const musicGenresContainer = document.querySelector('.music-genres-container');
+  musicGenresContainer.appendChild(musicGenreElement);
+  document.querySelectorAll('.music-genre-element').forEach(genre => {
+    genre.addEventListener('click', (e) => {
+          for (let i = 0; i < tagsPicked.length; i++) {
+        if (tagsPicked[i] === e.target.id) {
+          tagsPicked.splice(i, 1);
+        };
+      };
+      e.target.remove();
+    });
+
+  });
+};
+
+
+
+
+
 

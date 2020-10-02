@@ -30,13 +30,15 @@
     </head>
 
     <body>
-        <main>
-            {% block content %}{% endblock %}
-        </main>
-        <script src="{{ url_for('static', filename='nouislider/nouislider.min.js') }}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@7.2.0/dist/js/autoComplete.min.js"></script>
-        <script src="{{ url_for('static', filename='main.js') }}">
-        </script>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <script src="{{ url_for('static', filename='nouislider/nouislider.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@7.2.0/dist/js/autoComplete.min.js"></script>
+    <script type="module" src="{{ url_for('static', filename='main.js') }}">
+
+    </script>
+
     </body>
 
 </html>
