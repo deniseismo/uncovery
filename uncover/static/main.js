@@ -554,11 +554,11 @@ function createSliderContainer() {
 };
 
 /* activates/creates a Slider object (range slider) */
-export function createSlider() {
+function createSlider() {
     const timeSpanSlider = document.getElementById('time-span-slider');
 
     noUiSlider.create(timeSpanSlider, {
-        start: [1967, 2015],
+        start: [musicFilters.timeSpanInfo[0], musicFilters.timeSpanInfo[1]],
         tooltips: true,
         connect: true,
         padding: 0,
@@ -583,20 +583,20 @@ export function createSlider() {
     });
 
     timeSpanSlider.noUiSlider.on('change', (values, handle) => {
-        timeSpan = timeSpanSlider.noUiSlider.get();
+        musicFilters.timeSpanInfo = timeSpanSlider.noUiSlider.get();
         const timeSpanElement = document.querySelector('.time-span');
-        timeSpanElement.textContent = `${timeSpan[0]}–${timeSpan[1]}`;
+        timeSpanElement.textContent = `${musicFilters.timeSpanInfo[0]}–${musicFilters.timeSpanInfo[1]}`;
     });
 };
 
 
-export async function fetchTags() {
+async function fetchTags() {
   const response = await fetch('get_tags');
   const tags = await response.json();
   return tags;
 }
 
-export async function handleTags(e) {
+async function handleTags(e) {
   const options = {
     // isCaseSensitive: false,
     // includeScore: false,
@@ -621,7 +621,7 @@ export async function handleTags(e) {
   if (results > 0) {
     console.log(fuse.search(pattern));
     const okButton = document.querySelector(".ok-btn");
-    currentMusicGenre = fuse.search(pattern)[0]['item'];
+    musicFilters.currentTag = fuse.search(pattern)[0]['item'];
     okButton.disabled = false;
   } else {
     const okButton = document.querySelector(".ok-btn");
@@ -629,26 +629,26 @@ export async function handleTags(e) {
   };
 };
 
-export function addMusicTags() {
+function addMusicTags() {
   if (frequentElements.activeButtonID() === 'explore') {
     const tagsSearchInput = document.querySelector('#tag-field');
-    if (tagsPicked.length > 2) {
+    if (musicFilters.tagsPickedInfo.length > 2) {
       console.log('too many tags to filter');
       return false;
     };
-    if (!(tagsPicked.includes(currentMusicGenre))) {
-      tagsPicked.push(currentMusicGenre);
-      createMusicGenreElement(currentMusicGenre);
-      console.log(`${currentMusicGenre} was successfully added to the tags.`);
-      console.log(tagsPicked);
+    if (!(musicFilters.tagsPickedInfo.includes(musicFilters.currentTag))) {
+      musicFilters.addMusicGenre(musicFilters.currentTag);
+      createMusicGenreElement(musicFilters.currentTag);
+      console.log(`${musicFilters.currentTag} was successfully added to the tags.`);
+      console.log(musicFilters.tagsPickedInfo);
     } else {
-      console.log(`${currentMusicGenre} already exists.`);
+      console.log(`${musicFilters.currentTag} already exists.`);
       return false;
     };
   }
 };
 
-export function createMusicGenresContainer() {
+function createMusicGenresContainer() {
   const musicGenresContainer = document.createElement('div');
   musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
@@ -656,14 +656,17 @@ export function createMusicGenresContainer() {
   const timeSpanElement = document.createElement('p');
   timeSpanElement.classList.add('time-span');
   const timeSpanSlider = document.querySelector('#time-span-slider');
-  const timeSpan = timeSpanSlider.noUiSlider.get();
-  timeSpanElement.textContent = `${timeSpan[0]}—${timeSpan[1]}`;
+  musicFilters.timeSpanInfo = timeSpanSlider.noUiSlider.get();
+  timeSpanElement.textContent = `${musicFilters.timeSpanInfo[0]}—${musicFilters.timeSpanInfo[1]}`;
   musicGenresContainer.appendChild(selectedFilters);
   musicGenresContainer.appendChild(timeSpanElement);
   document.querySelector('main').appendChild(musicGenresContainer);
+  musicFilters.tagsPickedInfo.forEach(tag => {
+    createMusicGenreElement(tag);
+  });
 };
 
-export function createMusicGenreElement(musicGenre) {
+function createMusicGenreElement(musicGenre) {
   const musicGenreElement = document.createElement('p');
   musicGenreElement.classList.add('music-genre-element', 'shadow-main');
   musicGenreElement.id = musicGenre;
@@ -672,11 +675,7 @@ export function createMusicGenreElement(musicGenre) {
   musicGenresContainer.appendChild(musicGenreElement);
   document.querySelectorAll('.music-genre-element').forEach(genre => {
     genre.addEventListener('click', (e) => {
-          for (let i = 0; i < tagsPicked.length; i++) {
-        if (tagsPicked[i] === e.target.id) {
-          tagsPicked.splice(i, 1);
-        };
-      };
+      musicFilters.removeMusicGenre(e.target.id)
       e.target.remove();
     });
 
