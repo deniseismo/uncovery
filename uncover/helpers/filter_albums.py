@@ -10,16 +10,14 @@ def explore_filtered_albums(genres: list, time_span: list):
     :param time_span: a list of a time span range [start_year, end_year]
     :return:
     """
-    if not genres and not time_span:
-        print('no filters used')
-        # no filter used
-        return None
     start_year = '1950-01-01'
     end_year = '2020-01-01'
     if time_span:
-
+        if time_span[0] == time_span[1]:
+            time_span[1] += 1
         start_year = str(time_span[0]) + "-01-01"
         end_year = str(time_span[1]) + "-01-01"
+
     print(f'time_span: {time_span}, genres: {genres}')
     print(start_year, end_year)
 
