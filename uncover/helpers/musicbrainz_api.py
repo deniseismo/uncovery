@@ -5,8 +5,8 @@ import musicbrainzngs
 import requests
 import requests_cache
 
-import uncover.helpers.lastfm_api as lastfm_api
-from uncover.helpers.utils import timeit, get_filtered_names_list, get_filtered_name
+import uncover.helpers.lastfm_api as lastfm
+import uncover.helpers.utilities as utils
 
 requests_cache.install_cache()
 
@@ -51,22 +51,30 @@ def mb_get_album_release_date(album_id: str):
     return release_date
 
 
-def mb_get_artist_mbid(artist: str):
+def mb_get_artist_mbid(artist_name: str):
     """
     search for an artist's mbid on MusicBrainz
-    :param artist: artist's name (e.g. MGMT, The Prodigy, etc.)
+    :param artist_name: artist's name (e.g. MGMT, The Prodigy, etc.)
     :return: mbid (MusicBrainz ID)
     """
     headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     url = "http://musicbrainz.org/ws/2/artist/"
-    params = {"query": "artist:" + artist, "limit": "1", "fmt": "json"}
+    params = {"query": "artist:" + artist_name, "limit": "10", "fmt": "json"}
     response = requests.get(url=url, params=params, headers=headers)
     if response.status_code != 200:
         return None
     try:
+        # get the first one (should probably be ok)
         mbid = response.json()["artists"][0]["id"]
+        for artist_obj in response.json()['artists']:
+            print(artist_obj['name'], artist_name)
+            print(len(artist_obj['name']))
+            # go deep in case of some discrepancies or bugs
+            if artist_name.lower() == artist_obj['name'].lower():
+                print(f"equal! {artist_name} {artist_obj['name']}")
+                mbid = artist_obj['id']
     except (KeyError, IndexError):
-        mbid = mb_get_artist_mbid_v2(artist)
+        mbid = mb_get_artist_mbid_v2(artist_name)
     if not mbid:
         return None
     return mbid
@@ -110,7 +118,7 @@ def mb_get_album_mbid(album: str, artist: str):
     return mbid
 
 
-@timeit
+@utils.timeit
 def mb_get_artists_albums(artist: str):
     """
     :param artist: artist's name
@@ -118,6 +126,7 @@ def mb_get_artists_albums(artist: str):
     """
     headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     artist_mbid = mb_get_artist_mbid(artist)
+    print(artist_mbid)
 
     if not artist_mbid:
         # if nothing found
@@ -139,11 +148,11 @@ def mb_get_artists_albums(artist: str):
         alternative_name = mb_get_album_alternative_name(release['id'])
         full_title = release['title'].replace("’", "'")
         correct_title = full_title.lower()
-        rating = lastfm_api.lastfm_get_album_listeners(correct_title, artist)
-        filtered_name = get_filtered_name(full_title)
+        rating = lastfm.lastfm_get_album_listeners(correct_title, artist)
+        filtered_name = utils.get_filtered_name(full_title)
         an_album_dict = {
             "title": full_title,
-            "names": [correct_title] + get_filtered_names_list(full_title),
+            "names": [correct_title] + utils.get_filtered_names_list(full_title),
             "id": release['id'],
             "rating": rating if rating else 0
         }
@@ -152,7 +161,7 @@ def mb_get_artists_albums(artist: str):
             alternative_name = alternative_name.replace("“", "").replace("”", "")
             an_album_dict['altenative_name'] = alternative_name
             an_album_dict["names"] += alternative_name
-            an_album_dict["names"] += get_filtered_names_list(alternative_name)
+            an_album_dict["names"] += utils.get_filtered_names_list(alternative_name)
 
         # filters duplicate album names
         an_album_dict['names'] = list(set(an_album_dict['names']))
@@ -176,7 +185,7 @@ def mb_get_album_image(mbid: str, size='large', fast=False):
     # /release-group/{mbid}/front[-(250|500|1200)]
     if not mbid:
         return None
-
+    image = None
     if fast:
         # a faster way (lower resolution)
         url = "http://coverartarchive.org/release-group/" + mbid

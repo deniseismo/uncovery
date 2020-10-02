@@ -6,13 +6,14 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 import uncover.helpers.lastfm_api as lastfm_api
-from uncover.helpers.musicbrainz_api import mb_get_artists_albums
-from uncover.helpers.utils import get_filtered_names_list, timeit
+import uncover.helpers.musicbrainz_api as musicbrainz
+from uncover.helpers.utilities import get_filtered_names_list, timeit
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
 requests_cache.install_cache()
+
 
 @timeit
 def spotify_get_users_playlist_albums(playlist_id: str):
@@ -94,7 +95,7 @@ def spotify_get_artist_top_albums(artist: str):
         artist = correct_name
     try:
         # gets album titles
-        album_titles = mb_get_artists_albums(artist).keys()
+        album_titles = musicbrainz.mb_get_artists_albums(artist).keys()
     except AttributeError:
         return None
     if not album_titles:

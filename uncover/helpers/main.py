@@ -1,14 +1,14 @@
 from fuzzywuzzy import fuzz
 
 import uncover.helpers.discogs_api as discogs_api
-import uncover.helpers.lastfm_api as lastfm_api
-from uncover.helpers.musicbrainz_api import mb_get_album_image, mb_get_artists_albums, mb_get_album_mbid
+import uncover.helpers.lastfm_api as lastfm
+import uncover.helpers.musicbrainz_api as musicbrainz
+import uncover.helpers.utilities as utils
 from uncover.helpers.spotify_api import spotify_get_album_image
-from uncover.helpers.utils import timeit, get_filtered_names_list, log_artist_missing_from_db
 from uncover.models import Artist, Album
 
 
-@timeit
+@utils.timeit
 def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
@@ -24,10 +24,10 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
         album_image = spotify_get_album_image(album_title, artist)
         print(f'{album_image} through Spotify {album_title}')
     if not mbid and not fast:
-        mbid = mb_get_album_mbid(album_title, artist)
+        mbid = musicbrainz.mb_get_album_mbid(album_title, artist)
     if mbid and not album_image:
         print(f'mbid: {mbid}, album: {album_title}')
-        album_image = mb_get_album_image(mbid, fast=fast)
+        album_image = musicbrainz.mb_get_album_image(mbid, fast=fast)
         print('finding through mb')
 
     if not album_image and not fast:
@@ -49,7 +49,7 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
     return album_image
 
 
-@timeit
+@utils.timeit
 def get_artists_top_albums_images(artist: str):
     """
     get artist's album images through Spotify's API
@@ -57,13 +57,13 @@ def get_artists_top_albums_images(artist: str):
     :return:
     """
     # try correcting some typos in artist's name
-    correct_name = lastfm_api.lastfm_get_artist_correct_name(artist)
+    correct_name = lastfm.lastfm_get_artist_correct_name(artist)
     if correct_name:
         artist = correct_name
         print(f'the correct name is {correct_name}')
     try:
         # gets album titles
-        albums = mb_get_artists_albums(artist)
+        albums = musicbrainz.mb_get_artists_albums(artist)
     except AttributeError:
         return None
     if not albums:
@@ -87,7 +87,7 @@ def get_artists_top_albums_images(artist: str):
     print(f'there are {len(album_info["albums"])} album images found with the Ultimate')
     if album_info['albums']:
         print(f'search through APIs was successful')
-        log_artist_missing_from_db(artist_name=artist)
+        utils.log_artist_missing_from_db(artist_name=artist)
     return album_info
 
 
@@ -98,7 +98,7 @@ def sql_select_artist_albums(artist_name: str):
     :return: album info dict with all the info about albums
     """
     ALBUM_LIMIT = 9
-    correct_name = lastfm_api.lastfm_get_artist_correct_name(artist_name)
+    correct_name = lastfm.lastfm_get_artist_correct_name(artist_name)
     if correct_name:
         # corrects the name if there is need
         artist_name = correct_name
@@ -117,14 +117,14 @@ def sql_select_artist_albums(artist_name: str):
     for album in album_entries:
         an_album_dict = {
             "title": album.title,
-            "names": [album.title.lower()] + get_filtered_names_list(album.title),
+            "names": [album.title.lower()] + utils.get_filtered_names_list(album.title),
             "id": album_id,
             "rating": album.rating,
             "image": 'static/cover_art_images/' + album.cover_art + ".png"
         }
         if album.alternative_title:
             an_album_dict['names'] += album.alternative_title
-            an_album_dict["names"] += get_filtered_names_list(album.alternative_title)
+            an_album_dict["names"] += utils.get_filtered_names_list(album.alternative_title)
         album_info['albums'].append(an_album_dict)
         album_id += 1
     return album_info
@@ -135,7 +135,7 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     if not artist:
         # no such artist found
         print('no artist found')
-        log_artist_missing_from_db(artist_name=artist_name)
+        utils.log_artist_missing_from_db(artist_name=artist_name)
         return None
     print('artist found')
     album_entries = Album.query.filter_by(artist=artist).all()

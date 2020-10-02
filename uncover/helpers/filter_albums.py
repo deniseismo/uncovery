@@ -1,6 +1,6 @@
 from sqlalchemy import func
 
-from uncover.helpers.utils import get_filtered_names_list
+from uncover.helpers.utilities import get_filtered_names_list
 from uncover.models import Album, Artist, Tag, tags
 
 

@@ -41,7 +41,7 @@ const submitInput = function() {
     const timeSpanSlider = document.getElementById('time-span-slider');
 
     option = {
-      "genres": tagsPicked,
+      "genres": musicFilters.tagsPickedInfo,
       "time_span": timeSpanSlider.noUiSlider.get()
     }
   } else {

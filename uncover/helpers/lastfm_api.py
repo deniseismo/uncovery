@@ -6,7 +6,7 @@ import requests
 import requests_cache
 
 import uncover.helpers.main as main
-from uncover.helpers.utils import timeit, get_filtered_names_list, get_filtered_name
+import uncover.helpers.utilities as utils
 
 requests_cache.install_cache()
 
@@ -83,7 +83,7 @@ def lastfm_get_artist_correct_name(artist: str):
     return correct_name
 
 
-@timeit
+@utils.timeit
 def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", amount=25):
     """
     :param amount: amount ot albums
@@ -135,7 +135,7 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
             # gets the correct artist's name
             artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
             album_name = album['name']
-            album_correct_name = get_filtered_name(album_name)
+            album_correct_name = utils.get_filtered_name(album_name)
             album_image = main.sql_find_specific_album(artist_correct_name, album_name)
             if not album_image:
                 album_image = main.sql_find_specific_album(artist_correct_name, album_correct_name)
@@ -147,10 +147,10 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
 
             # checks for incorrect/broken images
             if album_image:
-                filtered_name = get_filtered_name(album['name'])
+                filtered_name = utils.get_filtered_name(album['name'])
                 an_album_dict = {
                     "title": album_name,
-                    "names": [album_name.lower()] + get_filtered_names_list(album_name),
+                    "names": [album_name.lower()] + utils.get_filtered_names_list(album_name),
                     "image": album_image
                     # "image": album['image'][size]['#text'],
                 }

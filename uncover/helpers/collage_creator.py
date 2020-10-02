@@ -5,7 +5,7 @@ import urllib.request
 from PIL import Image
 from flask import current_app
 
-from uncover.helpers.utils import timeit
+from uncover.helpers.utilities import timeit
 
 
 @timeit
