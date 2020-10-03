@@ -4,20 +4,18 @@ export let notGuessedAlbums;
 // a global variable that stores a number of albums guessed so far
 export let guessedCount = 0;
 /* main AJAX function */
-export let timeSpan;
-export let tagsPicked = [];
-export let currentMusicGenre = '';
 
 import {frequentElements, insertAfter, addTooltips} from './utils.js'
 import {winningMessage} from './info.js'
 import {MusicFilter} from './musicFilter.js'
+import {prepareToExplore} from './explore.js'
 
-const musicFilters = new MusicFilter({
+export const musicFilters = new MusicFilter({
   tags: ['hip-hop', 'jazz'],
   timeSpan: [1967, 2015]
 })
 
-const submitInput = function() {
+export const submitInput = function() {
   // make 'play-button' disappear
   frequentElements.playButton.classList.remove("visible");
   // make 'download-button' disappear
@@ -261,11 +259,13 @@ buttonsContainer.addEventListener('click', (event) => {
   if (!isButton) {
     return;
   };
+  const targetButtonID = event.target.id;
+  console.log(`event target: ${targetButtonID}`);
+  console.log(frequentElements.activeButtonID());
+  configureOptionsStyle(targetButtonID);
   const methodButtonsList = document.querySelectorAll(".method");
   methodButtonsList.forEach(button => button.classList.remove('active'));
   event.target.classList.add('active');
-  // change placeholder to a correct one
-  setPlaceholder();
   frequentElements.textField.value = '';
   const sliderContainer = document.querySelector('.slider-container');
   const musicGenresContainer = document.querySelector('.music-genres-container');
@@ -383,20 +383,14 @@ function removeGuessedAlbum(albumID) {
   }
 };
 
-function setPlaceholder() {
-  if (frequentElements.activeButtonID() === 'by_username') {
-    frequentElements.textField.placeholder = 'last.fm username';
-    setWavesColors('by_username');
-  } else if (frequentElements.activeButtonID() === 'by_artist') {
-    frequentElements.textField.placeholder = 'artist name';
-    setWavesColors('by_artist');
-  } else if (frequentElements.activeButtonID() === 'explore'){
-    frequentElements.textField.placeholder = 'music tags/genres';
-    setWavesColors('explore');
-  } else if (frequentElements.activeButtonID() === 'by_spotify'){
-    setWavesColors('by_spotify');
-    frequentElements.textField.placeholder = 'Spotify Playlist Link';
-  };
+function setPlaceholder(targetButtonID) {
+  const options = {
+    "by_username": "last.fm username",
+    "by_artist": "artist name",
+    "by_spotify": "Spotify Playlist Link",
+    "explore": "music tags/genres"
+  }
+  frequentElements.textField.placeholder = options[targetButtonID];
 };
 
 
@@ -404,15 +398,15 @@ function setWavesColors(methodType) {
       const wavePathOne = document.querySelector("#wave-path-1");
       const wavePathTwo = document.querySelector("#wave-path-2");
       const wavePathThree = document.querySelector("#wave-path-3");
-
   switch(methodType) {
     case 'by_spotify':
       wavePathTwo.setAttribute("style", "fill: #1DB954");
       wavePathThree.setAttribute("style", "fill: #191414");
       break;
     case "by_username":
-      wavePathTwo.setAttribute("style", "fill: #d51007");
-      wavePathThree.setAttribute("style", "fill: #000");
+      wavePathOne.setAttribute("style", "fill: #000");
+      wavePathTwo.setAttribute("style", "fill: #95A2AC");
+      wavePathThree.setAttribute("style", "fill: #d51007");
       break;
     default:
       wavePathTwo.setAttribute("style", "fill: #95A2AC");
@@ -423,42 +417,39 @@ function setWavesColors(methodType) {
 
 
 function prepareGame() {
-  const scoreContainer = document.querySelector('.score-container');
+  hideOptions('on');
+  createScoreContainer();
   frequentElements.textField.id = 'play-field';
   frequentElements.textField.placeholder = 'Can you name all the albums?';
   frequentElements.textField.value = '';
   frequentElements.textField.focus();
-  const submitForm = document.querySelector("#submit-form");
-  if (submitForm) {
-    submitForm.id = 'guess-form';
-  } else {
-  const tagsForm = document.querySelector("#tags-form");
-    if (tagsForm) {
-      tagsForm.id = 'guess-form';
-    }
-  };
-  frequentElements.selectOptions.style.display = 'none';
-  const sliderContainer = document.querySelector('.slider-container');
-  if (sliderContainer) {
-    sliderContainer.style.display = 'none';
-  };
-  scoreContainer.style.display = "block";
-  const scoreText = document.querySelector(".score-text");
-  scoreText.textContent = "You haven't guessed any albums yet. 😟";
+  const formContainer = document.querySelector(".form-container");
+  formContainer.id = "guess-form";
   frequentElements.playButton.value = 'GIVE UP';
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "none";
   notGuessedAlbums = albums.slice(0, 10);
 };
 
+function createScoreContainer() {
+  const scoreContainer = document.createElement("div");
+  scoreContainer.classList.add("flex-container", "shadow-main", "score-container");
+  const scoreText = document.createElement("h1");
+  scoreText.classList.add("score-text");
+  scoreText.textContent = "You haven't guessed any albums yet. 😟";
+  scoreContainer.appendChild(scoreText);
+  const referenceNode = document.querySelector(".search-and-options-container");
+  insertAfter(scoreContainer, referenceNode);
+}
+
+
 function cancelGame() {
+
   const scoreContainer = document.querySelector('.score-container');
-  scoreContainer.style.display = "none";
-  const playField = document.querySelector("#play-field");
-  playField.id = 'text-field';
-  playField.placeholder = '';
-  playField.value = ''
-  const guessForm = document.querySelector("#guess-form");
+  if (scoreContainer) {
+    scoreContainer.remove();
+  };
+  const formContainer = document.querySelector(".form-container");
   let defaultForm = 'submit-form';
   if (frequentElements.activeButtonID() === 'explore') {
     defaultForm = 'tags-form';
@@ -467,13 +458,15 @@ function cancelGame() {
       sliderContainer.style.display = 'flex';
     };
   };
-  guessForm.id = defaultForm;
-  const methodButtonsList = document.querySelectorAll(".method");
-  methodButtonsList.forEach(button => button.style.display = 'block');
+  formContainer.id = defaultForm;
+  console.log(formContainer.id);
   frequentElements.playButton.value = 'GUESS ALBUMS';
+  if (frequentElements.playButton.classList.contains('on')) {
+    frequentElements.playButton.classList.remove('on');
+  };
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "block";
-  setPlaceholder();
+  setPlaceholder(frequentElements.activeButtonID());
 };
 
 function resetGame() {
@@ -539,176 +532,63 @@ tooltipElements.forEach(function(el) {
 });
 
 
-const exploreButton = document.querySelector("#explore");
-exploreButton.addEventListener("click", (event) => {
-
-  if (!(frequentElements.activeButtonID() === 'explore')) {
-    createSliderContainer();
-    createSlider();
-    createMusicGenresContainer();
-    frequentElements.textField.id = "tag-field";
-    const submitForm = document.querySelector("#submit-form");
-    submitForm.id = 'tags-form';
-  }
-  const tagsSearchInput = document.querySelector('#tag-field');
-  tagsSearchInput.oninput = handleTags;
-})
 
 
-function createSliderContainer() {
-  const okButton = document.querySelector(".ok-btn");
-  okButton.value = 'ADD';
-  okButton.disabled = true;
-  okButton.addEventListener('click', addMusicTags);
-  const sliderContainer = document.createElement("div");
-  sliderContainer.classList.add('slider-container');
-  const sliderBar = document.createElement("div");
-  sliderBar.classList.add('slider-bar');
-  const slider = document.createElement("div");
-  slider.id = "time-span-slider";
-  sliderBar.appendChild(slider);
-  const filterButton = document.createElement('input');
-  filterButton.id = 'submit-filter';
-  filterButton.type = 'submit';
-  filterButton.value = 'uncover';
-  filterButton.classList.add('btn', 'button', 'shadow-main', 'play-button', 'visible');
-  filterButton.addEventListener('click', submitInput);
-  sliderContainer.appendChild(sliderBar);
-  sliderContainer.appendChild(filterButton);
-  frequentElements.searchAndOptionsContainer.appendChild(sliderContainer);
-};
-
-/* activates/creates a Slider object (range slider) */
-function createSlider() {
-    const timeSpanSlider = document.getElementById('time-span-slider');
-
-    noUiSlider.create(timeSpanSlider, {
-        start: [musicFilters.timeSpanInfo[0], musicFilters.timeSpanInfo[1]],
-        tooltips: true,
-        connect: true,
-        padding: 0,
-        step: 1,
-        range: {
-            'min': 1950,
-            'max': 2020
-        },
-        pips: {
-            mode: 'values',
-            values: [1965, 1985, 2010],
-            density: 10
-        },
-        format: {
-            to: function (value) {
-                return parseInt(value);
-            },
-            from: function (value) {
-                return parseInt(value);
-            }
-        }
-    });
-
-    timeSpanSlider.noUiSlider.on('change', (values, handle) => {
-        musicFilters.timeSpanInfo = timeSpanSlider.noUiSlider.get();
-        const timeSpanElement = document.querySelector('.time-span');
-        timeSpanElement.textContent = `${musicFilters.timeSpanInfo[0]}–${musicFilters.timeSpanInfo[1]}`;
-    });
-};
 
 
-async function fetchTags() {
-  const response = await fetch('get_tags');
-  const tags = await response.json();
-  return tags;
-}
+function hideOptions() {
+  frequentElements.selectOptions.style.display = 'none';
 
-async function handleTags(e) {
-  const options = {
-    // isCaseSensitive: false,
-    // includeScore: false,
-    // shouldSort: true,
-    // includeMatches: false,
-    // findAllMatches: false,
-    minMatchCharLength: 12,
-    location: 2,
-    threshold: 0.015,
-    // distance: 100,
-    // useExtendedSearch: false,
-    // ignoreLocation: false,
-    // ignoreFieldNorm: false,
-    keys: [
-      "names",
-    ]
+  const sliderContainer = document.querySelector('.slider-container');
+  if (sliderContainer) {
+    sliderContainer.style.display = 'none';
   };
-  const tags_list = await fetchTags();
-  const fuse = new Fuse(tags_list, options);
-  const pattern = e.target.value;
-  const results = fuse.search(pattern).length;
-  if (results > 0) {
-    console.log(fuse.search(pattern));
-    const okButton = document.querySelector(".ok-btn");
-    musicFilters.currentTag = fuse.search(pattern)[0]['item'];
-    okButton.disabled = false;
-  } else {
-    const okButton = document.querySelector(".ok-btn");
-    okButton.disabled = true;
+
+  const scoreContainer = document.querySelector('.score-container');
+  if (scoreContainer) {
+    scoreContainer.style.display = "none";
   };
 };
 
-function addMusicTags() {
-  if (frequentElements.activeButtonID() === 'explore') {
-    const tagsSearchInput = document.querySelector('#tag-field');
-    if (musicFilters.tagsPickedInfo.length > 2) {
-      console.log('too many tags to filter');
-      return false;
-    };
-    if (!(musicFilters.tagsPickedInfo.includes(musicFilters.currentTag))) {
-      musicFilters.addMusicGenre(musicFilters.currentTag);
-      createMusicGenreElement(musicFilters.currentTag);
-      console.log(`${musicFilters.currentTag} was successfully added to the tags.`);
-      console.log(musicFilters.tagsPickedInfo);
-    } else {
-      console.log(`${musicFilters.currentTag} already exists.`);
-      return false;
-    };
+function configureOptionsStyle(targetButtonID) {
+  // if a button pressed is a new button/new destination
+  if (targetButtonID !== frequentElements.activeButtonID()) {
+    // change the placeholder to the correct one
+    // cancel the game
+    if (targetButtonID === "explore") {
+      prepareToExplore();
+    } else if (frequentElements.activeButtonID() === "explore") {
+      cleanAfterExplore();
+    }
+    cancelGame();
+    setPlaceholder(targetButtonID);
   }
 };
 
-function createMusicGenresContainer() {
-  const musicGenresContainer = document.createElement('div');
-  musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
-  const selectedFilters = document.createElement('h1');
-  selectedFilters.textContent = "FILTERS SELECTED";
-  const timeSpanElement = document.createElement('p');
-  timeSpanElement.classList.add('time-span');
-  const timeSpanSlider = document.querySelector('#time-span-slider');
-  musicFilters.timeSpanInfo = timeSpanSlider.noUiSlider.get();
-  timeSpanElement.textContent = `${musicFilters.timeSpanInfo[0]}—${musicFilters.timeSpanInfo[1]}`;
-  musicGenresContainer.appendChild(selectedFilters);
-  musicGenresContainer.appendChild(timeSpanElement);
-  document.querySelector('main').appendChild(musicGenresContainer);
-  musicFilters.tagsPickedInfo.forEach(tag => {
-    createMusicGenreElement(tag);
-  });
-};
+//function prepareToExplore() {
+//  createSliderContainer();
+//  createSlider();
+//  createMusicGenresContainer();
+//  frequentElements.textField.id = "tag-field";
+//  const submitForm = document.querySelector("#submit-form");
+//  submitForm.id = 'tags-form';
+//  const tagsSearchInput = document.querySelector('#tag-field');
+//  tagsSearchInput.oninput = handleTags;
+//};
 
-function createMusicGenreElement(musicGenre) {
-  const musicGenreElement = document.createElement('p');
-  musicGenreElement.classList.add('music-genre-element', 'shadow-main');
-  musicGenreElement.id = musicGenre;
-  musicGenreElement.textContent = `${musicGenre}`;
+
+function cleanAfterExplore() {
+  const sliderContainer = document.querySelector('.slider-container');
   const musicGenresContainer = document.querySelector('.music-genres-container');
-  musicGenresContainer.appendChild(musicGenreElement);
-  document.querySelectorAll('.music-genre-element').forEach(genre => {
-    genre.addEventListener('click', (e) => {
-      musicFilters.removeMusicGenre(e.target.id)
-      e.target.remove();
-    });
-
+  [sliderContainer, musicGenresContainer].forEach(container => {
+    if (container) {
+      container.remove();
+    };
   });
+  const okButton = document.querySelector(".ok-btn");
+  okButton.value = 'OK';
+  okButton.disabled = false;
+  const formField = document.querySelector('.form-field');
+  formField.id = "text-field";
+  formField.oninput = '';
 };
-
-
-
-
-
-
