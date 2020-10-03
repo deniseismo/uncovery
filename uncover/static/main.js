@@ -266,7 +266,6 @@ buttonsContainer.addEventListener('click', (event) => {
   const methodButtonsList = document.querySelectorAll(".method");
   methodButtonsList.forEach(button => button.classList.remove('active'));
   event.target.classList.add('active');
-  frequentElements.textField.value = '';
   const sliderContainer = document.querySelector('.slider-container');
   const musicGenresContainer = document.querySelector('.music-genres-container');
   if (!(event.target.id === "explore")) {
@@ -555,13 +554,14 @@ function configureOptionsStyle(targetButtonID) {
   if (targetButtonID !== frequentElements.activeButtonID()) {
     // change the placeholder to the correct one
     // cancel the game
+    cancelGame();
     if (targetButtonID === "explore") {
       prepareToExplore();
     } else if (frequentElements.activeButtonID() === "explore") {
       cleanAfterExplore();
     }
-    cancelGame();
     setPlaceholder(targetButtonID);
+    frequentElements.textField.value = '';
   }
 };
 
