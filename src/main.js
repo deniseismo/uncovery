@@ -5,15 +5,20 @@ export let notGuessedAlbums;
 export let guessedCount = 0;
 /* main AJAX function */
 
+import {AlbumGameInfo} from "./game.js"
 import {frequentElements, insertAfter, addTooltips} from './utils.js'
 import {winningMessage} from './info.js'
 import {MusicFilter} from './musicFilter.js'
 import {prepareToExplore} from './explore.js'
 
+const albumGame = new AlbumGameInfo();
+
 export const musicFilters = new MusicFilter({
   tags: ['hip-hop', 'jazz'],
   timeSpan: [1967, 2015]
 })
+
+
 
 export const submitInput = function() {
   // make 'play-button' disappear
@@ -73,8 +78,10 @@ export const submitInput = function() {
 
   }).then(data => {
     /* storing album info in a global object */
-    albums = data['albums'];
+//    albums = data['albums'];
+    albumGame.albums = data['albums'];
     console.log(albums);
+    console.log(albumGame);
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
     // when done, removes current pictures from the frame, adds new ones
@@ -143,7 +150,7 @@ frequentElements.downloadButton.addEventListener('click', () => {
       'Content-Type': 'application/json'
     }),
     body: JSON.stringify({
-      "images": albums.map(album => album.image)
+      "images": albumGame.albums.map(album => album.image)
     })
   }).then(response => response.json()).then(data => {
     const myLink = document.createElement('a');
@@ -189,7 +196,7 @@ function handleGuesses(e) {
       "names",
     ]
   };
-  const fuse = new Fuse(notGuessedAlbums, options);
+  const fuse = new Fuse(albumGame.notGuessedAlbums, options);
   const pattern = e.target.value;
   const results = fuse.search(pattern).length;
   if (results > 0) {
@@ -197,7 +204,7 @@ function handleGuesses(e) {
     console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
     highlightGuessedAlbum(albumID);
     updateScore();
-    removeGuessedAlbum(albumID);
+    albumGame.removeGuessedAlbum(albumID);
     frequentElements.textField.value ='';
   }
 };
@@ -206,7 +213,7 @@ function handleGuesses(e) {
 // highlights the guessed album with animation & puts the success icon over the image
 function highlightGuessedAlbum(albumID) {
   const guessedAlbum = document.querySelector(`.art-${albumID}`);
-  const title = albums[albumID]['title'];
+  const title = albumGame.albums[albumID]['title'];
 
   guessedAlbum.classList.remove("guessed-right");
   /**
@@ -222,16 +229,16 @@ function highlightGuessedAlbum(albumID) {
 
 // updates score
 function updateScore() {
-  const totalAmountOfAlbums = albums.length;
+  const totalAmountOfAlbums = albumGame.albums.length;
   const total = Math.min(totalAmountOfAlbums, 9);
-  guessedCount++;
+  albumGame.incrementAlbumsCount();
   const scoreText = document.querySelector(".score-text");
-  if (guessedCount === total) {
+  if (albumGame.albumsCount === total) {
     // triggers winning function if all albums guessed
     gameWon();
   } else {
     // updates the message otherwise
-    scoreText.textContent = `Wowee! You've guessed ${guessedCount} out of ${total}.`;
+    scoreText.textContent = `Wowee! You've guessed ${albumGame.albumsCount} out of ${total}.`;
   }
 };
 
@@ -427,7 +434,7 @@ function prepareGame() {
   frequentElements.playButton.value = 'GIVE UP';
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "none";
-  notGuessedAlbums = albums.slice(0, 10);
+  albumGame.notGuessedAlbums = albumGame.albums;
 };
 
 function createScoreContainer() {
@@ -471,7 +478,7 @@ function cancelGame() {
 function resetGame() {
   // resets game state
   // reset a number of guessed albums
-  guessedCount = 0;
+  albumGame.albumsCount = 0;
   const successIconList = document.querySelectorAll('.success-icon');
   // remove 'check mark' icons
   successIconList.forEach(icon => icon.classList.remove('visible'));
@@ -561,6 +568,7 @@ function configureOptionsStyle(targetButtonID) {
       cleanAfterExplore();
     }
     setPlaceholder(targetButtonID);
+    setWavesColors(targetButtonID);
     frequentElements.textField.value = '';
   }
 };

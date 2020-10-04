@@ -13,7 +13,6 @@ def get_album_discogs_id(album: str, artist: str):
     :param album: album name
     :return: discogs ID for the album
     """
-    # TODO: fix a search with complex artist names like 'notorious b.i.g.'
     results = discogs.search(album, type='release', artist=artist)
     try:
         album_id = results[0].id

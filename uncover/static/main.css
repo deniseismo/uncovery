@@ -369,7 +369,7 @@ it encapsulates all the content with the navigation except 'waves'
 
 .score-container {
   background: #F0F2F3;
-  display: none;
+  display: block;
   width: 600px;
   height: calc(2.25rem + 2px);
   text-align: center;

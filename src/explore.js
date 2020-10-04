@@ -1,28 +1,27 @@
 import {frequentElements} from "./utils.js"
 import {submitInput, musicFilters} from "./main.js"
 
-
+// prepares all the sliders and options for the EXPLORE mode
 export function prepareToExplore() {
   createSliderContainer();
   createSlider();
   createMusicGenresContainer();
   frequentElements.textField.id = "tag-field";
   const formContainer = document.getElementById("submit-form");
-  console.log(formContainer);
-  formContainer.setAttribute("id", "tags-form");
-  console.log(formContainer);
+  formContainer.id = "tags-form";
   const tagsSearchInput = document.querySelector('#tag-field');
   tagsSearchInput.oninput = handleTags;
 };
 
-export async function handleTags(e) {
+// search through tags
+async function handleTags(e) {
   const options = {
     // isCaseSensitive: false,
     // includeScore: false,
     // shouldSort: true,
     // includeMatches: false,
     // findAllMatches: false,
-    minMatchCharLength: 12,
+    minMatchCharLength: 5,
     location: 2,
     threshold: 0.015,
     // distance: 100,
@@ -33,22 +32,28 @@ export async function handleTags(e) {
       "names",
     ]
   };
+  // get current tags list
   const tags_list = await fetchTags();
   const fuse = new Fuse(tags_list, options);
   const pattern = e.target.value;
+  // if something was found
   const results = fuse.search(pattern).length;
   if (results > 0) {
     console.log(fuse.search(pattern));
-    const okButton = document.querySelector(".ok-btn");
+    // makes currentTag = the tag that was actually found
     musicFilters.currentTag = fuse.search(pattern)[0]['item'];
+    // activates 'add' button so you can add the tag to the list
+    const okButton = document.querySelector(".ok-btn");
     okButton.disabled = false;
   } else {
+    // deactivates button otherwise
     const okButton = document.querySelector(".ok-btn");
     okButton.disabled = true;
   };
 };
 
-export function createMusicGenresContainer() {
+// a container with music tags/genres filters chosen
+function createMusicGenresContainer() {
   const musicGenresContainer = document.createElement('div');
   musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
@@ -56,11 +61,14 @@ export function createMusicGenresContainer() {
   const timeSpanElement = document.createElement('p');
   timeSpanElement.classList.add('time-span');
   const timeSpanSlider = document.querySelector('#time-span-slider');
+  // get current/default time span values
   musicFilters.timeSpanInfo = timeSpanSlider.noUiSlider.get();
+  // display the current time span
   timeSpanElement.textContent = `ticking away ${musicFilters.timeSpanInfo[0]}—${musicFilters.timeSpanInfo[1]}`;
   musicGenresContainer.appendChild(selectedFilters);
   musicGenresContainer.appendChild(timeSpanElement);
   document.querySelector('main').appendChild(musicGenresContainer);
+  // display all the tags already chosen/left from before
   musicFilters.tagsPickedInfo.forEach(tag => {
     createMusicGenreElement(tag);
   });
@@ -82,11 +90,15 @@ function createMusicGenreElement(musicGenre) {
   });
 };
 
-export function createSliderContainer() {
+// creates a timespan slider container
+function createSliderContainer() {
+  // make an 'ok' button the 'add' button
   const okButton = document.querySelector(".ok-btn");
   okButton.value = 'ADD';
   okButton.disabled = true;
+  // add listener to the button
   okButton.addEventListener('click', addMusicTags);
+
   const sliderContainer = document.createElement("div");
   sliderContainer.classList.add('slider-container');
   const sliderBar = document.createElement("div");
@@ -106,9 +118,8 @@ export function createSliderContainer() {
 };
 
 /* activates/creates a Slider object (range slider) */
-export function createSlider() {
+function createSlider() {
     const timeSpanSlider = document.getElementById('time-span-slider');
-
     noUiSlider.create(timeSpanSlider, {
         start: [musicFilters.timeSpanInfo[0], musicFilters.timeSpanInfo[1]],
         tooltips: true,
@@ -142,14 +153,18 @@ export function createSlider() {
 };
 
 function addMusicTags() {
+  // add current chosen music tag to the list
   if (frequentElements.activeButtonID() === 'explore') {
-    const tagsSearchInput = document.querySelector('#tag-field');
     if (musicFilters.tagsPickedInfo.length > 2) {
+      // tags limit is set to 3, => can't add anymore
       console.log('too many tags to filter');
       return false;
     };
+    // checks if the tag's already been added
     if (!(musicFilters.tagsPickedInfo.includes(musicFilters.currentTag))) {
+      // add tag to the list of chosen filters
       musicFilters.addMusicGenre(musicFilters.currentTag);
+      // creates a DOM element with the tag
       createMusicGenreElement(musicFilters.currentTag);
       console.log(`${musicFilters.currentTag} was successfully added to the tags.`);
       console.log(musicFilters.tagsPickedInfo);
@@ -161,7 +176,8 @@ function addMusicTags() {
 };
 
 async function fetchTags() {
+  // fetches current tags list
   const response = await fetch('get_tags');
   const tags = await response.json();
   return tags;
-}
+}''

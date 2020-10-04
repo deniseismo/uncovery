@@ -47,7 +47,6 @@ def sql_get_albums_by_artist():
 @explore.route("/explore", methods=["POST"])
 def get_albums_by_filter():
     """
-    # TODO: filter by music genres and/or year (decade)
     :return:
     """
     content = request.get_json()

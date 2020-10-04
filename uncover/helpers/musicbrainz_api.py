@@ -10,7 +10,7 @@ import uncover.helpers.utilities as utils
 
 requests_cache.install_cache()
 
-musicbrainzngs.set_useragent("albumguesser", "0.1", "denisseismo@gmail.com")
+musicbrainzngs.set_useragent("uncovery", "0.5", "denisseismo@gmail.com")
 
 
 def mb_get_album_alternative_name(album_id: str):
@@ -65,7 +65,8 @@ def mb_get_artist_mbid(artist_name: str):
         return None
     try:
         # get the first one (should probably be ok)
-        mbid = response.json()["artists"][0]["id"]
+        # mbid = response.json()["artists"][0]["id"]
+        mbid = musicbrainzngs.search_artists(artist_name, limit=2)["artist-list"][0]['id']
         for artist_obj in response.json()['artists']:
             print(artist_obj['name'], artist_name)
             print(len(artist_obj['name']))

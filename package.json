@@ -4,7 +4,8 @@
   "description": "album cover collage generator & album guesser",
   "main": "/static/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "webpack-dev-server --mode development --open",
+    "build": "webpack --mode production"
   },
   "repository": {
     "type": "git",
@@ -33,5 +34,11 @@
     "jquery.waitforimages": "^2.4.0",
     "nouislider": "^14.6.2",
     "popper.js": "^1.16.1"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^4.5.0",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   }
 }
