@@ -177,7 +177,12 @@ function addMusicTags() {
 
 async function fetchTags() {
   // fetches current tags list
-  const response = await fetch('get_tags');
+  const response = await fetch('get_tags', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
   const tags = await response.json();
   return tags;
 }''

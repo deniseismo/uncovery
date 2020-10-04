@@ -1,10 +1,3 @@
-// main global object with all the info about albums & album covers
-export let albums;
-export let notGuessedAlbums;
-// a global variable that stores a number of albums guessed so far
-export let guessedCount = 0;
-/* main AJAX function */
-
 import {AlbumGameInfo} from "./game.js"
 import {frequentElements, insertAfter, addTooltips} from './utils.js'
 import {winningMessage} from './info.js'
@@ -78,9 +71,7 @@ export const submitInput = function() {
 
   }).then(data => {
     /* storing album info in a global object */
-//    albums = data['albums'];
     albumGame.albums = data['albums'];
-    console.log(albums);
     console.log(albumGame);
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
@@ -379,16 +370,6 @@ function resizeCoverArtImages(amountOfAlbums) {
 };
 
 
-// removes an album from the list of guessed albums so that it didn't count more than once
-function removeGuessedAlbum(albumID) {
-  for (let i = 0; i < notGuessedAlbums.length; i++) {
-    if (notGuessedAlbums[i]['id'] === albumID) {
-      notGuessedAlbums.splice(i, 1);
-      return true;
-    }
-  }
-};
-
 function setPlaceholder(targetButtonID) {
   const options = {
     "by_username": "last.fm username",
@@ -434,7 +415,7 @@ function prepareGame() {
   frequentElements.playButton.value = 'GIVE UP';
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "none";
-  albumGame.notGuessedAlbums = albumGame.albums;
+  albumGame.notGuessedAlbums = [...albumGame.albums];
 };
 
 function createScoreContainer() {

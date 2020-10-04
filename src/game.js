@@ -26,8 +26,11 @@ export class AlbumGameInfo {
     this.guessedAlbumsCount = newCount;
   }
   removeGuessedAlbum(guessedAlbumID) {
-    for (let i = 0; i < this.notGuessedAlbumsList; i++) {
+    console.log(this);
+
+    for (let i = 0; i < this.notGuessedAlbumsList.length; i++) {
       if (this.notGuessedAlbumsList[i]['id'] === guessedAlbumID) {
+        console.log(this.notGuessedAlbumsList);
         this.notGuessedAlbumsList.splice(i, 1);
         return true;
       };
