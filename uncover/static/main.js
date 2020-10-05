@@ -2,7 +2,7 @@ import {AlbumGameInfo} from "./game.js"
 import {frequentElements, insertAfter, addTooltips} from './utils.js'
 import {winningMessage} from './info.js'
 import {MusicFilter} from './musicFilter.js'
-import {prepareToExplore} from './explore.js'
+import {prepareToExplore, cleanAfterExplore} from './explore.js'
 
 const albumGame = new AlbumGameInfo();
 
@@ -555,18 +555,3 @@ function configureOptionsStyle(targetButtonID) {
 };
 
 
-function cleanAfterExplore() {
-  const sliderContainer = document.querySelector('.slider-container');
-  const musicGenresContainer = document.querySelector('.music-genres-container');
-  [sliderContainer, musicGenresContainer].forEach(container => {
-    if (container) {
-      container.remove();
-    };
-  });
-  const okButton = document.querySelector(".ok-btn");
-  okButton.value = 'OK';
-  okButton.disabled = false;
-  const formField = document.querySelector('.form-field');
-  formField.id = "text-field";
-  formField.oninput = '';
-};

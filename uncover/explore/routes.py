@@ -76,11 +76,18 @@ def get_albums_by_filter():
 
 @explore.route("/get_tags", methods=["POST", "GET"])
 def get_tags_list():
+    """
+    gets a list of genres
+    filtered based on the search query
+    :return:
+    """
     with open('uncover/static/data/genres_list.json') as jsonfile:
         tags_list = json.load(jsonfile)
     if request.method == "GET":
+        # used for autocomplete/suggestions
         search_query = request.args.get('query')
     else:
+        # used for triggered the 'add' button whether the tag's in the list or not
         search_query = request.get_json()['query']
 
     filtered_tags_list = []

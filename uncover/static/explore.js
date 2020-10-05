@@ -17,7 +17,7 @@ export async function prepareToExplore() {
 $('#tag-field').autocomplete({
     serviceUrl: '/get_tags',
     type: "GET",
-    minChars: 3,
+    minChars: 2,
     onSelect: function () {
       const tagsSearchInput = document.querySelector('#tag-field');
       tagsSearchInput.dispatchEvent(new Event('input'));
@@ -206,4 +206,21 @@ async function fetchTags(value) {
   });
   const tags = await response.json();
   return tags;
-}
+};
+
+export function cleanAfterExplore() {
+  const sliderContainer = document.querySelector('.slider-container');
+  const musicGenresContainer = document.querySelector('.music-genres-container');
+  [sliderContainer, musicGenresContainer].forEach(container => {
+    if (container) {
+      container.remove();
+    };
+  });
+  const okButton = document.querySelector(".ok-btn");
+  okButton.value = 'OK';
+  okButton.disabled = false;
+  const formField = document.querySelector('.form-field');
+  formField.id = "text-field";
+  formField.oninput = '';
+  $('.form-field').autocomplete('dispose');
+};
