@@ -1,6 +1,6 @@
 import {frequentElements} from "./utils.js"
 import {submitInput, musicFilters} from "./main.js"
-
+import anime from './anime.es.js';
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
@@ -74,17 +74,28 @@ function createMusicGenresContainer() {
   const musicGenresContainer = document.createElement('div');
   musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
-  selectedFilters.textContent = "FILTERS SELECTED";
+  selectedFilters.textContent = "FILTERS APPLIED";
   const calendarIcon = document.createElement("img");
   calendarIcon.src = "/static/images/filters/calendar.png";
   calendarIcon.classList.add("calendarIcon");
   const timeSpanElement = document.createElement('p');
   timeSpanElement.classList.add('time-span');
+  const timeSpanBegin = document.createElement('span');
+  timeSpanBegin.classList.add('time-span-begin');
+  const timeSpanEnd = document.createElement('span');
+  timeSpanEnd.classList.add('time-span-end');
+  const timeSpanDelimit = document.createElement('span');
+  timeSpanDelimit.classList.add('time-span-delimit');
+  timeSpanElement.appendChild(timeSpanBegin);
+  timeSpanElement.appendChild(timeSpanDelimit);
+  timeSpanElement.appendChild(timeSpanEnd);
   const timeSpanSlider = document.querySelector('#time-span-slider');
   // get current/default time span values
   musicFilters.timeSpanInfo = timeSpanSlider.noUiSlider.get();
   // display the current time span
-  timeSpanElement.textContent = `ticking away ${musicFilters.timeSpanInfo[0]}—${musicFilters.timeSpanInfo[1]}`;
+  timeSpanBegin.textContent = musicFilters.timeSpanInfo[0];
+  timeSpanDelimit.textContent = "—";
+  timeSpanEnd.textContent = musicFilters.timeSpanInfo[1];
   musicGenresContainer.appendChild(selectedFilters);
   musicGenresContainer.appendChild(timeSpanElement);
   document.querySelector('main').appendChild(musicGenresContainer);
@@ -97,16 +108,44 @@ function createMusicGenresContainer() {
 function createMusicGenreElement(musicGenre) {
   const musicGenreElement = document.createElement('p');
   musicGenreElement.classList.add('music-genre-element', 'shadow-main');
-  musicGenreElement.id = musicGenre;
+  musicGenreElement.id = `tag-${musicGenre.replace(/\s/g, '')}`;
+  musicGenreElement.dataset.tagName = musicGenre;
   musicGenreElement.textContent = `${musicGenre}`;
   const musicGenresContainer = document.querySelector('.music-genres-container');
   musicGenresContainer.appendChild(musicGenreElement);
+  console.log(musicGenre);
+  animateMusicGenre(musicGenreElement);
   document.querySelectorAll('.music-genre-element').forEach(genre => {
     genre.addEventListener('click', (e) => {
-      musicFilters.removeMusicGenre(e.target.id)
-      e.target.remove();
+      musicFilters.removeMusicGenre(e.target.dataset.tagName);
+      animateMusicGenreOff(e.target.id);
+      setTimeout(() => {
+        e.target.remove();
+      }, 100);
     });
 
+  });
+};
+
+function animateMusicGenreOff(musicGenreElement) {
+  anime({
+    targets: `#${musicGenreElement}`,
+    scale: [1, 0],
+    translateY: [0, 50],
+    opacity: [1, 0],
+    duration: 500,
+    backgroundColor: "#ed6663"
+  });
+};
+
+
+function animateMusicGenre(musicGenreElement) {
+  anime({
+    targets: musicGenreElement,
+    scale: [0.8, 1],
+    translateY: [50, 0],
+    opacity: [0, 1],
+    duration: 500
   });
 };
 
@@ -166,11 +205,35 @@ function createSlider() {
     });
 
     timeSpanSlider.noUiSlider.on('change', (values, handle) => {
+        const timeBefore = musicFilters.timeSpanInfo;
         musicFilters.timeSpanInfo = timeSpanSlider.noUiSlider.get();
+        const timeAfter = musicFilters.timeSpanInfo;
         const timeSpanElement = document.querySelector('.time-span');
-        timeSpanElement.textContent = `ticking away ${musicFilters.timeSpanInfo[0]}–${musicFilters.timeSpanInfo[1]}`;
+        animateTimeSpan(timeBefore, timeAfter);
+//        timeSpanElement.textContent = `ticking away ${musicFilters.timeSpanInfo[0]}–${musicFilters.timeSpanInfo[1]}`;
     });
 };
+
+function animateTimeSpan(timeBefore, timeAfter) {
+  if (timeBefore[0] !== timeAfter[0]) {
+    anime({
+      targets: '.time-span-begin',
+      textContent: [timeBefore[0], timeAfter[0]],
+      round: 1,
+      duration: 500
+    });
+  };
+  if (timeBefore[1] !== timeAfter[1]) {
+    anime({
+      targets: '.time-span-end',
+      textContent: [timeBefore[1], timeAfter[1]],
+      round: 1,
+      duration: 500,
+      easing: 'linear'
+    });
+  };
+};
+
 
 function addMusicTags() {
   // add current chosen music tag to the list

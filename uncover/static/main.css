@@ -34,6 +34,10 @@ body {
   transform-origin: bottom;
 }
 
+.wave-additional {
+  display: none;
+}
+
 .wave-cont-1 {
   opacity: 0.25;
 }
@@ -763,6 +767,8 @@ label.tooltipText:after {
   padding: 1rem;
   border: 1px solid black;
   border-radius: 10px;
+  font-size: 1.25rem;
+  text-align: center;
 }
 
 .music-genre-element {
@@ -773,4 +779,8 @@ label.tooltipText:after {
 
 .music-genre-element:hover {
   cursor: pointer;
+}
+
+.time-span {
+  font-size: 2rem;
 }

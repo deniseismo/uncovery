@@ -389,6 +389,8 @@ function setWavesColors(methodType) {
     case 'by_spotify':
       wavePathTwo.setAttribute("style", "fill: #1DB954");
       wavePathThree.setAttribute("style", "fill: #191414");
+      const waveAdditional = document.querySelector(".wave-additional");
+      waveAdditional.style.display = 'block';
       break;
     case "by_username":
       wavePathOne.setAttribute("style", "fill: #000");
