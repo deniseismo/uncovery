@@ -74,8 +74,20 @@ def get_albums_by_filter():
     return jsonify(albums)
 
 
-@explore.route("/get_tags", methods=["GET"])
+@explore.route("/get_tags", methods=["POST", "GET"])
 def get_tags_list():
     with open('uncover/static/data/genres_list.json') as jsonfile:
         tags_list = json.load(jsonfile)
-    return jsonify(tags_list)
+    if request.method == "GET":
+        search_query = request.args.get('query')
+    else:
+        search_query = request.get_json()['query']
+
+    filtered_tags_list = []
+    for tag in tags_list:
+        if search_query:
+            if search_query in tag:
+                filtered_tags_list.append(tag)
+
+    suggestions = {"suggestions": filtered_tags_list}
+    return jsonify(suggestions)

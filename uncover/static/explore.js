@@ -1,6 +1,7 @@
 import {frequentElements} from "./utils.js"
 import {submitInput, musicFilters} from "./main.js"
 
+
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
   createSliderContainer();
@@ -10,18 +11,23 @@ export async function prepareToExplore() {
   const formContainer = document.getElementById("submit-form");
   formContainer.id = "tags-form";
   const tagsSearchInput = document.querySelector('#tag-field');
-//  tagsSearchInput.oninput = handleTags; default behaviour
+//  tagsSearchInput.oninput = handleTags;
+  tagsSearchInput.addEventListener('input', handleTags);
 
 $('#tag-field').autocomplete({
     serviceUrl: '/get_tags',
-    onSelect: function (suggestion) {
-        alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+    type: "GET",
+    minChars: 3,
+    onSelect: function () {
+      const tagsSearchInput = document.querySelector('#tag-field');
+      tagsSearchInput.dispatchEvent(new Event('input'));
     }
 });
 };
 
 // search through tags
 async function handleTags(e) {
+  console.log(e.target.value);
   const options = {
     // isCaseSensitive: false,
     // includeScore: false,
@@ -40,8 +46,9 @@ async function handleTags(e) {
     ]
   };
   // get current tags list
-  const tags_list = await fetchTags();
-  const fuse = new Fuse(tags_list, options);
+  const tags_list = await fetchTags(e.target.value);
+  console.log(tags_list);
+  const fuse = new Fuse(tags_list['suggestions'], options);
   const pattern = e.target.value;
   // if something was found
   const results = fuse.search(pattern).length;
@@ -188,13 +195,14 @@ function addMusicTags() {
   }
 };
 
-async function fetchTags() {
+async function fetchTags(value) {
   // fetches current tags list
   const response = await fetch('get_tags', {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
-    }
+    },
+    body: JSON.stringify({"query": value})
   });
   const tags = await response.json();
   return tags;

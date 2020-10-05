@@ -2,7 +2,7 @@ import {AlbumGameInfo} from "./game.js"
 import {frequentElements, insertAfter, addTooltips} from './utils.js'
 import {winningMessage} from './info.js'
 import {MusicFilter} from './musicFilter.js'
-import {prepareToExplore, musicTags} from './explore.js'
+import {prepareToExplore} from './explore.js'
 
 const albumGame = new AlbumGameInfo();
 
