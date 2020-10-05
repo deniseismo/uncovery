@@ -221,6 +221,6 @@ export function cleanAfterExplore() {
   okButton.disabled = false;
   const formField = document.querySelector('.form-field');
   formField.id = "text-field";
-  formField.oninput = '';
+  formField.removeEventListener("input", handleTags);
   $('.form-field').autocomplete('dispose');
 };
