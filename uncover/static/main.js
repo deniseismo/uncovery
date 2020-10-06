@@ -3,6 +3,9 @@ import {frequentElements, insertAfter, addTooltips} from './utils.js'
 import {winningMessage} from './info.js'
 import {MusicFilter} from './musicFilter.js'
 import {prepareToExplore, cleanAfterExplore} from './explore.js'
+import {animateCoverArt, animateWaves} from './animation.js'
+import anime from './anime.es.js';
+
 
 const albumGame = new AlbumGameInfo();
 
@@ -89,8 +92,8 @@ export const submitInput = function() {
     progressBar.id = "progress-bar";
     const referenceNode = document.querySelector(".search-and-options-container");
     insertAfter(progressBar, referenceNode);
-    const waves = document.querySelectorAll('.wave');
-    waves.forEach(wave => wave.classList.add('falldown'));
+//    const waves = document.querySelectorAll('.wave');
+//    waves.forEach(wave => wave.classList.add('falldown'));
     /* waiting for all images to load before showing them up*/
     $('#game-frame').waitForImages(function() {
       /* remove progress bar once loaded */
@@ -104,12 +107,11 @@ export const submitInput = function() {
 
       frequentElements.playButton.classList.add("visible");
       frequentElements.downloadButton.classList.add("visible");
-//      const collageURL = document.querySelector('#collage-link');
-//      collageURL.href = data['collage'];
+      animateCoverArt();
+      animateWaves(desiredMethod);
+      const waves = document.querySelectorAll('.wave');
+      waves.forEach(wave => wave.classList.remove('falldown'));
 
-      /*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
-                      $('#game-frame').after(`<class="data-info">${data["info"]}</div>`);
-                  };*/
     }, function(loaded, count, success) {
       /* animate progress bar */
       var bar1 = new ldBar("#progress-bar", {
@@ -122,6 +124,7 @@ export const submitInput = function() {
     console.log(`error is ${error}`);
   });
 };
+
 
 // event listener for a submit form and an 'ok' submit button
 const submitForm = document.querySelector('#submit-form');
@@ -381,29 +384,6 @@ function setPlaceholder(targetButtonID) {
 };
 
 
-function setWavesColors(methodType) {
-      const wavePathOne = document.querySelector("#wave-path-1");
-      const wavePathTwo = document.querySelector("#wave-path-2");
-      const wavePathThree = document.querySelector("#wave-path-3");
-  switch(methodType) {
-    case 'by_spotify':
-      wavePathTwo.setAttribute("style", "fill: #1DB954");
-      wavePathThree.setAttribute("style", "fill: #191414");
-      const waveAdditional = document.querySelector(".wave-additional");
-      waveAdditional.style.display = 'block';
-      break;
-    case "by_username":
-      wavePathOne.setAttribute("style", "fill: #000");
-      wavePathTwo.setAttribute("style", "fill: #95A2AC");
-      wavePathThree.setAttribute("style", "fill: #d51007");
-      break;
-    default:
-      wavePathTwo.setAttribute("style", "fill: #95A2AC");
-      wavePathThree.setAttribute("style", "fill: #95A2AC");
-  }
-};
-
-
 
 function prepareGame() {
   hideOptions('on');
@@ -551,7 +531,6 @@ function configureOptionsStyle(targetButtonID) {
       cleanAfterExplore();
     }
     setPlaceholder(targetButtonID);
-    setWavesColors(targetButtonID);
     frequentElements.textField.value = '';
   }
 };
