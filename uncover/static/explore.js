@@ -11,7 +11,6 @@ export async function prepareToExplore() {
   const formContainer = document.getElementById("submit-form");
   formContainer.id = "tags-form";
   const tagsSearchInput = document.querySelector('#tag-field');
-//  tagsSearchInput.oninput = handleTags;
   tagsSearchInput.addEventListener('input', handleTags);
 
 $('#tag-field').autocomplete({
@@ -26,7 +25,7 @@ $('#tag-field').autocomplete({
 };
 
 // search through tags
-async function handleTags(e) {
+export async function handleTags(e) {
   console.log(e.target.value);
   const options = {
     // isCaseSensitive: false,

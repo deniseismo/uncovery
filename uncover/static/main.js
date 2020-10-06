@@ -2,7 +2,7 @@ import {AlbumGameInfo} from "./game.js"
 import {frequentElements, insertAfter, addTooltips} from './utils.js'
 import {winningMessage} from './info.js'
 import {MusicFilter} from './musicFilter.js'
-import {prepareToExplore, cleanAfterExplore} from './explore.js'
+import {prepareToExplore, cleanAfterExplore, handleTags} from './explore.js'
 import {animateCoverArt, animateWaves} from './animation.js'
 import anime from './anime.es.js';
 
@@ -388,6 +388,9 @@ function setPlaceholder(targetButtonID) {
 function prepareGame() {
   hideOptions('on');
   createScoreContainer();
+  const formField = document.querySelector('.form-field');
+  formField.removeEventListener("input", handleTags);
+  $('.form-field').autocomplete('dispose');
   frequentElements.textField.id = 'play-field';
   frequentElements.textField.placeholder = 'Can you name all the albums?';
   frequentElements.textField.value = '';
