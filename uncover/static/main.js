@@ -1,13 +1,14 @@
-import {AlbumGameInfo} from "./game.js"
-import {frequentElements, insertAfter, addTooltips} from './utils.js'
-import {winningMessage} from './info.js'
+import {AlbumGameInfo, Game, handleGuesses, prepareGame, cancelGame, resetGame} from "./game.js"
+import {frequentElements, insertAfter, removeAllChildNodes} from './utils.js'
+import {setPlaceholder, configureOptionsStyle} from './uiconfig.js'
 import {MusicFilter} from './musicFilter.js'
 import {prepareToExplore, cleanAfterExplore, handleTags} from './explore.js'
 import {animateCoverArt, animateWaves} from './animation.js'
-import anime from './anime.es.js';
+import anime from './anime.es.js'
 
+export const theGame = new Game(false);
 
-const albumGame = new AlbumGameInfo();
+export const albumGame = new AlbumGameInfo();
 
 export const musicFilters = new MusicFilter({
   tags: ['hip-hop', 'jazz'],
@@ -37,11 +38,10 @@ export const submitInput = function() {
   let qualifier = '';
   let option = frequentElements.selectOptions.value
   if (desiredMethod === "explore") {
-    const timeSpanSlider = document.getElementById('time-span-slider');
 
     option = {
       "genres": musicFilters.tagsPickedInfo,
-      "time_span": timeSpanSlider.noUiSlider.get()
+      "time_span": musicFilters.timeSpanInfo
     }
   } else {
     qualifier = document.querySelector('#text-field').value;
@@ -172,85 +172,6 @@ frequentElements.playButton.onclick = (e) => {
 };
 
 
-function handleGuesses(e) {
-  const options = {
-    // isCaseSensitive: false,
-    // includeScore: false,
-    // shouldSort: true,
-    // includeMatches: false,
-    // findAllMatches: false,
-    minMatchCharLength: 12,
-    location: 2,
-    threshold: 0.015,
-    // distance: 100,
-    // useExtendedSearch: false,
-    // ignoreLocation: false,
-    // ignoreFieldNorm: false,
-    keys: [
-      "names",
-    ]
-  };
-  const fuse = new Fuse(albumGame.notGuessedAlbums, options);
-  const pattern = e.target.value;
-  const results = fuse.search(pattern).length;
-  if (results > 0) {
-    const albumID = fuse.search(pattern)[0]['item']['id'];
-    console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
-    highlightGuessedAlbum(albumID);
-    updateScore();
-    albumGame.removeGuessedAlbum(albumID);
-    frequentElements.textField.value ='';
-  }
-};
-
-
-// highlights the guessed album with animation & puts the success icon over the image
-function highlightGuessedAlbum(albumID) {
-  const guessedAlbum = document.querySelector(`.art-${albumID}`);
-  const title = albumGame.albums[albumID]['title'];
-
-  guessedAlbum.classList.remove("guessed-right");
-  /**
-   trigger a reflow in between removing and adding the class name © css-tricks.com
-   helps restarting animation & playing it again if needed
-  */
-  void guessedAlbum.offsetWidth;
-  guessedAlbum.classList.add("guessed-right");
-  guessedAlbum.alt = title;
-  const successIcon = document.querySelector(`#success-${albumID}`);
-  successIcon.classList.add('visible');
-};
-
-// updates score
-function updateScore() {
-  const totalAmountOfAlbums = albumGame.albums.length;
-  const total = Math.min(totalAmountOfAlbums, 9);
-  albumGame.incrementAlbumsCount();
-  const scoreText = document.querySelector(".score-text");
-  if (albumGame.albumsCount === total) {
-    // triggers winning function if all albums guessed
-    gameWon();
-  } else {
-    // updates the message otherwise
-    scoreText.textContent = `Wowee! You've guessed ${albumGame.albumsCount} out of ${total}.`;
-  }
-};
-
-// handles winning
-function gameWon() {
-  const scoreText = document.querySelector(".score-text");
-  const randomIndex = Math.floor(Math.random() * winningMessage.length);
-  scoreText.textContent = winningMessage[randomIndex]["quote"];
-  const scoreContainer = document.querySelector('.score-container');
-  scoreContainer.classList.add('info-tooltip', 'score-game-won');
-  scoreContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
-  addTooltips();
-  frequentElements.playButton.value = 'PLAY SOME MORE';
-  frequentElements.playButton.classList.add('won');
-};
-
-
-
 // activate buttons
 const buttonsContainer = document.querySelector('#buttons-container');
 // add an event listener to a buttons wrapper (event bubbling)
@@ -373,87 +294,7 @@ function resizeCoverArtImages(amountOfAlbums) {
 };
 
 
-function setPlaceholder(targetButtonID) {
-  const options = {
-    "by_username": "last.fm username",
-    "by_artist": "artist name",
-    "by_spotify": "Spotify Playlist Link",
-    "explore": "music tags/genres"
-  }
-  frequentElements.textField.placeholder = options[targetButtonID];
-};
 
-
-
-function prepareGame() {
-  hideOptions('on');
-  createScoreContainer();
-  const formField = document.querySelector('.form-field');
-  formField.removeEventListener("input", handleTags);
-  $('.form-field').autocomplete('dispose');
-  frequentElements.textField.id = 'play-field';
-  frequentElements.textField.placeholder = 'Can you name all the albums?';
-  frequentElements.textField.value = '';
-  frequentElements.textField.focus();
-  const formContainer = document.querySelector(".form-container");
-  formContainer.id = "guess-form";
-  frequentElements.playButton.value = 'GIVE UP';
-  const okButton = document.querySelector(".ok-btn");
-  okButton.style.display = "none";
-  albumGame.notGuessedAlbums = [...albumGame.albums];
-};
-
-function createScoreContainer() {
-  const scoreContainer = document.createElement("div");
-  scoreContainer.classList.add("flex-container", "shadow-main", "score-container");
-  const scoreText = document.createElement("h1");
-  scoreText.classList.add("score-text");
-  scoreText.textContent = "You haven't guessed any albums yet. 😟";
-  scoreContainer.appendChild(scoreText);
-  const referenceNode = document.querySelector(".search-and-options-container");
-  insertAfter(scoreContainer, referenceNode);
-}
-
-
-function cancelGame() {
-
-  const scoreContainer = document.querySelector('.score-container');
-  if (scoreContainer) {
-    scoreContainer.remove();
-  };
-  const formContainer = document.querySelector(".form-container");
-  let defaultForm = 'submit-form';
-  if (frequentElements.activeButtonID() === 'explore') {
-    defaultForm = 'tags-form';
-    const sliderContainer = document.querySelector('.slider-container');
-    if (sliderContainer) {
-      sliderContainer.style.display = 'flex';
-    };
-  };
-  formContainer.id = defaultForm;
-  console.log(formContainer.id);
-  frequentElements.playButton.value = 'GUESS ALBUMS';
-  if (frequentElements.playButton.classList.contains('on')) {
-    frequentElements.playButton.classList.remove('on');
-  };
-  const okButton = document.querySelector(".ok-btn");
-  okButton.style.display = "block";
-  setPlaceholder(frequentElements.activeButtonID());
-};
-
-function resetGame() {
-  // resets game state
-  // reset a number of guessed albums
-  albumGame.albumsCount = 0;
-  const successIconList = document.querySelectorAll('.success-icon');
-  // remove 'check mark' icons
-  successIconList.forEach(icon => icon.classList.remove('visible'));
-  // remove a description of the album
-  const coverArtList = document.querySelectorAll('.cover-art');
-  coverArtList.forEach(image => {
-    image.alt = "";
-  });
-};
 
 function loadFailureArt(node, failData) {
   frequentElements.gameFrame.classList.add("shadow-main");
@@ -483,11 +324,6 @@ function loadSpinner(node) {
   node.appendChild(spinner);
 };
 
-function removeAllChildNodes(parent) {
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-};
 
 /* tooltips */
 // find all elements that need tooltips
@@ -503,39 +339,5 @@ tooltipElements.forEach(function(el) {
   el.appendChild(tooltip);
 });
 
-
-
-
-
-
-function hideOptions() {
-  frequentElements.selectOptions.style.display = 'none';
-
-  const sliderContainer = document.querySelector('.slider-container');
-  if (sliderContainer) {
-    sliderContainer.style.display = 'none';
-  };
-
-  const scoreContainer = document.querySelector('.score-container');
-  if (scoreContainer) {
-    scoreContainer.style.display = "none";
-  };
-};
-
-function configureOptionsStyle(targetButtonID) {
-  // if a button pressed is a new button/new destination
-  if (targetButtonID !== frequentElements.activeButtonID()) {
-    // change the placeholder to the correct one
-    // cancel the game
-    cancelGame();
-    if (targetButtonID === "explore") {
-      prepareToExplore();
-    } else if (frequentElements.activeButtonID() === "explore") {
-      cleanAfterExplore();
-    }
-    setPlaceholder(targetButtonID);
-    frequentElements.textField.value = '';
-  }
-};
 
 

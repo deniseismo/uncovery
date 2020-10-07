@@ -26,3 +26,9 @@ export function addTooltips() {
     element.appendChild(tooltip);
   });
 };
+
+export function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+};

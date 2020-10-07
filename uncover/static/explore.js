@@ -1,5 +1,5 @@
 import {frequentElements} from "./utils.js"
-import {submitInput, musicFilters} from "./main.js"
+import {theGame, submitInput, musicFilters} from "./main.js"
 import anime from './anime.es.js';
 
 // prepares all the sliders and options for the EXPLORE mode
@@ -12,17 +12,27 @@ export async function prepareToExplore() {
   formContainer.id = "tags-form";
   const tagsSearchInput = document.querySelector('#tag-field');
   tagsSearchInput.addEventListener('input', handleTags);
+  tagsSearchInput.addEventListener('focus', autocompletjke);
+};
 
-$('#tag-field').autocomplete({
+
+function autocompletjke() {
+  if (!(theGame.status)) {
+    console.log('autocompletjke!')
+    $('#tag-field').autocomplete({
     serviceUrl: '/get_tags',
     type: "GET",
     minChars: 2,
     onSelect: function () {
-      const tagsSearchInput = document.querySelector('#tag-field');
+      const tagsSearchInput = document.querySelector('.form-field');
       tagsSearchInput.dispatchEvent(new Event('input'));
-    }
-});
+    },
+    showNoSuggestionNotice: true,
+      noSuggestionNotice: 'No such tag found.'
+    });
+  }
 };
+
 
 // search through tags
 export async function handleTags(e) {
