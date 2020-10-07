@@ -1,7 +1,7 @@
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters} from "./main.js"
 import anime from './anime.es.js';
-import {animateTimeSpan, animateMusicGenreOn, animateMusicGenreOff} from './animation.js'
+import {animateTimeSpan, animateMusicGenreOn, animateMusicGenreOff, animateMusicGenresContainer} from './animation.js'
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
@@ -109,6 +109,7 @@ function createMusicGenresContainer() {
   musicGenresContainer.appendChild(selectedFilters);
   musicGenresContainer.appendChild(timeSpanElement);
   document.querySelector('main').appendChild(musicGenresContainer);
+  animateMusicGenresContainer(musicGenresContainer);
   // display all the tags already chosen/left from before
   musicFilters.tagsPickedInfo.forEach(tag => {
     createMusicGenreElement(tag);

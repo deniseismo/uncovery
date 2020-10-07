@@ -69,3 +69,25 @@ export function animateMusicGenreOff(musicGenreElement) {
     backgroundColor: "#ed6663"
   });
 };
+
+export function animateHighlightGuessedAlbum(album) {
+  anime({
+    targets: album,
+    opacity: [
+      {value: 0.3, easing: 'easeOutElastic(5, 0.3)', duration: 200},
+      {value: 1, easing: 'easeOutElastic(5, 0.3)', duration: 400}
+    ]
+  });
+};
+
+export function animateMusicGenresContainer() {
+  anime({
+    targets: '.music-genres-container',
+    scale: [0.5, 1],
+    translateY: [50, 0],
+    opacity: [0, 1],
+    borderRadius: ['200px', '0px'],
+    duration: 700
+  });
+
+}
