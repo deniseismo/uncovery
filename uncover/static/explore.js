@@ -1,6 +1,7 @@
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters} from "./main.js"
 import anime from './anime.es.js';
+import {animateTimeSpan, animateMusicGenreOn, animateMusicGenreOff} from './animation.js'
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
@@ -123,7 +124,7 @@ function createMusicGenreElement(musicGenre) {
   const musicGenresContainer = document.querySelector('.music-genres-container');
   musicGenresContainer.appendChild(musicGenreElement);
   console.log(musicGenre);
-  animateMusicGenre(musicGenreElement);
+  animateMusicGenreOn(musicGenreElement);
   document.querySelectorAll('.music-genre-element').forEach(genre => {
     genre.addEventListener('click', (e) => {
       musicFilters.removeMusicGenre(e.target.dataset.tagName);
@@ -132,31 +133,9 @@ function createMusicGenreElement(musicGenre) {
         e.target.remove();
       }, 100);
     });
-
   });
 };
 
-function animateMusicGenreOff(musicGenreElement) {
-  anime({
-    targets: `#${musicGenreElement}`,
-    scale: [1, 0],
-    translateY: [0, 50],
-    opacity: [1, 0],
-    duration: 500,
-    backgroundColor: "#ed6663"
-  });
-};
-
-
-function animateMusicGenre(musicGenreElement) {
-  anime({
-    targets: musicGenreElement,
-    scale: [0.8, 1],
-    translateY: [50, 0],
-    opacity: [0, 1],
-    duration: 500
-  });
-};
 
 // creates a timespan slider container
 function createSliderContainer() {
@@ -223,25 +202,7 @@ function createSlider() {
     });
 };
 
-function animateTimeSpan(timeBefore, timeAfter) {
-  if (timeBefore[0] !== timeAfter[0]) {
-    anime({
-      targets: '.time-span-begin',
-      textContent: [timeBefore[0], timeAfter[0]],
-      round: 1,
-      duration: 500
-    });
-  };
-  if (timeBefore[1] !== timeAfter[1]) {
-    anime({
-      targets: '.time-span-end',
-      textContent: [timeBefore[1], timeAfter[1]],
-      round: 1,
-      duration: 500,
-      easing: 'linear'
-    });
-  };
-};
+
 
 
 function addMusicTags() {

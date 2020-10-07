@@ -22,9 +22,50 @@ export function animateWaves(method) {
       {
         value: theWave.getWave()['d'],
         duration: 300,
-        easing: 'easeInOutQuad'
+        easing: 'easeInOutBack'
       }
     ],
     fill: theWave.getWave()['fill']
+  });
+};
+
+export function animateTimeSpan(timeBefore, timeAfter) {
+  if (timeBefore[0] !== timeAfter[0]) {
+    anime({
+      targets: '.time-span-begin',
+      textContent: [timeBefore[0], timeAfter[0]],
+      round: 1,
+      duration: 500
+    });
+  };
+  if (timeBefore[1] !== timeAfter[1]) {
+    anime({
+      targets: '.time-span-end',
+      textContent: [timeBefore[1], timeAfter[1]],
+      round: 1,
+      duration: 500,
+      easing: 'linear'
+    });
+  };
+};
+
+export function animateMusicGenreOn(musicGenreElement) {
+  anime({
+    targets: musicGenreElement,
+    scale: [0.8, 1],
+    translateY: [50, 0],
+    opacity: [0, 1],
+    duration: 500
+  });
+};
+
+export function animateMusicGenreOff(musicGenreElement) {
+  anime({
+    targets: `#${musicGenreElement}`,
+    scale: [1, 0],
+    translateY: [0, 50],
+    opacity: [1, 0],
+    duration: 500,
+    backgroundColor: "#ed6663"
   });
 };

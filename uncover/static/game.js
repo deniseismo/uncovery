@@ -5,6 +5,7 @@ import {handleTags} from './explore.js'
 import {hideOptions} from './uiconfig.js'
 import {insertAfter} from './utils.js'
 import {winningMessage} from './info.js'
+import anime from './anime.es.js'
 
 
 export class Game {
@@ -104,7 +105,14 @@ function highlightGuessedAlbum(albumID) {
    helps restarting animation & playing it again if needed
   */
   void guessedAlbum.offsetWidth;
-  guessedAlbum.classList.add("guessed-right");
+//  guessedAlbum.classList.add("guessed-right");
+  anime({
+    targets: guessedAlbum,
+    opacity: [
+      {value: 0.3, easing: 'easeOutElastic(5, 0.3)', duration: 200},
+      {value: 1, easing: 'easeOutElastic(5, 0.3)', duration: 400}
+    ]
+  });
   guessedAlbum.alt = title;
   const successIcon = document.querySelector(`#success-${albumID}`);
   successIcon.classList.add('visible');
@@ -197,6 +205,7 @@ export function cancelGame() {
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "block";
   setPlaceholder(frequentElements.activeButtonID());
+  resetGame();
 };
 
 export function resetGame() {
