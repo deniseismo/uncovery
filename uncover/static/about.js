@@ -12,8 +12,8 @@ export function renderAboutPage() {
     frameItem.classList.add('about-item', "shadow-main");
     frequentElements.gameFrame.appendChild(frameItem);
   }
-  animateAboutItems();
   addAboutText();
+  animateAboutItems();
 }
 
 function addAboutText() {
@@ -57,6 +57,13 @@ function animateAboutItems() {
     ],
     opacity: [0, 0.5],
     borderRadius: ['100%', '0%'],
+    delay: anime.stagger(110, {easing: 'easeOutQuad'})
+  });
+  anime({
+    targets: ".about-text p",
+    backgroundColor: ["#FFF", "#005191"],
+    scale: [2, 1],
+    opacity: [0.5, 1],
     delay: anime.stagger(110, {easing: 'easeOutQuad'})
   });
 };

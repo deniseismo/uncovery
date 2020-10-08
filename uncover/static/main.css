@@ -845,40 +845,32 @@ label.tooltipText:after {
  background: #3A3E4A;
 }
 
+.about-text > p {
+  position: absolute;
+  font-size: 1.25rem;
+  color:white;
+  background: #005191;
+  padding: 0.6rem;
+}
+
+
 .created-by {
-	position: absolute;
 	top: 10%;
-	font-size: 1rem;
-	color: white;
-	background: #005191;
-	padding: 0.6rem;
 	left: 33%;
 }
 
 .thanks {
-	position: absolute;
 	top: 30%;
 	left: 35%;
-	background: #3c053b;
-	color: white;
-	padding: 0.6rem;
 }
 .for-what {
-	position: absolute;
-	top: 35%;
+	top: 38%;
 	left: 55%;
-	background: #3c053b;
-	color: white;
-	padding: 0.6rem;
 }
 
 .if-you-like {
-	position: absolute;
 	top: 55%;
 	left: 40%;
-	background: #3c053b;
-	color: white;
-	padding: 0.6rem;
 }
 
 

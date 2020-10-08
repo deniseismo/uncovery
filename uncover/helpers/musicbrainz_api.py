@@ -73,7 +73,11 @@ def mb_get_artist_mbid(artist_name: str):
             # go deep in case of some discrepancies or bugs
             if artist_name.lower() == artist_obj['name'].lower():
                 print(f"equal! {artist_name} {artist_obj['name']}")
-                mbid = artist_obj['id']
+                try:
+                    mbid = artist_obj['id']
+                    break
+                except (IndexError, KeyError):
+                    continue
     except (KeyError, IndexError):
         mbid = mb_get_artist_mbid_v2(artist_name)
     if not mbid:
@@ -132,12 +136,13 @@ def mb_get_artists_albums(artist: str):
     if not artist_mbid:
         # if nothing found
         return None
-    album_query_filter = '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json'
+    album_query_filter = '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&limit=100&fmt=json'
     response = requests.get(
         'https://musicbrainz.org/ws/2/release-group?query=arid:'
         + artist_mbid
         + album_query_filter,
-        headers=headers)
+        headers=headers
+    )
     # in case of an error, return None
     if response.status_code != 200:
         return None
