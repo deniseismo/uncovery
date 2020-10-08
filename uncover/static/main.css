@@ -133,13 +133,19 @@ header {
   width: 200px;
 }
 
-.navigation-bar > .button {
+.method {
   color: white;
   background-color: #3b444b;
   line-height: 60px;
   padding: 0;
   border: 0;
 }
+
+.method::hover {
+  background-color: #ebecf1 !important;
+
+}
+
 
 /* default text style for the LCD Soundsystem quote */
 .lcd-quote p {
@@ -788,3 +794,94 @@ label.tooltipText:after {
 .time-span {
   font-size: 2rem;
 }
+
+
+
+.about-item {
+  width: 200px;
+  height: 200px;
+  font-size: 2rem;
+  color: white;
+  text-align: center;
+}
+
+.about-item::before{
+    content: '';
+    width: 150px;
+    height: 150px;
+    border-radius: 100%;
+    position: absolute;
+    background-color: #ccc;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: -1;
+}
+
+#about-1 {
+ background: #3A4A3E;
+}
+#about-2 {
+ background: #3A4A41;
+}
+#about-3 {
+ background: #3A4A43;
+}
+#about-4 {
+ background: #3A4A46;
+}
+#about-5 {
+ background: #3A4A49;
+}
+#about-6 {
+ background: #3A464A;
+}
+#about-7 {
+ background: #3B444B;
+}
+#about-8 {
+ background: #3A414A;
+}
+#about-9 {
+ background: #3A3E4A;
+}
+
+.created-by {
+	position: absolute;
+	top: 10%;
+	font-size: 1rem;
+	color: white;
+	background: #005191;
+	padding: 0.6rem;
+	left: 33%;
+}
+
+.thanks {
+	position: absolute;
+	top: 30%;
+	left: 35%;
+	background: #3c053b;
+	color: white;
+	padding: 0.6rem;
+}
+.for-what {
+	position: absolute;
+	top: 35%;
+	left: 55%;
+	background: #3c053b;
+	color: white;
+	padding: 0.6rem;
+}
+
+.if-you-like {
+	position: absolute;
+	top: 55%;
+	left: 40%;
+	background: #3c053b;
+	color: white;
+	padding: 0.6rem;
+}
+
+
+
+
+

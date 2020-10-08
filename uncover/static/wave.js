@@ -25,7 +25,7 @@ export class Wave {
       },
       "explore": {
         "d": this.shapes[Math.floor(Math.random() * this.shapes.length)],
-        "fill": "#95A2AC"
+        "fill": "#000"
       }
     }
   }

@@ -233,7 +233,7 @@ function fixArtistName(data) {
 function loadCoverArt(data) {
   const totalAmountOfAlbums = data['albums'].length;
   let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     const album = data['albums'][i];
     const imageURL = data['albums'][i]['image'];
     const id = data['albums'][i]['id']

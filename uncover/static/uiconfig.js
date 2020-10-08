@@ -1,6 +1,7 @@
-import {frequentElements} from './utils.js'
+import {frequentElements, removeAllChildNodes} from './utils.js'
 import {cancelGame} from './game.js'
 import {prepareToExplore, cleanAfterExplore} from './explore.js'
+import {renderAboutPage} from './about.js';
 
 export function hideOptions() {
   frequentElements.selectOptions.style.display = 'none';
@@ -27,6 +28,14 @@ export function configureOptionsStyle(targetButtonID) {
     } else if (frequentElements.activeButtonID() === "explore") {
       cleanAfterExplore();
     }
+    if (targetButtonID === "about") {
+      renderAboutPage();
+    } else if (frequentElements.activeButtonID() === "about") {
+      const searchBar = document.querySelector(".search-and-options-container");
+      searchBar.style.display = 'block';
+      removeAllChildNodes(frequentElements.gameFrame);
+    }
+
     setPlaceholder(targetButtonID);
     frequentElements.textField.value = '';
   }
