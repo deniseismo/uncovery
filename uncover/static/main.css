@@ -763,9 +763,8 @@ label.tooltipText:after {
     display: block;
 }
 .noUi-connect {
-    background: #911A1A;
+  background: #911A1A;
 }
-
 
 .music-genres-container {
   display: flex;
@@ -774,7 +773,7 @@ label.tooltipText:after {
   top: 20%;
   margin-left: 10%;
   padding: 1rem;
-  border: 1px solid black;
+  border: 1px solid #3B444B;
   border-radius: 10px;
   font-size: 1.25rem;
   text-align: center;
@@ -784,11 +783,29 @@ label.tooltipText:after {
 .music-genre-element {
   text-align: center;
   padding: 0.25rem;
-  border: 1px solid black;
+  border: 2px solid #3B444B;
+  transition: all .3s ease-in-out;
 }
+
 
 .music-genre-element:hover {
   cursor: pointer;
+  border-color: #911A1A;
+}
+.music-genre-element::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 1px;
+  left: 5%;
+  background: #911A1A;
+  position: absolute;
+  top: 50%;
+  transition: width 0.3s cubic-bezier(1,-0.13,.47,1.33);
+}
+
+.music-genre-element:hover::after {
+  width: 90%;
 }
 
 .time-span {
@@ -898,4 +915,5 @@ label.tooltipText:after {
   z-index: -500;
   opacity: 0.7;
   overflow: visible;
+  z-index: -99;
 }

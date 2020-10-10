@@ -116,14 +116,17 @@ export function animateWinningMessage() {
 };
 
 export function animateBlob() {
-  anime({
-    targets: '.blob',
+  const blobs = document.querySelectorAll('.blob');
+  blobs.forEach(blob => {
+    anime({
+    targets: blob,
     opacity: [0, 1],
     scale: [3, 1],
     translateX: Math.floor(Math.random() * Math.floor(200)) - 150,
     translateY: Math.floor(Math.random() * Math.floor(200)) - 150,
     delay: anime.stagger(100)
   });
+  })
 }
 
 export function animateMorphBlob() {
