@@ -39,10 +39,3 @@ class Tag(db.Model):
 
     def __repr__(self):
         return f"Genre('{self.tag_name}')"
-
-# <div id="form">
-#     <div class="bar">
-#         <div class="label">the times they are a-changin'</div>
-#         <div id="r-slider"></div>
-#     </div>
-# </div>

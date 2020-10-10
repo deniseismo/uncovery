@@ -138,7 +138,25 @@ function gameWon() {
   addTooltips();
   frequentElements.playButton.value = 'PLAY SOME MORE';
   frequentElements.playButton.classList.add('won');
+  createWinningContainer();
 };
+
+
+function createWinningContainer() {
+  const winningContainer = document.createElement('div');
+  winningContainer.classList.add('winning-container');
+  const winningText = document.createElement('p');
+  winningText.classList.add('winning-text');
+  const randomIndex = Math.floor(Math.random() * winningMessage.length);
+  winningText.textContent = winningMessage[randomIndex]["quote"];
+  winningContainer.appendChild(winningText);
+  winningContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
+  frequentElements.gameFrame.appendChild(winningContainer);
+  addTooltips();
+}
+
+
+
 
 export function prepareGame() {
   theGame.status = true;

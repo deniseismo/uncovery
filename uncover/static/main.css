@@ -874,6 +874,8 @@ label.tooltipText:after {
 }
 
 
-
-
-
+.winning-text {
+  position: absolute;
+  top: 50%;
+  display: block;
+}

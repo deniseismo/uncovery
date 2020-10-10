@@ -67,11 +67,15 @@ def mb_get_artist_mbid(artist_name: str):
         # get the first one (should probably be ok)
         # mbid = response.json()["artists"][0]["id"]
         mbid = musicbrainzngs.search_artists(artist_name, limit=2)["artist-list"][0]['id']
+        print(f'mbid found with ngs: {mbid}')
         for artist_obj in response.json()['artists']:
             print(artist_obj['name'], artist_name)
             print(len(artist_obj['name']))
             # go deep in case of some discrepancies or bugs
-            if artist_name.lower() == artist_obj['name'].lower():
+            artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
+            object_fixed = artist_obj['name'].lower().replace("’", "'").replace('‐', '-').replace(',', '')
+            print(f'my evaluation: {artist_fixed} {object_fixed}')
+            if artist_fixed == object_fixed:
                 print(f"equal! {artist_name} {artist_obj['name']}")
                 try:
                     mbid = artist_obj['id']
