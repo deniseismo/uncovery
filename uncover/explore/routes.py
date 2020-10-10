@@ -93,7 +93,7 @@ def get_tags_list():
     filtered_tags_list = []
     for tag in tags_list:
         if search_query:
-            if search_query in tag:
+            if search_query.lower() in tag:
                 filtered_tags_list.append(tag)
 
     suggestions = {"suggestions": filtered_tags_list}

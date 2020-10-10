@@ -509,8 +509,9 @@ it encapsulates all the content with the navigation except 'waves'
              bounce 0.6s .65s cubic-bezier(0,1.6,.6,1) none;
 }*/
 
+/* TODO: hover effect on cover arts */
 /* magnifies cover art on hover */
-.cover-art:hover {
+/*.cover-art:hover {
   transform: scale(1.35);
   transition: transform .3s cubic-bezier(.17,.67,.49,1.53);
   z-index: 1;
@@ -522,7 +523,7 @@ it encapsulates all the content with the navigation except 'waves'
 
 .cover-art.cover-medium:hover {
   transform: scale(1.25);
-}
+}*/
 
 /* failure art width & height */
 .failure-art {
@@ -694,7 +695,6 @@ label.tooltipText:after {
 }
 
 .info-tooltip {
-  position: relative;
 }
 
 .tooltipText {
@@ -874,8 +874,18 @@ label.tooltipText:after {
 }
 
 
+.winning-container {
+  display: flex;
+  background: red;
+}
+
+
 .winning-text {
   position: absolute;
-  top: 50%;
-  display: block;
+  top: 33%;
+  left: 33%;
+  background: #3b444b;
+  padding: 1rem;
+  color: white;
+  font-size: 2rem;
 }

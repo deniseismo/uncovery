@@ -4,7 +4,9 @@ import {setPlaceholder, configureOptionsStyle} from './uiconfig.js'
 import {MusicFilter} from './musicFilter.js'
 import {prepareToExplore, cleanAfterExplore, handleTags} from './explore.js'
 import {animateCoverArt, animateWaves} from './animation.js'
+import {winningMessage} from './info.js'
 import anime from './anime.es.js'
+import {addTooltips} from './utils.js'
 
 export const theGame = new Game(false);
 
@@ -341,3 +343,42 @@ tooltipElements.forEach(function(el) {
 
 
 
+
+function createWinningContainer() {
+  const winningContainer = document.createElement('div');
+  winningContainer.classList.add('winning-container', 'info-tooltip');
+  const winningText = document.createElement('p');
+  winningText.classList.add('winning-text');
+  const randomIndex = Math.floor(Math.random() * winningMessage.length);
+  winningText.textContent = winningMessage[randomIndex]["quote"];
+  winningContainer.appendChild(winningText);
+  winningContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
+  frequentElements.gameFrame.appendChild(winningContainer);
+  addTooltips();
+  animateWinningMessage();
+}
+
+function animateWinningMessage() {
+  anime({
+    targets: '.winning-text',
+    opacity: [
+      {value: 0, easing: 'easeOutExpo'},
+      {value: 1, easing: 'easeOutExpo'},
+      {value: 0, easing: 'easeOutElastic(5, 0.3)'},
+      {value: 1, easing: 'linear'}
+    ],
+    scale: [
+      {value: 1.5, easing: 'easeOutExpo'},
+      {value: 2, delay: 500},
+      {value: 1, duration: 500}
+    ],
+    fontSize: ['0.1rem', '2rem'],
+    padding: ['0rem', '1rem'],
+//    borderRadius: ['50% 0% 50% 0%', '0%'],
+    backgroundColor: ['#911a1a', '#243d00'],
+    easing: 'easeOutExpo',
+    duration: 500
+  })
+}
+
+createWinningContainer();

@@ -5,7 +5,7 @@ import {handleTags} from './explore.js'
 import {hideOptions} from './uiconfig.js'
 import {insertAfter} from './utils.js'
 import {winningMessage} from './info.js'
-import {animateHighlightGuessedAlbum} from './animation.js'
+import {animateHighlightGuessedAlbum, animateBlockOff, animateWinningMessage} from './animation.js'
 
 
 export class Game {
@@ -118,33 +118,27 @@ function updateScore() {
   const total = Math.min(totalAmountOfAlbums, 9);
   albumGame.incrementAlbumsCount();
   const scoreText = document.querySelector(".score-text");
+  // updates the message
+  scoreText.textContent = `Wowee! You've guessed ${albumGame.albumsCount} out of ${total}.`;
   if (albumGame.albumsCount === total) {
     // triggers winning function if all albums guessed
     gameWon();
-  } else {
-    // updates the message otherwise
-    scoreText.textContent = `Wowee! You've guessed ${albumGame.albumsCount} out of ${total}.`;
   }
 };
 
 // handles winning
 function gameWon() {
-  const scoreText = document.querySelector(".score-text");
-  const randomIndex = Math.floor(Math.random() * winningMessage.length);
-  scoreText.textContent = winningMessage[randomIndex]["quote"];
-  const scoreContainer = document.querySelector('.score-container');
-  scoreContainer.classList.add('info-tooltip', 'score-game-won');
-  scoreContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
-  addTooltips();
   frequentElements.playButton.value = 'PLAY SOME MORE';
   frequentElements.playButton.classList.add('won');
   createWinningContainer();
+  animateWinningMessage();
+  addTooltips();
 };
-
 
 function createWinningContainer() {
   const winningContainer = document.createElement('div');
-  winningContainer.classList.add('winning-container');
+  winningContainer.id = 'winning-container';
+  winningContainer.classList.add('winning-container', 'info-tooltip');
   const winningText = document.createElement('p');
   winningText.classList.add('winning-text');
   const randomIndex = Math.floor(Math.random() * winningMessage.length);
@@ -152,10 +146,13 @@ function createWinningContainer() {
   winningContainer.appendChild(winningText);
   winningContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
   frequentElements.gameFrame.appendChild(winningContainer);
-  addTooltips();
+  winningContainer.addEventListener('click', (e) => {
+    animateBlockOff(winningContainer.id);
+    setTimeout(() => {
+        e.target.remove();
+      }, 100);
+  });
 }
-
-
 
 
 export function prepareGame() {
@@ -207,6 +204,9 @@ export function cancelGame() {
     if (sliderContainer) {
       sliderContainer.style.display = 'flex';
     };
+  } else {
+    const formField = document.querySelector('.form-field');
+    formField.id = 'text-field';
   };
   formContainer.id = defaultForm;
   console.log(formContainer.id);

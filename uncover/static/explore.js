@@ -1,7 +1,7 @@
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters} from "./main.js"
 import anime from './anime.es.js';
-import {animateTimeSpan, animateMusicGenreOn, animateMusicGenreOff, animateMusicGenresContainer} from './animation.js'
+import {animateTimeSpan, animateMusicGenreOn, animateBlockOff, animateMusicGenresContainer} from './animation.js'
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
@@ -129,7 +129,7 @@ function createMusicGenreElement(musicGenre) {
   document.querySelectorAll('.music-genre-element').forEach(genre => {
     genre.addEventListener('click', (e) => {
       musicFilters.removeMusicGenre(e.target.dataset.tagName);
-      animateMusicGenreOff(e.target.id);
+      animateBlockOff(e.target.id);
       setTimeout(() => {
         e.target.remove();
       }, 100);
