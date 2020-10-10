@@ -30,9 +30,8 @@ body {
 }
 .blob-container {
   position: absolute;
-  top: 35%;
+  top: 5%;
   left: 7%;
-  width: 400px;
   z-index: -500;
   opacity: 0.7;
 }
@@ -772,13 +771,14 @@ label.tooltipText:after {
   display: flex;
   flex-flow: column nowrap;
   position: absolute;
-  top: 40%;
+  top: 20%;
   margin-left: 10%;
   padding: 1rem;
   border: 1px solid black;
   border-radius: 10px;
   font-size: 1.25rem;
   text-align: center;
+  overflow: hidden;
 }
 
 .music-genre-element {
@@ -888,4 +888,14 @@ label.tooltipText:after {
   padding: 1rem;
   color: white;
   font-size: 2rem;
+}
+
+
+.blob {
+  position: absolute;
+  top: 35%;
+  left: 7%;
+  z-index: -500;
+  opacity: 0.7;
+  overflow: visible;
 }

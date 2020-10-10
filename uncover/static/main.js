@@ -127,7 +127,6 @@ export const submitInput = function() {
   });
 };
 
-
 // event listener for a submit form and an 'ok' submit button
 const submitForm = document.querySelector('#submit-form');
 submitForm.addEventListener('submit', () => {
@@ -172,7 +171,6 @@ frequentElements.playButton.onclick = (e) => {
     cancelGame();
   };
 };
-
 
 // activate buttons
 const buttonsContainer = document.querySelector('#buttons-container');
@@ -295,9 +293,6 @@ function resizeCoverArtImages(amountOfAlbums) {
   }
 };
 
-
-
-
 function loadFailureArt(node, failData) {
   frequentElements.gameFrame.classList.add("shadow-main");
   const failureArt = document.createElement("img");
@@ -326,7 +321,6 @@ function loadSpinner(node) {
   node.appendChild(spinner);
 };
 
-
 /* tooltips */
 // find all elements that need tooltips
 const tooltipElements = document.querySelectorAll('.info-tooltip');
@@ -340,45 +334,3 @@ tooltipElements.forEach(function(el) {
   tooltip.textContent = el.dataset.tooltip;
   el.appendChild(tooltip);
 });
-
-
-
-
-function createWinningContainer() {
-  const winningContainer = document.createElement('div');
-  winningContainer.classList.add('winning-container', 'info-tooltip');
-  const winningText = document.createElement('p');
-  winningText.classList.add('winning-text');
-  const randomIndex = Math.floor(Math.random() * winningMessage.length);
-  winningText.textContent = winningMessage[randomIndex]["quote"];
-  winningContainer.appendChild(winningText);
-  winningContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
-  frequentElements.gameFrame.appendChild(winningContainer);
-  addTooltips();
-  animateWinningMessage();
-}
-
-function animateWinningMessage() {
-  anime({
-    targets: '.winning-text',
-    opacity: [
-      {value: 0, easing: 'easeOutExpo'},
-      {value: 1, easing: 'easeOutExpo'},
-      {value: 0, easing: 'easeOutElastic(5, 0.3)'},
-      {value: 1, easing: 'linear'}
-    ],
-    scale: [
-      {value: 1.5, easing: 'easeOutExpo'},
-      {value: 2, delay: 500},
-      {value: 1, duration: 500}
-    ],
-    fontSize: ['0.1rem', '2rem'],
-    padding: ['0rem', '1rem'],
-//    borderRadius: ['50% 0% 50% 0%', '0%'],
-    backgroundColor: ['#911a1a', '#243d00'],
-    easing: 'easeOutExpo',
-    duration: 500
-  })
-}
-
-createWinningContainer();

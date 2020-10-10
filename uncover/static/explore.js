@@ -1,7 +1,8 @@
+import {Blob} from "./shapes.js"
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters} from "./main.js"
-import anime from './anime.es.js';
-import {animateTimeSpan, animateMusicGenreOn, animateBlockOff, animateMusicGenresContainer} from './animation.js'
+import {animateTimeSpan, animateMusicGenreOn, animateBlockOff,
+        animateMusicGenresContainer, animateMorphBlob, animateBlob} from './animation.js'
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
@@ -106,9 +107,11 @@ function createMusicGenresContainer() {
   timeSpanBegin.textContent = musicFilters.timeSpanInfo[0];
   timeSpanDelimit.textContent = "—";
   timeSpanEnd.textContent = musicFilters.timeSpanInfo[1];
+  addBlob(musicGenresContainer, 3);
   musicGenresContainer.appendChild(selectedFilters);
   musicGenresContainer.appendChild(timeSpanElement);
   document.querySelector('main').appendChild(musicGenresContainer);
+  animateBlob();
   animateMusicGenresContainer(musicGenresContainer);
   // display all the tags already chosen/left from before
   musicFilters.tagsPickedInfo.forEach(tag => {
@@ -130,12 +133,25 @@ function createMusicGenreElement(musicGenre) {
     genre.addEventListener('click', (e) => {
       musicFilters.removeMusicGenre(e.target.dataset.tagName);
       animateBlockOff(e.target.id);
+      animateMorphBlob();
       setTimeout(() => {
         e.target.remove();
       }, 100);
     });
   });
 };
+
+
+function addBlob(parentElement, numberOfBlobs) {
+  const a_blob = new Blob();
+  for (let i = 0; i < numberOfBlobs; i++) {
+    const blob_element = a_blob.getBlob();
+    parentElement.appendChild(blob_element);
+  }
+};
+
+
+
 
 
 // creates a timespan slider container
@@ -220,6 +236,7 @@ function addMusicTags() {
       musicFilters.addMusicGenre(musicFilters.currentTag);
       // creates a DOM element with the tag
       createMusicGenreElement(musicFilters.currentTag);
+      animateMorphBlob();
       console.log(`${musicFilters.currentTag} was successfully added to the tags.`);
       console.log(musicFilters.tagsPickedInfo);
     } else {

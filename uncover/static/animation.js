@@ -1,5 +1,5 @@
 import anime from './anime.es.js'
-import {Wave} from './wave.js'
+import {Wave, Blob} from './shapes.js'
 
 export function animateCoverArt() {
   anime({
@@ -113,4 +113,39 @@ export function animateWinningMessage() {
     easing: 'easeOutExpo',
     duration: 500
   })
+};
+
+export function animateBlob() {
+  anime({
+    targets: '.blob',
+    opacity: [0, 1],
+    scale: [3, 1],
+    translateX: Math.floor(Math.random() * Math.floor(200)) - 150,
+    translateY: Math.floor(Math.random() * Math.floor(200)) - 150,
+    delay: anime.stagger(100)
+  });
 }
+
+export function animateMorphBlob() {
+  const a_blob = new Blob();
+  anime({
+    targets: '.blob',
+    opacity: [0, 1],
+    scale: [1.5],
+    translateX: Math.floor(Math.random() * Math.floor(200)) - 200,
+    translateY: Math.floor(Math.random() * Math.floor(200)) - 200,
+    delay: anime.stagger(100)
+  });
+    const paths = document.querySelectorAll('.blob path');
+    paths.forEach(path => {
+      anime({
+        targets: path,
+        d: a_blob.getMorphed(),
+        fill: a_blob.getColored(),
+        easing: 'easeOutElastic(4, 0.5)',
+        delay: anime.stagger(100),
+        duration: 1500
+      });
+    });
+};
+
