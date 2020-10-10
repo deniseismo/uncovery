@@ -123,8 +123,11 @@ def sql_select_artist_albums(artist_name: str):
             "image": 'static/cover_art_images/' + album.cover_art + ".png"
         }
         if album.alternative_title:
-            an_album_dict['names'] += album.alternative_title
+            print(album.alternative_title)
+
+            an_album_dict['names'] += [album.alternative_title]
             an_album_dict["names"] += utils.get_filtered_names_list(album.alternative_title)
+        an_album_dict['names'] = list(set(an_album_dict['names']))
         album_info['albums'].append(an_album_dict)
         album_id += 1
     return album_info

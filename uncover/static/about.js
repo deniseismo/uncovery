@@ -4,6 +4,8 @@ import anime from './anime.es.js'
 export function renderAboutPage() {
   // empty html
   removeAllChildNodes(frequentElements.gameFrame);
+  frequentElements.playButton.classList.remove("visible");
+  frequentElements.downloadButton.classList.remove("visible");
   const searchBar = document.querySelector(".search-and-options-container");
   searchBar.style.display = 'none';
   for (let i = 1; i < 10; i++) {
