@@ -619,15 +619,10 @@ it encapsulates all the content with the navigation except 'waves'
   border: 0;
   color: #ebecf1;
   transform: scale(0.8);
-  transition: opacity 0.6s cubic-bezier(0,1.6,.6,1) 1.2s,
-              transform 0.6s cubic-bezier(0,1.6,.6,1) 1.2s,
-              background-color 0.6s cubic-bezier(0,1.6,.6,1);
 }
 
 .play-button.visible {
   visibility: visible;
-  opacity: 1;
-  transform: scale(1);
 }
 
 .play-button:hover {
@@ -728,6 +723,7 @@ label.tooltipText:after {
   left: 0;
   bottom: 0;
   opacity: 0.75;
+  z-index: -99;
 }
 
 .copyright > p {
@@ -787,7 +783,6 @@ label.tooltipText:after {
   transition: all .3s ease-in-out;
 }
 
-
 .music-genre-element:hover {
   cursor: pointer;
   border-color: #911A1A;
@@ -828,10 +823,22 @@ label.tooltipText:after {
     height: 150px;
     border-radius: 100%;
     position: absolute;
-    background-color: #ccc;
+    background-color: #000;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) translateX(-50%);
     z-index: -1;
+}
+
+.about-item::after{
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 100%;
+    position: absolute;
+    background-color: #eee;
+    top: 50%;
+    transform: translateY(-50%)translateX(-50%);
+    z-index: 0;
 }
 
 #about-1 {
@@ -915,5 +922,16 @@ label.tooltipText:after {
   z-index: -500;
   opacity: 0.7;
   overflow: visible;
-  z-index: -99;
+  z-index: -999;
+}
+
+.center-circle {
+	width: 60px;
+	height: 60px;
+	background: #668229;
+	border-radius: 100%;
+	top: 50%;
+	position: absolute;
+	transform: translateY(-50%) translateX(-50%);
+	left: 50%;
 }

@@ -127,7 +127,6 @@ function createMusicGenreElement(musicGenre) {
   musicGenreElement.textContent = `${musicGenre}`;
   const musicGenresContainer = document.querySelector('.music-genres-container');
   musicGenresContainer.appendChild(musicGenreElement);
-  console.log(musicGenre);
   animateMusicGenreOn(musicGenreElement);
   document.querySelectorAll('.music-genre-element').forEach(genre => {
     genre.addEventListener('click', (e) => {

@@ -3,9 +3,8 @@ import {frequentElements, insertAfter, removeAllChildNodes} from './utils.js'
 import {setPlaceholder, configureOptionsStyle} from './uiconfig.js'
 import {MusicFilter} from './musicFilter.js'
 import {prepareToExplore, cleanAfterExplore, handleTags} from './explore.js'
-import {animateCoverArt, animateWaves} from './animation.js'
+import {animateCoverArt, animateWaves, animatePlayButtons} from './animation.js'
 import {winningMessage} from './info.js'
-import anime from './anime.es.js'
 import {addTooltips} from './utils.js'
 
 export const theGame = new Game(false);
@@ -106,9 +105,9 @@ export const submitInput = function() {
       itemsList.forEach(item => {
         item.classList.add("loaded");
       });
-
       frequentElements.playButton.classList.add("visible");
       frequentElements.downloadButton.classList.add("visible");
+      animatePlayButtons([frequentElements.playButton, frequentElements.downloadButton]);
       animateCoverArt();
       animateWaves(desiredMethod);
       const waves = document.querySelectorAll('.wave');

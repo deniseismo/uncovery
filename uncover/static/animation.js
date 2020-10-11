@@ -50,12 +50,13 @@ export function animateTimeSpan(timeBefore, timeAfter) {
 };
 
 export function animateMusicGenreOn(musicGenreElement) {
+  console.log('genre show up!', musicGenreElement)
   anime({
     targets: musicGenreElement,
-    scale: [0.8, 1],
-    translateY: [50, 0],
+    scale: [5, 1],
+    translateY: [150, 0],
     opacity: [0, 1],
-    duration: 500
+    duration: 600
   });
 };
 
@@ -152,3 +153,42 @@ export function animateMorphBlob() {
     });
 };
 
+
+export function animateAboutItems() {
+  anime({
+    targets: '.about-item',
+    scale: [
+      {value: 0.5, easing: 'easeInOutQuad', duration: 50},
+      {value: 1, easing: 'easeInOutQuad', duration: 100}
+    ],
+    opacity: [0, 0.5],
+    borderRadius: ['100%', '0%'],
+    delay: anime.stagger(110, {easing: 'easeOutQuad'})
+  });
+  anime({
+    targets: ".about-text p",
+    backgroundColor: ["#FFF", "#005191"],
+    scale: [2, 1],
+    opacity: [0.5, 1],
+    delay: anime.stagger(110, {easing: 'easeOutQuad'})
+  });
+  anime({
+    targets: ".center-circle",
+    scale: [0, 1],
+    translateX: ['0%', '-50%'],
+    translateY: ['-50%'],
+    delay: anime.stagger(60, {easing: 'easeOutQuad'})
+  })
+};
+
+
+export function animatePlayButtons(elementsList) {
+ anime({
+   targets: elementsList,
+   opacity: [0, 1],
+   scale: [0.8, 1],
+   duration: 600,
+   delay: 1200,
+   easing: 'easeOutExpo'
+ })
+}

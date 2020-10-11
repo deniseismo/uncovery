@@ -1,5 +1,5 @@
 import {frequentElements, removeAllChildNodes, insertAfter} from './utils.js'
-import anime from './anime.es.js'
+import {animateAboutItems} from "./animation.js"
 
 export function renderAboutPage() {
   // empty html
@@ -12,6 +12,9 @@ export function renderAboutPage() {
     const frameItem = document.createElement('div');
     frameItem.id = `about-${i}`;
     frameItem.classList.add('about-item', "shadow-main");
+    const centerCircle = document.createElement('div');
+    centerCircle.classList.add('center-circle');
+    frameItem.appendChild(centerCircle);
     frequentElements.gameFrame.appendChild(frameItem);
   }
   addAboutText();
@@ -38,8 +41,6 @@ function addAboutText() {
   ifYouLike.textContent = "If you like this project, consider supporting it";
 
 
-
-
   aboutText.appendChild(createdBy);
   aboutText.appendChild(thanks);
   aboutText.appendChild(forWhat);
@@ -50,22 +51,3 @@ function addAboutText() {
 }
 
 
-function animateAboutItems() {
-  anime({
-    targets: '.about-item',
-    scale: [
-      {value: 0.5, easing: 'easeInOutQuad', duration: 50},
-      {value: 1, easing: 'easeInOutQuad', duration: 100}
-    ],
-    opacity: [0, 0.5],
-    borderRadius: ['100%', '0%'],
-    delay: anime.stagger(110, {easing: 'easeOutQuad'})
-  });
-  anime({
-    targets: ".about-text p",
-    backgroundColor: ["#FFF", "#005191"],
-    scale: [2, 1],
-    opacity: [0.5, 1],
-    delay: anime.stagger(110, {easing: 'easeOutQuad'})
-  });
-};
