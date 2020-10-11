@@ -2,7 +2,7 @@ import {Blob} from "./shapes.js"
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters} from "./main.js"
 import {animateTimeSpan, animateMusicGenreOn, animateBlockOff,
-        animateMusicGenresContainer, animateMorphBlob, animateBlob} from './animation.js'
+        animateMusicGenresContainer, animateMorphBlob, animateBlob, animatePlayButtons} from './animation.js'
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
@@ -178,6 +178,7 @@ function createSliderContainer() {
   sliderContainer.appendChild(sliderBar);
   sliderContainer.appendChild(filterButton);
   frequentElements.searchAndOptionsContainer.appendChild(sliderContainer);
+  animatePlayButtons(filterButton, 1);
 };
 
 /* activates/creates a Slider object (range slider) */
