@@ -1,11 +1,11 @@
 import {frequentElements, removeAllChildNodes, insertAfter} from './utils.js'
-import {animateAboutItems} from "./animation.js"
+import {animateAboutItems} from "./animation.js";
+import {removePlayButtons} from "./uiconfig.js";
 
 export function renderAboutPage() {
   // empty html
   removeAllChildNodes(frequentElements.gameFrame);
-  frequentElements.playButton.classList.remove("visible");
-  frequentElements.downloadButton.classList.remove("visible");
+  removePlayButtons();
   const searchBar = document.querySelector(".search-and-options-container");
   searchBar.style.display = 'none';
   for (let i = 1; i < 10; i++) {

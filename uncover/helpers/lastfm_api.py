@@ -133,17 +133,20 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
         a_set_of_titles = set()
         for album in response.json()['topalbums']['album'][:amount]:
             # gets the correct artist's name
+            artist_name = album['artist']['name']
             artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
+            if artist_correct_name:
+                artist_name = artist_correct_name
             album_name = album['name']
             album_correct_name = utils.get_filtered_name(album_name)
-            album_image = main.sql_find_specific_album(artist_correct_name, album_name)
+            album_image = main.sql_find_specific_album(artist_name, album_name)
             if not album_image:
-                album_image = main.sql_find_specific_album(artist_correct_name, album_correct_name)
+                album_image = main.sql_find_specific_album(artist_name, album_correct_name)
             # gets the album image
 
             if not album_image:
                 album_image = main.ultimate_album_image_finder(album_title=album_name,
-                                                               artist=artist_correct_name, fast=True)
+                                                               artist=artist_name, fast=True)
 
             # checks for incorrect/broken images
             if album_image:
@@ -151,7 +154,8 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
                 an_album_dict = {
                     "title": album_name,
                     "names": [album_name.lower()] + utils.get_filtered_names_list(album_name),
-                    "image": album_image
+                    "image": album_image,
+                    "artist_name": artist_name
                     # "image": album['image'][size]['#text'],
                 }
                 an_album_dict['names'] = list(set(an_album_dict['names']))

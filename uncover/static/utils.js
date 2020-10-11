@@ -1,8 +1,6 @@
 // frequently used elements
 export const frequentElements = {
   gameFrame: document.querySelector('#game-frame'),
-  playButton: document.querySelector('#play-button'),
-  downloadButton: document.querySelector('#download-button'),
   textField: document.querySelector('#text-field'),
   selectOptions: document.querySelector('.select-options'),
   searchAndOptionsContainer: document.querySelector('.search-and-options-container'),
@@ -31,4 +29,12 @@ export function removeAllChildNodes(parent) {
   while (parent.firstChild) {
     parent.removeChild(parent.firstChild);
   }
+};
+
+export function loadSpinner(node) {
+  const spinner = document.createElement("img");
+  const url = "static/images/loading/spinner-vinyl-64.gif";
+  spinner.classList.add('spinner');
+  spinner.src = url;
+  node.appendChild(spinner);
 };

@@ -13,8 +13,7 @@ def explore_filtered_albums(genres: list, time_span: list):
     start_year = '1950-01-01'
     end_year = '2020-01-01'
     if time_span:
-        if time_span[0] == time_span[1]:
-            time_span[1] += 1
+        time_span[1] += 1
         start_year = str(time_span[0]) + "-01-01"
         end_year = str(time_span[1]) + "-01-01"
 

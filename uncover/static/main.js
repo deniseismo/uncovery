@@ -1,11 +1,8 @@
-import {AlbumGameInfo, Game, handleGuesses, prepareGame, cancelGame, resetGame} from "./game.js"
-import {frequentElements, insertAfter, removeAllChildNodes} from './utils.js'
-import {setPlaceholder, configureOptionsStyle} from './uiconfig.js'
+import {AlbumGameInfo, Game, playInit} from "./game.js"
 import {MusicFilter} from './musicFilter.js'
-import {prepareToExplore, cleanAfterExplore, handleTags} from './explore.js'
+import {addTooltips, frequentElements, insertAfter, removeAllChildNodes, loadSpinner} from './utils.js'
+import {configureOptionsStyle, removePlayButtons, createPlayButtons, resetPlayButtons} from './uiconfig.js'
 import {animateCoverArt, animateWaves, animatePlayButtons} from './animation.js'
-import {winningMessage} from './info.js'
-import {addTooltips} from './utils.js'
 
 export const theGame = new Game(false);
 
@@ -19,15 +16,7 @@ export const musicFilters = new MusicFilter({
 
 
 export const submitInput = function() {
-  // make 'play-button' disappear
-  frequentElements.playButton.classList.remove("visible");
-  // make 'download-button' disappear
-  frequentElements.downloadButton.classList.remove("visible");
-  // make info at the bottom disappear (if exists)
-  const responseInfo = document.querySelector(".data-info");
-  if (responseInfo) {
-    responseInfo.remove();
-  };
+  removePlayButtons();
   // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
   const desiredMethod = document.querySelector('.method.active').id;
   frequentElements.gameFrame.classList.remove('shadow-main');
@@ -105,15 +94,15 @@ export const submitInput = function() {
       itemsList.forEach(item => {
         item.classList.add("loaded");
       });
-      frequentElements.playButton.classList.add("visible");
-      frequentElements.downloadButton.classList.add("visible");
-      console.log(albumGame.albums.length);
-      const total = Math.min(albumGame.albums.length, 9);
-      animatePlayButtons([frequentElements.playButton, frequentElements.downloadButton], total);
       animateCoverArt();
+      createPlayButtons(desiredMethod);
+      const total = Math.min(albumGame.albums.length, 9);
+      animatePlayButtons('.play-buttons-container .play-button', total);
       animateWaves(desiredMethod);
       const waves = document.querySelectorAll('.wave');
       waves.forEach(wave => wave.classList.remove('falldown'));
+      downloadInit();
+      playInit();
 
     }, function(loaded, count, success) {
       /* animate progress bar */
@@ -137,9 +126,10 @@ submitForm.addEventListener('submit', () => {
   }
 });
 
-
-frequentElements.downloadButton.addEventListener('click', () => {
-  frequentElements.downloadButton.value = "WAIT FOR IT…";
+function downloadInit() {
+  const downloadButton = document.querySelector('#download-button');
+  downloadButton.addEventListener('click', () => {
+  downloadButton.value = "WAIT FOR IT…";
   fetch("save_collage", {
     method: 'POST',
     headers: new Headers({
@@ -154,24 +144,12 @@ frequentElements.downloadButton.addEventListener('click', () => {
     myLink.target = "_blank";
     document.body.appendChild(myLink);
     myLink.click();
-    frequentElements.downloadButton.value = "SAVE COLLAGE";
+    downloadButton.value = "SAVE COLLAGE";
   });
 });
-
-// play button
-frequentElements.playButton.onclick = (e) => {
-  // reset score, remove 'success' icons
-  resetGame();
-  e.target.classList.toggle('on');
-  e.target.classList.remove('won');
-  if (e.target.classList.contains('on')) {
-    prepareGame();
-    const input = document.querySelector('#play-field');
-    input.oninput = handleGuesses;
-  } else {
-    cancelGame();
-  };
 };
+
+
 
 // activate buttons
 const buttonsContainer = document.querySelector('#buttons-container');
@@ -209,7 +187,7 @@ let timerID;
   item.addEventListener('focusin', () => {
     clearTimeout(timerID);
     // make sure the button's 'username' and the game is off
-    if (frequentElements.activeButtonID() === 'by_username' && !(frequentElements.playButton.classList.contains('on'))) {
+    if (frequentElements.activeButtonID() === 'by_username' && !(theGame.status)) {
       frequentElements.selectOptions.style.display = 'block';
     };
   });
@@ -314,24 +292,5 @@ function loadFailureArt(node, failData) {
   node.appendChild(failureArtBlock);
 };
 
-function loadSpinner(node) {
-  const spinner = document.createElement("img");
-  const url = "static/images/loading/spinner-vinyl-64.gif";
-  spinner.classList.add('spinner');
-  spinner.src = url;
-  node.appendChild(spinner);
-};
-
-/* tooltips */
-// find all elements that need tooltips
-const tooltipElements = document.querySelectorAll('.info-tooltip');
-// loop through every such element
-tooltipElements.forEach(function(el) {
-  // add 'label' element
-  const tooltip = document.createElement('label');
-  // add class to it
-  tooltip.classList.add('tooltipText');
-  // change text of that element to the text from 'data-tooltip' of the element
-  tooltip.textContent = el.dataset.tooltip;
-  el.appendChild(tooltip);
-});
+// initialize/create the tooltips
+addTooltips();

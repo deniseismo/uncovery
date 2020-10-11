@@ -2,7 +2,7 @@ import {frequentElements, addTooltips} from './utils.js'
 import {theGame, albumGame} from './main.js'
 import {setPlaceholder} from './uiconfig.js'
 import {handleTags} from './explore.js'
-import {hideOptions} from './uiconfig.js'
+import {hideOptions, resetPlayButtons} from './uiconfig.js'
 import {insertAfter} from './utils.js'
 import {winningMessage} from './info.js'
 import {animateHighlightGuessedAlbum, animateBlockOff, animateWinningMessage} from './animation.js'
@@ -11,6 +11,7 @@ import {animateHighlightGuessedAlbum, animateBlockOff, animateWinningMessage} fr
 export class Game {
   constructor(status) {
     this.isOn = status;
+    this.mode = '';
   }
   get status() {
     return this.isOn;
@@ -18,6 +19,13 @@ export class Game {
   set status(status) {
     this.isOn = status;
   }
+  get playMode() {
+    return this.mode;
+  }
+  set playMode(theMode) {
+    this.mode = theMode;
+  }
+
 }
 
 
@@ -61,8 +69,34 @@ export class AlbumGameInfo {
   };
 };
 
+export function playInit() {
+// play button
+  const playButtons = document.querySelectorAll('.play-buttons-container .guess');
+  playButtons.forEach(button => {
+    button.addEventListener("click", (e) => {
+      resetGame();
+      resetPlayButtons(e.target.id);
+      e.target.classList.toggle('on');
+      e.target.classList.remove('won');
+      if (e.target.classList.contains('on')) {
+        prepareGame(e.target);
+      } else {
+        console.log('cancel');
+        cancelGame(e.target);
+      };
+    })
+  })
+}
+
+
+
+
 
 export function handleGuesses(e) {
+  let searchMode = "names";
+  if (theGame.playMode === 'artists') {
+    searchMode = "artist_name";
+  }
   const options = {
     // isCaseSensitive: false,
     // includeScore: false,
@@ -77,7 +111,7 @@ export function handleGuesses(e) {
     // ignoreLocation: false,
     // ignoreFieldNorm: false,
     keys: [
-      "names",
+      searchMode,
     ]
   };
   const fuse = new Fuse(albumGame.notGuessedAlbums, options);
@@ -128,8 +162,9 @@ function updateScore() {
 
 // handles winning
 function gameWon() {
-  frequentElements.playButton.value = 'PLAY SOME MORE';
-  frequentElements.playButton.classList.add('won');
+  const currentButton = document.querySelector('.play-button.on');
+  currentButton.value = 'PLAY SOME MORE';
+  currentButton.classList.add('won');
   createWinningContainer();
   animateWinningMessage();
   addTooltips();
@@ -155,23 +190,30 @@ function createWinningContainer() {
 }
 
 
-export function prepareGame() {
+export function prepareGame(buttonPressed) {
   theGame.status = true;
+  let mode = 'albums';
+  if (buttonPressed.id == 'guess-artists') {
+    mode = 'artists';
+  }
+  theGame.playMode = mode;
   hideOptions('on');
   createScoreContainer();
   const formField = document.querySelector('.form-field');
   formField.removeEventListener("input", handleTags);
   $('.form-field').autocomplete('disable');
   frequentElements.textField.id = 'play-field';
-  frequentElements.textField.placeholder = 'Can you name all the albums?';
+  frequentElements.textField.placeholder = `Can you name all the ${mode}?`;
   frequentElements.textField.value = '';
   frequentElements.textField.focus();
   const formContainer = document.querySelector(".form-container");
   formContainer.id = "guess-form";
-  frequentElements.playButton.value = 'GIVE UP';
+  buttonPressed.value = 'GIVE UP';
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "none";
   albumGame.notGuessedAlbums = [...albumGame.albums];
+  const input = document.querySelector('#play-field');
+  input.oninput = handleGuesses;
 };
 
 function createScoreContainer() {
@@ -179,14 +221,14 @@ function createScoreContainer() {
   scoreContainer.classList.add("flex-container", "shadow-main", "score-container");
   const scoreText = document.createElement("h1");
   scoreText.classList.add("score-text");
-  scoreText.textContent = "You haven't guessed any albums yet. 😟";
+  scoreText.textContent = `You haven't guessed any ${theGame.playMode} yet. 😟`;
   scoreContainer.appendChild(scoreText);
   const referenceNode = document.querySelector(".search-and-options-container");
   insertAfter(scoreContainer, referenceNode);
 }
 
 
-export function cancelGame() {
+export function cancelGame(buttonPressed) {
   theGame.status = false;
   const scoreContainer = document.querySelector('.score-container');
   if (scoreContainer) {
@@ -209,10 +251,10 @@ export function cancelGame() {
     formField.id = 'text-field';
   };
   formContainer.id = defaultForm;
-  console.log(formContainer.id);
-  frequentElements.playButton.value = 'GUESS ALBUMS';
-  if (frequentElements.playButton.classList.contains('on')) {
-    frequentElements.playButton.classList.remove('on');
+
+  buttonPressed.value = 'GUESS ALBUMS';
+  if (buttonPressed.classList.contains('on')) {
+    buttonPressed.classList.remove('on');
   };
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "block";

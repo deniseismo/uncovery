@@ -138,12 +138,14 @@ header {
   line-height: 60px;
   padding: 0;
   border: 0;
+  font-size: 1.2rem;
 }
 
 .method::hover {
   background-color: #ebecf1 !important;
 
 }
+
 
 
 /* default text style for the LCD Soundsystem quote */
@@ -608,8 +610,12 @@ it encapsulates all the content with the navigation except 'waves'
   font-weight: 400;
 }
 
+.play-buttons-container {
+  width: 600px;
+}
+
+
 .play-button {
-  width: 300px;
   font-weight: 500;
   visibility: hidden;
   overflow: hidden;
@@ -619,6 +625,7 @@ it encapsulates all the content with the navigation except 'waves'
   border: 0;
   color: #ebecf1;
   transform: scale(0.8);
+  flex-grow: 1;
 }
 
 .play-button.visible {
@@ -936,11 +943,11 @@ label.tooltipText:after {
 	left: 50%;
 }
 
-.winning-container::after {
+.winning-text::after {
   content: "";
   display: block;
   width: 0;
-  height: 1px;
+  height: 4px;
   left: 5%;
   background: #911A1A;
   position: absolute;
@@ -948,6 +955,10 @@ label.tooltipText:after {
   transition: width 0.3s cubic-bezier(1,-0.13,.47,1.33);
 }
 
-.winning-container:hover::after {
+.winning-text:hover::after {
   width: 90%;
+}
+
+.winning-text:hover {
+  cursor: pointer;
 }

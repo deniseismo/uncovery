@@ -1,7 +1,8 @@
-import {frequentElements, removeAllChildNodes} from './utils.js'
+import {frequentElements, removeAllChildNodes, insertAfter} from './utils.js'
 import {cancelGame} from './game.js'
 import {prepareToExplore, cleanAfterExplore} from './explore.js'
 import {renderAboutPage} from './about.js';
+import {theGame} from "./main.js";
 
 export function hideOptions() {
   frequentElements.selectOptions.style.display = 'none';
@@ -22,7 +23,9 @@ export function configureOptionsStyle(targetButtonID) {
   if (targetButtonID !== frequentElements.activeButtonID()) {
     // change the placeholder to the correct one
     // cancel the game
-    cancelGame();
+    if (theGame.status) {
+      cancelGame();
+    }
     if (targetButtonID === "explore") {
       prepareToExplore();
     } else if (frequentElements.activeButtonID() === "explore") {
@@ -50,3 +53,52 @@ export function setPlaceholder(targetButtonID) {
   }
   frequentElements.textField.placeholder = options[targetButtonID];
 };
+
+export function createPlayButtons(method) {
+  const flexContainer = document.createElement('div');
+  flexContainer.classList.add('flex-container', 'play-buttons-container');
+  // button generator
+  function createButton(value, id) {
+    const someButton = document.createElement('input');
+    someButton.classList.add("button", "btn", "shadow-main", "play-button", "visible", "guess");
+    someButton.type = "button";
+    someButton.id = id;
+    someButton.value = value;
+    return someButton;
+  };
+
+  const downloadButton = createButton('SAVE COLLAGE', 'download-button');
+  downloadButton.classList.remove('guess');
+  const guessAlbums = createButton('GUESS ALBUMS', 'guess-albums');
+  flexContainer.appendChild(guessAlbums);
+  flexContainer.appendChild(downloadButton);
+  if (!(method === 'by_artist')) {
+    const guessArtists = createButton('GUESS ARTISTS', 'guess-artists');
+    // inserts 'guess artists' button after 'guess albums' button
+    insertAfter(guessArtists, guessAlbums);
+  };
+  // inserts a container with all the buttons after the Game Frame
+  insertAfter(flexContainer, frequentElements.gameFrame);
+};
+
+export function removePlayButtons() {
+  const buttonsContainer = document.querySelector('.play-buttons-container');
+  if (buttonsContainer){
+    buttonsContainer.remove();
+  }
+};
+
+
+export function resetPlayButtons(pressedButtonID) {
+  const playButtons = document.querySelectorAll('.play-buttons-container .guess');
+  playButtons.forEach(button => {
+    if (button.id === 'guess-albums') {
+      button.value = 'GUESS ALBUMS';
+    } else {
+      button.value = "GUESS ARTISTS";
+    }
+    if (!(button.id === pressedButtonID)) {
+      button.classList.remove('on');
+    }
+  })
+}
