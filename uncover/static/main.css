@@ -935,3 +935,19 @@ label.tooltipText:after {
 	transform: translateY(-50%) translateX(-50%);
 	left: 50%;
 }
+
+.winning-container::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 1px;
+  left: 5%;
+  background: #911A1A;
+  position: absolute;
+  top: 50%;
+  transition: width 0.3s cubic-bezier(1,-0.13,.47,1.33);
+}
+
+.winning-container:hover::after {
+  width: 90%;
+}

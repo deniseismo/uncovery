@@ -107,7 +107,9 @@ export const submitInput = function() {
       });
       frequentElements.playButton.classList.add("visible");
       frequentElements.downloadButton.classList.add("visible");
-      animatePlayButtons([frequentElements.playButton, frequentElements.downloadButton]);
+      console.log(albumGame.albums.length);
+      const total = Math.min(albumGame.albums.length, 9);
+      animatePlayButtons([frequentElements.playButton, frequentElements.downloadButton], total);
       animateCoverArt();
       animateWaves(desiredMethod);
       const waves = document.querySelectorAll('.wave');
@@ -231,7 +233,7 @@ function fixArtistName(data) {
 // loads cover art images to the main game frame
 function loadCoverArt(data) {
   const totalAmountOfAlbums = data['albums'].length;
-  let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
+  let length = Math.min(totalAmountOfAlbums, 9);
   for (let i = 0; i < length; i++) {
     const album = data['albums'][i];
     const imageURL = data['albums'][i]['image'];

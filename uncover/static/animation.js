@@ -182,13 +182,13 @@ export function animateAboutItems() {
 };
 
 
-export function animatePlayButtons(elementsList) {
+export function animatePlayButtons(elementsList, delay) {
  anime({
    targets: elementsList,
    opacity: [0, 1],
    scale: [0.8, 1],
    duration: 600,
-   delay: 1200,
+   delay: 110 * delay,
    easing: 'easeOutExpo'
  })
 }
