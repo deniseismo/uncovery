@@ -1,6 +1,6 @@
 from flask import request, Blueprint, jsonify, make_response, url_for
 
-from uncover.helpers.lastfm_api import lastfm_get_users_top_albums
+from uncover.helpers.lastfm_api import lastfm_get_users_top_albums, lastfm_get_user_avatar
 from uncover.helpers.spotify_api import spotify_get_users_playlist_albums
 from uncover.helpers.utilities import display_failure_art, get_failure_images
 
@@ -70,3 +70,20 @@ def get_albums_by_spotify():
         ),
             404)
     return jsonify(albums)
+
+
+@personal.route("/get_user_avatar", methods=["POST"])
+def get_avatar_image():
+    content = request.get_json()
+    if not content:
+        return None
+    username = content['qualifier']
+    if not username:
+        return None
+    user_avatar = lastfm_get_user_avatar(username)
+    if not user_avatar:
+        return None
+
+    return jsonify({
+        "avatar": user_avatar
+    })

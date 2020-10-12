@@ -783,6 +783,32 @@ label.tooltipText:after {
   overflow: hidden;
 }
 
+.avatar-container {
+  display: flex;
+  flex-flow: column nowrap;
+  position: absolute;
+  top: 20%;
+  margin-left: 10%;
+  border: 1px solid #3B444B;
+  border-radius: 10px;
+  font-size: 1.25rem;
+  text-align: center;
+  opacity: 0;
+  width: 200px;
+  height: 200px;
+}
+
+.username {
+	position: absolute;
+	background: #005191;
+	color: white;
+	padding: 0.5rem;
+	top: 65%;
+	left: 50%;
+	white-space: nowrap;
+}
+
+
 .music-genre-element {
   text-align: center;
   padding: 0.25rem;

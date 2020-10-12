@@ -123,12 +123,16 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
             'period': time_period
         })
     # initialize a dict to avoid KeyErrors
+    try:
+        username_correct = response.json()['topalbums']['@attr']['user']
+    except (KeyError, IndexError, TypeError):
+        return None
     album_info = {
-        "info": f"{username}'s top albums {time_period_table[time_period]}",
+        "info": f"{username_correct}",
         "albums": list()
     }
-    if shuffle:
-        album_info["info"] = f"{username} random albums {time_period_table[time_period]}"
+    # if shuffle:
+    #     album_info["info"] = f"{username} random albums {time_period_table[time_period]}"
     try:
         a_set_of_titles = set()
         for album in response.json()['topalbums']['album'][:amount]:
@@ -177,3 +181,29 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
         album['id'] = album_id
         album_id += 1
     return album_info
+
+
+def lastfm_get_user_avatar(username: str):
+    """
+    gets user's avatar image URL
+    :param username: user's name
+    :return:
+    """
+    response = lastfm_get_response({
+        'method': 'user.getInfo',
+        'user': username
+    })
+    # in case of an error, return None
+    if response.status_code != 200:
+        print(f"couldn't find {username} on last.fm")
+        return None
+    try:
+        user_avatars = response.json()['user']['image']
+    except KeyError:
+        print(f"there is no avatar for {username}")
+        return None
+    try:
+        avatar = user_avatars[-1]["#text"]
+    except (KeyError, IndexError):
+        return None
+    return avatar

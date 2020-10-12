@@ -1,8 +1,9 @@
 import {AlbumGameInfo, Game, playInit} from "./game.js"
 import {MusicFilter} from './musicFilter.js'
-import {addTooltips, frequentElements, insertAfter, removeAllChildNodes, loadSpinner} from './utils.js'
-import {configureOptionsStyle, removePlayButtons, createPlayButtons, resetPlayButtons} from './uiconfig.js'
-import {animateCoverArt, animateWaves, animatePlayButtons} from './animation.js'
+import {addTooltips, frequentElements, insertAfter, removeAllChildNodes, loadSpinner, fetchAvatar} from './utils.js'
+import {configureOptionsStyle, removePlayButtons, createPlayButtons,
+        resetPlayButtons, createAvatarBox, removeAvatarContainer} from './uiconfig.js'
+import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar} from './animation.js'
 
 export const theGame = new Game(false);
 
@@ -17,6 +18,7 @@ export const musicFilters = new MusicFilter({
 
 export const submitInput = function() {
   removePlayButtons();
+  removeAvatarContainer();
   // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
   const desiredMethod = document.querySelector('.method.active').id;
   frequentElements.gameFrame.classList.remove('shadow-main');
@@ -75,7 +77,7 @@ export const submitInput = function() {
     frequentElements.gameFrame.classList.add('loading');
     /* load/add cover art images */
     loadCoverArt(data);
-    fixArtistName(data);
+    fixInputData(desiredMethod, data['info']);
     // $('#text-field').val(data["info"]);
     /* add a progress bar */
     const progressBar = document.createElement("div");
@@ -85,6 +87,7 @@ export const submitInput = function() {
 //    const waves = document.querySelectorAll('.wave');
 //    waves.forEach(wave => wave.classList.add('falldown'));
     /* waiting for all images to load before showing them up*/
+    console.log(document.querySelector('.avatar-container'));
     $('#game-frame').waitForImages(function() {
       /* remove progress bar once loaded */
       progressBar.remove();
@@ -103,6 +106,18 @@ export const submitInput = function() {
       waves.forEach(wave => wave.classList.remove('falldown'));
       downloadInit();
       playInit();
+          if (desiredMethod === "by_username") {
+      const username = data['info'];
+      fetchAvatar(qualifier)
+        .then(avatar => avatar['avatar'])
+        .then(avatar => createAvatarBox(avatar, username))
+        .then(() => {
+          $('.avatar-container').waitForImages()
+            .done(() => animateAvatar(9));
+          }
+        );
+    }
+
 
     }, function(loaded, count, success) {
       /* animate progress bar */
@@ -111,6 +126,7 @@ export const submitInput = function() {
       });
       bar1.set((loaded + 1 / count) * 100);
     });
+
   }).catch((error) => {
     // Handle the error
     console.log(`error is ${error}`);
@@ -202,9 +218,9 @@ let timerID;
 });
 
 // fixes artist's name as per last.fm correction
-function fixArtistName(data) {
-  if (frequentElements.activeButtonID() === 'by_artist') {
-    frequentElements.textField.value = data['info'];
+function fixInputData(method, info) {
+  if (method === 'by_artist' || method === 'by_username') {
+    frequentElements.textField.value = info;
   };
 };
 

@@ -192,3 +192,46 @@ export function animatePlayButtons(elementsList, delay) {
    easing: 'easeOutExpo'
  })
 }
+
+
+export function animateAvatar(delay) {
+  const avatarjke = document.querySelector('.avatar-container');
+  console.log(avatarjke);
+  console.log('animating avatar')
+  let tl = anime.timeline({
+    easing: 'easeOutExpo',
+    duration: 350
+  });
+  tl
+  .add({
+    targets: '.avatar-container',
+    scale: [0.5, 1],
+    translateY: [50, 0],
+    opacity: [0, 1],
+    borderRadius: ['200px', '0px'],
+    delay: 90 * delay
+  })
+  .add({
+    targets: ".username",
+    backgroundColor: ["#FFF", "#005191"],
+    scale: [2, 1],
+    opacity: [0.5, 1],
+  })
+
+
+//  anime({
+//    targets: '.avatar-container',
+//    scale: [0.5, 1],
+//    translateY: [50, 0],
+//    opacity: [0, 1],
+//    borderRadius: ['200px', '0px'],
+//    delay: 90 * delay,
+//    duration: 500
+//  });
+//  anime({
+//    targets: ".username",
+//    backgroundColor: ["#FFF", "#005191"],
+//    scale: [2, 1],
+//    opacity: [0.5, 1],
+//  });
+}

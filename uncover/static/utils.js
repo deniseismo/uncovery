@@ -38,3 +38,18 @@ export function loadSpinner(node) {
   spinner.src = url;
   node.appendChild(spinner);
 };
+
+export async function fetchAvatar(qualifier) {
+  // fetches current tags list
+  const response = await fetch('get_user_avatar', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "qualifier": qualifier
+    })
+  });
+  const avatar = await response.json();
+  return avatar;
+};

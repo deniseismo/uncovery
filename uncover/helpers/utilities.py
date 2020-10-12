@@ -67,7 +67,6 @@ def get_filtered_name(album_name):
         a_correct_title = re.sub(pattern, '', a_correct_title, flags=re.IGNORECASE)
     # finally removes some trailing hyphens and/or whitespaces
     ultimate_filtered_name = a_correct_title.strip('-').strip()
-    print(f'ultimate: {ultimate_filtered_name}')
     return ultimate_filtered_name
 
 

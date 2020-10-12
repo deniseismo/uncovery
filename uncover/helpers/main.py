@@ -22,26 +22,27 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
     # -- MusicBrainz
     if fast:
         album_image = spotify_get_album_image(album_title, artist)
-        print(f'{album_image} through Spotify {album_title}')
+    if not mbid and fast and not album_image:
+        print(f'getting through musicbrainz with no mbid for {album_title}')
+        mbid = musicbrainz.mb_get_album_mbid(album_title, artist)
+        album_image = musicbrainz.mb_get_album_image(mbid, fast=fast)
     if not mbid and not fast:
         mbid = musicbrainz.mb_get_album_mbid(album_title, artist)
     if mbid and not album_image:
-        print(f'mbid: {mbid}, album: {album_title}')
+        print('getting through musicbrainz')
         album_image = musicbrainz.mb_get_album_image(mbid, fast=fast)
-        print('finding through mb')
 
     if not album_image and not fast:
         # try getting the image through Spotify's API
         album_image = spotify_get_album_image(album_title, artist)
-        print('finding through spotify')
 
     # -- Discogs
     if not album_image:
+        print(f'getting through discogs for {album_title}')
         # find album's discogs id
         discogs_id = discogs_api.get_album_discogs_id(album_title, artist)
         if discogs_id:
             album_image = discogs_api.discogs_get_album_image(discogs_id)
-            print(f'finding {album_title} through discogs')
 
     if not album_image:
         # No method helped :(
@@ -123,7 +124,6 @@ def sql_select_artist_albums(artist_name: str):
             "image": 'static/cover_art_images/' + album.cover_art + ".png"
         }
         if album.alternative_title:
-            print(album.alternative_title)
 
             an_album_dict['names'] += [album.alternative_title]
             an_album_dict["names"] += utils.get_filtered_names_list(album.alternative_title)
@@ -148,7 +148,6 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
         current_ratio = fuzz.ratio(album.title, an_album_to_find)
         if current_ratio > 98:
             # found perfect match
-            print(f'{album.title}, {current_ratio}')
             return 'static/cover_art_images/' + album.cover_art + ".png"
         elif current_ratio > ratio_threshold:
             ratio_threshold = current_ratio

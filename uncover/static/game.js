@@ -92,7 +92,7 @@ export function playInit() {
 
 
 
-export function handleGuesses(e) {
+function handleGuesses(e) {
   let searchMode = "names";
   if (theGame.playMode === 'artists') {
     searchMode = "artist_name";
@@ -190,7 +190,7 @@ function createWinningContainer() {
 }
 
 
-export function prepareGame(buttonPressed) {
+function prepareGame(buttonPressed) {
   theGame.status = true;
   let mode = 'albums';
   if (buttonPressed.id == 'guess-artists') {
@@ -262,7 +262,7 @@ export function cancelGame(buttonPressed) {
   resetGame();
 };
 
-export function resetGame() {
+function resetGame() {
   // resets game state
   // reset a number of guessed albums
   albumGame.albumsCount = 0;

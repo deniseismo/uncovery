@@ -29,8 +29,6 @@ def explore_filtered_albums(genres: list, time_span: list):
     # filter_query = filter_query.filter((Tag.tag_name == "electronic") | (Tag.tag_name == "jazz"))
     if genres:
         filter_query = filter_query.filter(Tag.tag_name.in_(genres))
-    print(filter_query.all())
-    print(len(filter_query.all()))
 
     # randomize sample
     filter_query = filter_query.order_by(func.random()).limit(9)

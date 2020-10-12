@@ -24,7 +24,8 @@ export function configureOptionsStyle(targetButtonID) {
     // change the placeholder to the correct one
     // cancel the game
     if (theGame.status) {
-      cancelGame();
+      const currentButton = document.querySelector('.play-button.on');
+      cancelGame(currentButton);
     }
     if (targetButtonID === "explore") {
       prepareToExplore();
@@ -101,4 +102,28 @@ export function resetPlayButtons(pressedButtonID) {
       button.classList.remove('on');
     }
   })
+}
+
+export function createAvatarBox(avatarURL, username) {
+  if (!(avatarURL)) {
+    return false;
+  }
+  console.log(avatarURL);
+  const avatarContainer = document.createElement('div');
+  avatarContainer.classList.add('avatar-container', 'shadow-main');
+  const userName = document.createElement('p');
+  userName.classList.add('username');
+  userName.textContent = username;
+  const avatarImage = document.createElement('img');
+  avatarImage.src = avatarURL;
+  avatarContainer.appendChild(userName);
+  avatarContainer.appendChild(avatarImage);
+  document.querySelector('main').appendChild(avatarContainer);
+}
+
+export function removeAvatarContainer() {
+  const avatarContainer = document.querySelector('.avatar-container');
+  if (avatarContainer) {
+    avatarContainer.remove();
+  }
 }

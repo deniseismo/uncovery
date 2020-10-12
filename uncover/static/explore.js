@@ -1,11 +1,13 @@
 import {Blob} from "./shapes.js"
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters} from "./main.js"
+import {removeAvatarContainer} from "./uiconfig.js"
 import {animateTimeSpan, animateMusicGenreOn, animateBlockOff,
         animateMusicGenresContainer, animateMorphBlob, animateBlob, animatePlayButtons} from './animation.js'
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
+  removeAvatarContainer();
   createSliderContainer();
   createSlider();
   createMusicGenresContainer();
@@ -77,18 +79,12 @@ export async function handleTags(e) {
   };
 };
 
-
-
-
 // a container with music tags/genres filters chosen
 function createMusicGenresContainer() {
   const musicGenresContainer = document.createElement('div');
   musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
   selectedFilters.textContent = "FILTERS APPLIED";
-  const calendarIcon = document.createElement("img");
-  calendarIcon.src = "/static/images/filters/calendar.png";
-  calendarIcon.classList.add("calendarIcon");
   const timeSpanElement = document.createElement('p');
   timeSpanElement.classList.add('time-span');
   const timeSpanBegin = document.createElement('span');
@@ -148,10 +144,6 @@ function addBlob(parentElement, numberOfBlobs) {
     parentElement.appendChild(blob_element);
   }
 };
-
-
-
-
 
 // creates a timespan slider container
 function createSliderContainer() {

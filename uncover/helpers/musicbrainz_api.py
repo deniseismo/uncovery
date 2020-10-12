@@ -10,7 +10,7 @@ import uncover.helpers.utilities as utils
 
 requests_cache.install_cache()
 
-musicbrainzngs.set_useragent("uncovery", "0.5", "denisseismo@gmail.com")
+musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
 
 
 def mb_get_album_alternative_name(album_id: str):
@@ -69,14 +69,10 @@ def mb_get_artist_mbid(artist_name: str):
         mbid = musicbrainzngs.search_artists(artist_name, limit=2)["artist-list"][0]['id']
         print(f'mbid found with ngs: {mbid}')
         for artist_obj in response.json()['artists']:
-            print(artist_obj['name'], artist_name)
-            print(len(artist_obj['name']))
             # go deep in case of some discrepancies or bugs
             artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
             object_fixed = artist_obj['name'].lower().replace("’", "'").replace('‐', '-').replace(',', '')
-            print(f'my evaluation: {artist_fixed} {object_fixed}')
             if artist_fixed == object_fixed:
-                print(f"equal! {artist_name} {artist_obj['name']}")
                 try:
                     mbid = artist_obj['id']
                     break
