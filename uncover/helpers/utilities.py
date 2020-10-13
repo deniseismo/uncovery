@@ -15,6 +15,10 @@ def display_failure_art(list_of_images):
 
 
 def get_failure_images():
+    """
+    gets the list of all 'failure' art images found in the corresponding folder
+    :return:
+    """
     images_folder = 'uncover/static/images/fail'
     failure_art_list = [os.path.join('images/fail/', f)
                         for f in os.listdir(images_folder)
@@ -29,6 +33,12 @@ def jprint(obj):
 
 
 def timeit(method):
+    """
+    times the function
+    :param method: function to time
+    :return: a number of ms
+    """
+
     def timed(*args, **kw):
         ts = time.time()
         result = method(*args, **kw)
@@ -59,6 +69,7 @@ def get_filtered_name(album_name):
         # no super deluxe
         r"((super)?\s?(deluxe)\s?).*",
         r"((\d+)?\s?(Remaster)\s?).*",
+        r"((\d+)?\s?(Complete)\s?).*"
         r"\d+?(th)?\s?Anniversary\s?\w*",
         # no weird characters
         r"[“”:\(\)\":…]"
