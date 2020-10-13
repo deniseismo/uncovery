@@ -16,16 +16,10 @@ def home():
 
 @main.errorhandler(404)
 def page_not_found():
-    # note that we set the 404 status explicitly
+    """
+    :return: a 404 page
+    """
     return render_template('404.html', title='Page Not Found'), 404
-
-
-@main.route("/about")
-def about():
-    """
-    # TODO: about page
-    """
-    return render_template("home.html")
 
 
 @main.route("/save_collage", methods=["POST"])
