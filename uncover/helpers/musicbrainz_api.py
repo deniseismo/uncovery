@@ -7,6 +7,7 @@ import requests_cache
 
 import uncover.helpers.lastfm_api as lastfm
 import uncover.helpers.utilities as utils
+from uncover import cache
 
 requests_cache.install_cache()
 
@@ -15,6 +16,7 @@ musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
 
 def mb_get_album_alternative_name(album_id: str):
     """
+    gets the alternative name for the album (e. g. White Album for 'The Beatles')
     :param album_id: album_id from MusicBrainz
     :return: alternative name for an album
     """
@@ -103,6 +105,7 @@ def mb_get_artist_mbid_v2(artist: str):
     return mbid
 
 
+@cache.memoize(timeout=3600)
 def mb_get_album_mbid(album: str, artist: str):
     """
     search for an album's mbid on MusicBrainz
@@ -180,6 +183,7 @@ def mb_get_artists_albums(artist: str):
     return sorted_albums
 
 
+@cache.memoize(timeout=3600)
 def mb_get_album_image(mbid: str, size='large', fast=False):
     """
     :param fast: a faster way to get the cover image
