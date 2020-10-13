@@ -2,8 +2,6 @@ import os
 
 import discogs_client
 
-# from uncover.helpers.musicbrainz_api import mb_get_album_image
-
 discogs = discogs_client.Client('uncover', user_token=os.environ.get('DISCOGS_USER_TOKEN'))
 
 
@@ -21,17 +19,12 @@ def get_album_discogs_id(album: str, artist: str):
     return album_id
 
 
-def discogs_get_album_image(album_discogs_id: str, mbid=None):
+def discogs_get_album_image(album_discogs_id: str):
     """
-    :param mbid: optional mbid as a fallback in case of missing ids from discogs
     :param album_discogs_id: album's discogs id
     :return:
     """
     album_image = None
-    # if mbid:
-    #     print('fallback function worked')
-    #     album_image = mb_get_album_image(mbid)
-    #     return album_image
     if not album_discogs_id:
         return None
     try:

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import func
 
 from uncover.helpers.utilities import get_filtered_names_list
@@ -10,12 +12,13 @@ def explore_filtered_albums(genres: list, time_span: list):
     :param time_span: a list of a time span range [start_year, end_year]
     :return:
     """
-    start_year = '1950-01-01'
-    end_year = '2020-01-01'
+    # default time span variables
+    start_year = datetime.strptime("1950", '%Y')
+    end_year = datetime.strptime("2021", '%Y')
     if time_span:
         time_span[1] += 1
-        start_year = str(time_span[0]) + "-01-01"
-        end_year = str(time_span[1]) + "-01-01"
+        start_year = datetime.strptime(str(time_span[0]), '%Y')
+        end_year = datetime.strptime(str(time_span[1]), '%Y')
 
     print(f'time_span: {time_span}, genres: {genres}')
     print(start_year, end_year)
@@ -24,9 +27,6 @@ def explore_filtered_albums(genres: list, time_span: list):
         .join(tags, (tags.c.artist_id == Artist.id)).join(Tag, (Tag.id == tags.c.tag_id)) \
         .filter(Album.release_date >= start_year).filter(Album.release_date <= end_year)
 
-    # if genres:
-    #     for genre in genres:
-    # filter_query = filter_query.filter((Tag.tag_name == "electronic") | (Tag.tag_name == "jazz"))
     if genres:
         filter_query = filter_query.filter(Tag.tag_name.in_(genres))
 
@@ -38,8 +38,7 @@ def explore_filtered_albums(genres: list, time_span: list):
     if not album_entries:
         return None
     album_info = {"info": f"Albums from {start_year} to {end_year}, {genres}", "albums": []}
-    counter = 0
-    for album_entry in album_entries:
+    for counter, album_entry in enumerate(album_entries):
         album_name = album_entry.title
         an_album_dict = {
             "id": counter,
@@ -49,5 +48,4 @@ def explore_filtered_albums(genres: list, time_span: list):
             "artist_name": album_entry.artist.name
         }
         album_info["albums"].append(an_album_dict)
-        counter += 1
     return album_info
