@@ -7,6 +7,7 @@ import requests_cache
 
 import uncover.helpers.main as main
 import uncover.helpers.utilities as utils
+from uncover import cache
 
 requests_cache.install_cache()
 
@@ -183,6 +184,7 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     return album_info
 
 
+@cache.memoize(timeout=360)
 def lastfm_get_user_avatar(username: str):
     """
     gets user's avatar image URL

@@ -5,6 +5,7 @@ import urllib.request
 from PIL import Image
 from flask import current_app
 
+from uncover import cache
 from uncover.helpers.utilities import timeit
 
 
@@ -94,6 +95,7 @@ def create_a_collage(a_list_of_images, filename_path):
     collage_image.save(f'{filename_path}.png')
 
 
+@cache.memoize(timeout=360)
 def save_collage(a_list_of_album_images):
     random_hex = secrets.token_hex(8)
     collage_filename = random_hex

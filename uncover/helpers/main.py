@@ -4,11 +4,13 @@ import uncover.helpers.discogs_api as discogs_api
 import uncover.helpers.lastfm_api as lastfm
 import uncover.helpers.musicbrainz_api as musicbrainz
 import uncover.helpers.utilities as utils
+from uncover import cache
 from uncover.helpers.spotify_api import spotify_get_album_image
 from uncover.models import Artist, Album
 
 
 @utils.timeit
+@cache.memoize(timeout=360)
 def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
@@ -51,6 +53,7 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
 
 
 @utils.timeit
+@cache.memoize(timeout=360)
 def get_artists_top_albums_images(artist: str):
     """
     get artist's album images through Spotify's API
@@ -133,6 +136,7 @@ def sql_select_artist_albums(artist_name: str):
     return album_info
 
 
+@cache.memoize(timeout=360)
 def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     artist = Artist.query.filter_by(name=artist_name).first()
     if not artist:

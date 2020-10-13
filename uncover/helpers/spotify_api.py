@@ -80,6 +80,8 @@ def spotify_get_album_image(album: str, artist: str):
                 return None
     if not album_image_url:
         return None
+    if not getattr(album_info, 'from_cache', False):
+        time.sleep(0.2)
     return album_image_url
 
 

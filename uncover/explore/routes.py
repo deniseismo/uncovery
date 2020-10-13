@@ -47,7 +47,8 @@ def sql_get_albums_by_artist():
 @explore.route("/explore", methods=["POST"])
 def get_albums_by_filter():
     """
-    :return:
+    finds albums for specific filters (tags & time span)
+    :return: a jsonified dict with all the albums found
     """
     content = request.get_json()
     print(content)
@@ -61,9 +62,10 @@ def get_albums_by_filter():
         time_span = content['option']['time_span']
     except KeyError:
         pass
+    # gets albums
     albums = explore_filtered_albums(genres=genres, time_span=time_span)
     if not albums:
-        # if the given username has no albums or the username's incorrect
+        # if no albums found, make a failure response
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
             {'message': f"couldn't find albums; try picking some other filters",
@@ -87,14 +89,16 @@ def get_tags_list():
         # used for autocomplete/suggestions
         search_query = request.args.get('query')
     else:
-        # used for triggered the 'add' button whether the tag's in the list or not
+        # used for triggering the 'add' button whether the tag's in the list or not
         search_query = request.get_json()['query']
 
     filtered_tags_list = []
-    for tag in tags_list:
-        if search_query:
-            if search_query.lower() in tag:
+    # check if the input's not empty
+    if search_query:
+        search_query = search_query.lower()
+        for tag in tags_list:
+            # if a 'tag' consists of the provided input, add it to the final list
+            if search_query in tag:
                 filtered_tags_list.append(tag)
-
     suggestions = {"suggestions": filtered_tags_list}
     return jsonify(suggestions)
