@@ -3,9 +3,9 @@ from fuzzywuzzy import fuzz
 import uncover.helpers.discogs_api as discogs_api
 import uncover.helpers.lastfm_api as lastfm
 import uncover.helpers.musicbrainz_api as musicbrainz
+import uncover.helpers.spotify_api as spotify
 import uncover.helpers.utilities as utils
 from uncover import cache
-from uncover.helpers.spotify_api import spotify_get_album_image
 from uncover.models import Artist, Album
 
 
@@ -23,7 +23,7 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
     album_image = None
     # -- MusicBrainz
     if fast:
-        album_image = spotify_get_album_image(album_title, artist)
+        album_image = spotify.spotify_get_album_image(album_title, artist)
     if not mbid and fast and not album_image:
         print(f'getting through musicbrainz with no mbid for {album_title}')
         mbid = musicbrainz.mb_get_album_mbid(album_title, artist)
@@ -36,7 +36,7 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
 
     if not album_image and not fast:
         # try getting the image through Spotify's API
-        album_image = spotify_get_album_image(album_title, artist)
+        album_image = spotify.spotify_get_album_image(album_title, artist)
 
     # -- Discogs
     if not album_image:
@@ -71,7 +71,14 @@ def get_artists_top_albums_images(artist: str):
     except AttributeError:
         return None
     if not albums:
-        return None
+        try:
+            albums = spotify.spotify_get_artists_albums_images(artist)
+            if albums:
+                return albums
+            else:
+                return None
+        except TypeError:
+            return None
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": []}
     for album in list(albums):

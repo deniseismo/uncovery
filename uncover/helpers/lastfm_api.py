@@ -214,3 +214,4 @@ def lastfm_get_user_avatar(username: str):
     except (KeyError, IndexError):
         return None
     return avatar
+

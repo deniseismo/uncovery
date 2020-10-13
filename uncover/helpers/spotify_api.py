@@ -7,7 +7,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 import uncover.helpers.lastfm_api as lastfm_api
 import uncover.helpers.musicbrainz_api as musicbrainz
-from uncover.helpers.utilities import get_filtered_names_list, timeit
+import uncover.helpers.utilities as utils
+from uncover import cache
 
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -15,7 +16,7 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 requests_cache.install_cache()
 
 
-@timeit
+@utils.timeit
 def spotify_get_users_playlist_albums(playlist_id: str):
     """
     :param playlist_id: spotify's playlist ID or a playlist's URL
@@ -36,7 +37,7 @@ def spotify_get_users_playlist_albums(playlist_id: str):
         name = track['track']['album']['name']
         an_album_dict = {
             "title": track['track']['album']['name'],
-            "names": [name.lower()] + get_filtered_names_list(name),
+            "names": [name.lower()] + utils.get_filtered_names_list(name),
             "image": track["track"]["album"]["images"][0]["url"],
             "rating": track["track"]['popularity']
         }
@@ -49,13 +50,13 @@ def spotify_get_users_playlist_albums(playlist_id: str):
             album_info["albums"].append(an_album_dict)
     # shuffles a list of albums to get random results
     random.shuffle(album_info["albums"])
-    album_id = 0
-    for album in album_info['albums']:
-        album['id'] = album_id
-        album_id += 1
+    # adds ids to albums
+    for count, album in enumerate(album_info['albums']):
+        album['id'] = count
     return album_info
 
 
+@cache.memoize(timeout=6000)
 def spotify_get_album_image(album: str, artist: str):
     """
     search for an album with the query: q=album:gold%20artist:abba&type=album
@@ -81,7 +82,7 @@ def spotify_get_album_image(album: str, artist: str):
     if not album_image_url:
         return None
     if not getattr(album_info, 'from_cache', False):
-        time.sleep(0.2)
+        time.sleep(0.25)
     return album_image_url
 
 
@@ -152,3 +153,53 @@ def spotify_get_artists_genres(artist_id: str):
     if not getattr(artist_info, 'from_cache', False):
         time.sleep(0.2)
     return genres
+
+
+def spotify_get_artists_albums_images(artist: str):
+    """
+    a backup function that gets all the info from Spotify
+    (in case MusicBrainz has nothing about a particular artist)
+    :param artist: artist's name
+    :return:
+    """
+    if not artist:
+        return None
+    artist_correct_name = lastfm_api.lastfm_get_artist_correct_name(artist)
+    if artist_correct_name:
+        artist = artist_correct_name
+    artist_spotify_id = spotify_get_artist_id(artist)
+    if not artist_spotify_id:
+        return None
+    albums = spotify.artist_albums(artist_id=artist_spotify_id, album_type="album", country="SE", limit=50)
+    if not albums:
+        return None
+    album_info = {"info": artist, "albums": []}
+    albums_list = []
+    try:
+        for an_album in albums['items']:
+            try:
+                album_image = an_album['images'][0]['url']
+                if album_image:
+                    album_title = an_album['name']
+                    correct_title = album_title.lower()
+                    rating = lastfm_api.lastfm_get_album_listeners(correct_title, artist)
+                    filtered_name = utils.get_filtered_name(album_title)
+                    an_album_dict = {
+                        "title": album_title,
+                        "image": album_image,
+                        "names": [correct_title] + utils.get_filtered_names_list(album_title),
+                        "rating": rating if rating else 0
+                    }
+                    albums_list.append(an_album_dict)
+
+            except (KeyError, IndexError):
+                continue
+
+    except (KeyError, TypeError, IndexError):
+        return None
+
+    if not albums_list:
+        return None
+    album_info['albums'] = sorted(albums_list, key=lambda item: item['rating'], reverse=True)
+
+    return album_info
