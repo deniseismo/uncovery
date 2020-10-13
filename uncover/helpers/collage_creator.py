@@ -55,6 +55,14 @@ def arrange_the_images(a_list_of_image_urls: list, collage_image: Image, width: 
 
 @timeit
 def create_a_collage(a_list_of_images, filename_path):
+    """
+    a main collage creator function
+    :param a_list_of_images: a list of filenames of all the images to create a collage from
+    :param filename_path: a filename (prior randomized) to save as
+    :return:
+    """
+    if not a_list_of_images or not filename_path:
+        return False
     DIMENSIONS = {
         1: (600, 600),
         2: (1200, 600),
@@ -77,6 +85,7 @@ def create_a_collage(a_list_of_images, filename_path):
     height = DIMENSIONS[total_amount_of_albums][1]
     collage_image = Image.new('RGB', (width, height))
 
+    # arrange album images in a collage depending on a number of album images the collage consists of
     if total_amount_of_albums in [1, 2, 3, 6, 9]:
         arrange_the_images(album_images, collage_image, width, IMAGE_SIZE['default'])
     elif total_amount_of_albums == 4:
@@ -92,13 +101,22 @@ def create_a_collage(a_list_of_images, filename_path):
         arrange_the_images(album_images[0:2], collage_image, width, IMAGE_SIZE['large'])
         arrange_the_images(album_images[2:], collage_image, width, IMAGE_SIZE['default'], (0, 900))
 
+    # save the collage to a file
     collage_image.save(f'{filename_path}.png')
 
 
 @cache.memoize(timeout=360)
-def save_collage(a_list_of_album_images):
+def save_collage(a_list_of_album_images: list):
+    """
+    :param: a list of album filenames
+    :return: a filename of the collage created
+    """
+    if not a_list_of_album_images:
+        return None
     random_hex = secrets.token_hex(8)
+    # randomize filename
     collage_filename = random_hex
     collage_path = os.path.join(current_app.root_path, 'static/collage', collage_filename)
+    # trigger collage creator function
     create_a_collage(a_list_of_album_images, collage_path)
     return collage_filename + '.png'
