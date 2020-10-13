@@ -56,9 +56,9 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
 @cache.memoize(timeout=360)
 def get_artists_top_albums_images(artist: str):
     """
-    get artist's album images through Spotify's API
+    get artist's top album images (default way), no database
     :param artist: artist's name
-    :return:
+    :return: a dict of all the album images found
     """
     # try correcting some typos in artist's name
     correct_name = lastfm.lastfm_get_artist_correct_name(artist)
@@ -75,16 +75,17 @@ def get_artists_top_albums_images(artist: str):
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": []}
     for album in list(albums):
-        album_image = ultimate_album_image_finder(album_title=album['title'], artist=artist, mbid=album['id'],
+        album_image = ultimate_album_image_finder(album_title=album['title'],
+                                                  artist=artist,
+                                                  mbid=album['id'],
                                                   fast=True)
         if album_image:
             album['image'] = album_image
-    album_id = 0
-    for album in albums:
+
+    for count, album in enumerate(albums):
         if 'image' in album:
-            album['id'] = album_id
+            album['id'] = count
             album_info['albums'].append(album)
-            album_id += 1
     if not album_info['albums']:
         print('error: no albums to show')
         return None
@@ -115,33 +116,37 @@ def sql_select_artist_albums(artist_name: str):
     # album entries, each of 'Album' SQL class
     album_entries = Album.query.filter_by(artist=artist).order_by(Album.rating.desc()).limit(ALBUM_LIMIT).all()
 
-    album_id = 0
     # initialize the album info dict
     album_info = {"info": artist_name, "albums": []}
-    for album in album_entries:
+    for count, album in enumerate(album_entries):
         an_album_dict = {
             "title": album.title,
             "names": [album.title.lower()] + utils.get_filtered_names_list(album.title),
-            "id": album_id,
+            "id": count,
             "rating": album.rating,
             "image": 'static/cover_art_images/' + album.cover_art + ".png"
         }
         if album.alternative_title:
-
             an_album_dict['names'] += [album.alternative_title]
             an_album_dict["names"] += utils.get_filtered_names_list(album.alternative_title)
         an_album_dict['names'] = list(set(an_album_dict['names']))
         album_info['albums'].append(an_album_dict)
-        album_id += 1
     return album_info
 
 
 @cache.memoize(timeout=360)
 def sql_find_specific_album(artist_name: str, an_album_to_find: str):
+    """
+    finds a specific album image via database
+    :param artist_name: artist's name
+    :param an_album_to_find: album's title
+    :return:
+    """
     artist = Artist.query.filter_by(name=artist_name).first()
     if not artist:
         # no such artist found
         print('no artist found')
+        # logs an artist to the missing artists list log
         utils.log_artist_missing_from_db(artist_name=artist_name)
         return None
     print('artist found')
@@ -149,9 +154,10 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     album_found = None
     ratio_threshold = 94
     for album in album_entries:
+        # implements a fuzzy match algorithm function
         current_ratio = fuzz.ratio(album.title, an_album_to_find)
         if current_ratio > 98:
-            # found perfect match
+            # found perfect match, return immediately
             return 'static/cover_art_images/' + album.cover_art + ".png"
         elif current_ratio > ratio_threshold:
             ratio_threshold = current_ratio
