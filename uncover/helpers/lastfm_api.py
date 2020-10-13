@@ -25,7 +25,7 @@ def lastfm_get_response(payload: dict):
 
 def lastfm_get_album_listeners(album: str, artist: str):
     """
-
+    gets the number of listeners of a particular album
     :param album: album's title
     :param artist: artist's name
     :return:
@@ -48,6 +48,11 @@ def lastfm_get_album_listeners(album: str, artist: str):
 
 
 def lastfm_get_artist_mbid(artist: str):
+    """
+    gets the MusicBrainz id through last.fm API (a backup function)
+    :param artist: artist's name
+    :return: MusicBrainz ID
+    """
     response = lastfm_get_response({
         'method': 'artist.getInfo',
         'artist': artist
@@ -99,14 +104,14 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     if time_period == "shuffle":
         shuffle = True
         time_period = random.choice(possible_time_periods)
-    time_period_table = {
-        "overall": "of all time",
-        "7day": "for the past 7 days",
-        "1month": "for the past month",
-        "3month": "for the past 3 months",
-        "6month": "for the past 6 months",
-        "12month": "for the past 12 months"
-    }
+    # time_period_table = {
+    #     "overall": "of all time",
+    #     "7day": "for the past 7 days",
+    #     "1month": "for the past month",
+    #     "3month": "for the past 3 months",
+    #     "6month": "for the past 6 months",
+    #     "12month": "for the past 12 months"
+    # }
     response = lastfm_get_response({
         'method': 'user.getTopAlbums',
         'username': username,
@@ -142,13 +147,16 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
             artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
             if artist_correct_name:
                 artist_name = artist_correct_name
+
             album_name = album['name']
             album_correct_name = utils.get_filtered_name(album_name)
+
+            # try getting the album image through database
             album_image = main.sql_find_specific_album(artist_name, album_name)
             if not album_image:
+                # second attempt in case the album name was badly written
                 album_image = main.sql_find_specific_album(artist_name, album_correct_name)
-            # gets the album image
-
+            # try getting through the ultimate image finder function if database doesn't have the image
             if not album_image:
                 album_image = main.ultimate_album_image_finder(album_title=album_name,
                                                                artist=artist_name, fast=True)
@@ -161,7 +169,6 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
                     "names": [album_name.lower()] + utils.get_filtered_names_list(album_name),
                     "image": album_image,
                     "artist_name": artist_name
-                    # "image": album['image'][size]['#text'],
                 }
                 an_album_dict['names'] = list(set(an_album_dict['names']))
                 # appends an album dict with all the info to the list
@@ -177,14 +184,12 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     if shuffle:
         random.shuffle(album_info["albums"])
     # get ids right
-    album_id = 0
-    for album in album_info['albums']:
-        album['id'] = album_id
-        album_id += 1
+    for count, album in enumerate(album_info['albums']):
+        album['id'] = count
     return album_info
 
 
-@cache.memoize(timeout=360)
+@cache.memoize(timeout=6000)
 def lastfm_get_user_avatar(username: str):
     """
     gets user's avatar image URL
