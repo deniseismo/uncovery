@@ -226,6 +226,7 @@ function createScoreContainer() {
 }
 
 
+// cancels the game
 export function cancelGame(buttonPressed) {
   theGame.status = false;
   const scoreContainer = document.querySelector('.score-container');
@@ -260,6 +261,7 @@ export function cancelGame(buttonPressed) {
   resetGame();
 };
 
+// resets the game
 function resetGame() {
   // resets game state
   // reset a number of guessed albums
@@ -270,6 +272,6 @@ function resetGame() {
   // remove a description of the album
   const coverArtList = document.querySelectorAll('.cover-art');
   coverArtList.forEach(image => {
-    image.alt = "";
+    image.alt = "album cover art";
   });
 };

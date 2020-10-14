@@ -176,7 +176,9 @@ function createSliderContainer() {
   filterButton.type = 'submit';
   filterButton.value = 'UNCOVER';
   filterButton.classList.add('btn', 'button', 'shadow-main', 'play-button', 'visible');
-  filterButton.addEventListener('click', submitInput);
+  filterButton.addEventListener('click', () => {
+    submitInput('explore');
+  });
   sliderContainer.appendChild(sliderBar);
   sliderContainer.appendChild(filterButton);
   frequentElements.searchAndOptionsContainer.appendChild(sliderContainer);

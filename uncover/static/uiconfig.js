@@ -18,7 +18,7 @@ export function hideOptions() {
 export function configureOptionsStyle(targetButtonID) {
   // if a button pressed is a new button/new destination
   if (targetButtonID !== frequentElements.activeButtonID()) {
-    // change the placeholder to the correct one
+    setSelectOptions(targetButtonID);
     // cancel the game
     if (theGame.status) {
       const currentButton = document.querySelector('.play-button.on');
@@ -37,10 +37,41 @@ export function configureOptionsStyle(targetButtonID) {
       removeAllChildNodes(frequentElements.gameFrame);
     }
 
+    // change the placeholder to the correct one
     setPlaceholder(targetButtonID);
     frequentElements.textField.value = '';
   }
 };
+
+
+function setSelectOptions(targetButtonID) {
+  removeAllChildNodes(frequentElements.selectOptions)
+  function createOption(value, text, selected=false) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.text = text;
+    option.selected = selected;
+    return option;
+  }
+  if (targetButtonID === "by_username") {
+    const sevenDays = createOption("7day", "7 days");
+    const threeMonths = createOption("3month", "3 months");
+    const twelveMonths = createOption("12month", "1 year");
+    const overall = createOption("overall", "All-time", true);
+    const shuffle = createOption("shuffle", "Shuffle");
+    [sevenDays, threeMonths, twelveMonths, overall, shuffle].forEach(option => {
+      frequentElements.selectOptions.appendChild(option);
+    });
+  } else if (targetButtonID === "by_artist") {
+    const popular = createOption("popular", "Popular", true);
+    const shuffle = createOption("shuffle", "Shuffle");
+    const latest = createOption("latest", "Latest");
+    const oldest = createOption("earliest", "Earliest");
+    [popular, shuffle, latest, oldest].forEach(option => {
+      frequentElements.selectOptions.appendChild(option);
+    });
+  };
+}
 
 export function setPlaceholder(targetButtonID) {
   const options = {

@@ -1,5 +1,6 @@
 import random
 import time
+from datetime import datetime
 
 import requests_cache
 import spotipy
@@ -160,13 +161,19 @@ def spotify_get_artists_genres(artist_id: str):
     return genres
 
 
-def spotify_get_artists_albums_images(artist: str):
+def spotify_get_artists_albums_images(artist: str, sorting="popular"):
     """
     a backup function that gets all the info from Spotify
     (in case MusicBrainz has nothing about a particular artist)
     :param artist: artist's name
     :return:
     """
+    ORDER = {
+        "popular": ("rating", True),
+        "latest": ("release_date", True),
+        "earliest": ("release_date", False)
+    }
+    print('finding through backup spotify')
     if not artist:
         return None
     artist_correct_name = lastfm_api.lastfm_get_artist_correct_name(artist)
@@ -189,23 +196,29 @@ def spotify_get_artists_albums_images(artist: str):
                     correct_title = album_title.lower()
                     rating = lastfm_api.lastfm_get_album_listeners(correct_title, artist)
                     filtered_name = utils.get_filtered_name(album_title)
+                    release_date = datetime.strptime(an_album["release_date"][:4], '%Y')
                     an_album_dict = {
                         "title": album_title,
                         "image": album_image,
                         "names": [correct_title] + utils.get_filtered_names_list(album_title),
-                        "rating": rating if rating else 0
+                        "rating": rating if rating else 0,
+                        "release_date": release_date
                     }
                     albums_list.append(an_album_dict)
 
             except (KeyError, IndexError):
                 continue
 
-    except (KeyError, TypeError, IndexError):
+    except (KeyError, TypeError, IndexError) as e:
+        print(e)
         return None
 
     if not albums_list:
         return None
-    album_info['albums'] = sorted(albums_list, key=lambda item: item['rating'], reverse=True)
-
+    if sorting == "shuffle":
+        random.seed(datetime.now())
+        random.shuffle(albums_list)
+        album_info['albums'] = albums_list
+    else:
+        album_info['albums'] = sorted(albums_list, key=lambda item: item[ORDER[sorting][0]], reverse=ORDER[sorting][1])
     return album_info
-

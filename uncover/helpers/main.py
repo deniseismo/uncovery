@@ -1,4 +1,5 @@
 from fuzzywuzzy import fuzz
+from sqlalchemy import func
 
 import uncover.helpers.discogs_api as discogs_api
 import uncover.helpers.lastfm_api as lastfm
@@ -53,8 +54,7 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
 
 
 @utils.timeit
-@cache.memoize(timeout=360)
-def get_artists_top_albums_images(artist: str):
+def get_artists_top_albums_images(artist: str, sorting):
     """
     get artist's top album images (default way), no database
     :param artist: artist's name
@@ -67,13 +67,14 @@ def get_artists_top_albums_images(artist: str):
         print(f'the correct name is {correct_name}')
     try:
         # gets album titles
-        albums = musicbrainz.mb_get_artists_albums(artist)
+        albums = musicbrainz.mb_get_artists_albums(artist, sorting)
     except AttributeError:
         return None
     if not albums:
         try:
-            albums = spotify.spotify_get_artists_albums_images(artist)
+            albums = spotify.spotify_get_artists_albums_images(artist, sorting)
             if albums:
+                utils.log_artist_missing_from_db(artist_name=artist)
                 return albums
             else:
                 return None
@@ -103,12 +104,19 @@ def get_artists_top_albums_images(artist: str):
     return album_info
 
 
-def sql_select_artist_albums(artist_name: str):
+def sql_select_artist_albums(artist_name: str, sorting: str):
     """
     search the artist through the database
-    :param artist_name:
+    :param sorting: sorted by: popularity, release date, randomly
+    :param artist_name: artist's name
     :return: album info dict with all the info about albums
     """
+    ORDER = {
+        "popular": Album.rating.desc(),
+        "shuffle": func.random(),
+        "latest": Album.release_date.desc(),
+        "earliest": Album.release_date.asc()
+    }
     ALBUM_LIMIT = 9
     correct_name = lastfm.lastfm_get_artist_correct_name(artist_name)
     if correct_name:
@@ -121,7 +129,7 @@ def sql_select_artist_albums(artist_name: str):
         return None
 
     # album entries, each of 'Album' SQL class
-    album_entries = Album.query.filter_by(artist=artist).order_by(Album.rating.desc()).limit(ALBUM_LIMIT).all()
+    album_entries = Album.query.filter_by(artist=artist).order_by(ORDER[sorting]).limit(ALBUM_LIMIT).all()
 
     # initialize the album info dict
     album_info = {"info": artist_name, "albums": []}

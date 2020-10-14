@@ -27,6 +27,16 @@ def get_albums_by_username():
                                     filename=failure_art_filename)}
         ),
             404)
+    if len(username) > 15 or len(username) < 2:
+        # if the input's empty, send an error message and a 'failure' image
+        failure_art_filename = display_failure_art(get_failure_images())
+        return make_response(jsonify(
+            {'message': 'this aint legal!',
+             'failure_art': url_for('static',
+                                    filename=failure_art_filename)}
+        ),
+            404)
+
     albums = lastfm_get_users_top_albums(username, time_period=time_period)
     if not albums:
         # if the given username has no albums or the username's incorrect

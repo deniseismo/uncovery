@@ -18,6 +18,8 @@ def sql_get_albums_by_artist():
     # input's value from the form
     content = request.get_json()
     artist = content["qualifier"]
+    sorting = content["option"]
+    print(f'sorting: {sorting}')
     if not artist:
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = display_failure_art(get_failure_images())
@@ -28,9 +30,9 @@ def sql_get_albums_by_artist():
         ),
             404)
     # get albums images
-    albums = sql_select_artist_albums(artist)
+    albums = sql_select_artist_albums(artist, sorting)
     if not albums:
-        albums = get_artists_top_albums_images(artist)
+        albums = get_artists_top_albums_images(artist, sorting)
         # TODO: add saving data to db if it doesn't exist yet
     if not albums:
         # if the given username has no albums or the username's incorrect

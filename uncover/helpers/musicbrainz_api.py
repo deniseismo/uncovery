@@ -1,5 +1,7 @@
 import os
+import random
 import time
+from datetime import datetime
 
 import musicbrainzngs
 import requests
@@ -127,11 +129,17 @@ def mb_get_album_mbid(album: str, artist: str):
 
 
 @utils.timeit
-def mb_get_artists_albums(artist: str):
+def mb_get_artists_albums(artist: str, sorting="popular"):
     """
+    :param sorting: sorting by: popularity, release date, random
     :param artist: artist's name
     :return:
     """
+    ORDER = {
+        "popular": ("rating", True),
+        "latest": ("release_date", True),
+        "earliest": ("release_date", False)
+    }
     headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
     artist_mbid = mb_get_artist_mbid(artist)
     print(artist_mbid)
@@ -165,6 +173,9 @@ def mb_get_artists_albums(artist: str):
             "id": release['id'],
             "rating": rating if rating else 0
         }
+        if sorting in ["earliest", "latest"]:
+            release_date = mb_get_album_release_date(release['id'])
+            an_album_dict["release_date"] = release_date
         # add an alternative album name if exists
         if alternative_name:
             alternative_name = alternative_name.replace("“", "").replace("”", "")
@@ -178,8 +189,12 @@ def mb_get_artists_albums(artist: str):
         if filtered_name not in a_set_of_titles:
             a_set_of_titles.add(filtered_name)
             albums.append(an_album_dict)
-
-    sorted_albums = sorted(albums, key=lambda item: item['rating'], reverse=True)
+    if sorting == "shuffle":
+        random.seed(datetime.now())
+        random.shuffle(albums)
+        return albums
+    else:
+        sorted_albums = sorted(albums, key=lambda item: item[ORDER[sorting][0]], reverse=ORDER[sorting][1])
     return sorted_albums
 
 

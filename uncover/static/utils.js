@@ -53,3 +53,10 @@ export async function fetchAvatar(qualifier) {
   const avatar = await response.json();
   return avatar;
 };
+
+// fixes artist's/user's name as per last.fm correction
+export function fixInputData(method, info) {
+  if (method === 'by_artist' || method === 'by_username') {
+    frequentElements.textField.value = info;
+  };
+};
