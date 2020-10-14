@@ -146,6 +146,8 @@ function downloadInit() {
   const downloadButton = document.querySelector('#download-button');
   downloadButton.addEventListener('click', () => {
   downloadButton.value = "WAIT FOR IT…";
+  downloadButton.classList.add("wait-for-it");
+  downloadButton.disabled = true;
   fetch("save_collage", {
     method: 'POST',
     headers: new Headers({
@@ -161,6 +163,8 @@ function downloadInit() {
     document.body.appendChild(myLink);
     myLink.click();
     downloadButton.value = "SAVE COLLAGE";
+    downloadButton.classList.remove("wait-for-it");
+    downloadButton.disabled = false;
   });
 });
 };
