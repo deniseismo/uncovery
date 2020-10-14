@@ -5,17 +5,14 @@ import {renderAboutPage} from './about.js';
 import {theGame} from "./main.js";
 
 export function hideOptions() {
-  frequentElements.selectOptions.style.display = 'none';
-
   const sliderContainer = document.querySelector('.slider-container');
-  if (sliderContainer) {
-    sliderContainer.style.display = 'none';
-  };
-
   const scoreContainer = document.querySelector('.score-container');
-  if (scoreContainer) {
-    scoreContainer.style.display = "none";
-  };
+  [frequentElements.selectOptions, sliderContainer, scoreContainer]
+    .forEach(container => {
+      if (container) {
+        container.style.display = 'none';
+      };
+    });
 };
 
 export function configureOptionsStyle(targetButtonID) {

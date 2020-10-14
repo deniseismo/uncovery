@@ -182,7 +182,7 @@ function createWinningContainer() {
   winningContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
   frequentElements.gameFrame.appendChild(winningContainer);
   winningContainer.addEventListener('click', (e) => {
-    animateBlockOff(winningContainer.id);
+    animateBlockOff(winningContainer);
     setTimeout(() => {
         e.target.remove();
       }, 100);

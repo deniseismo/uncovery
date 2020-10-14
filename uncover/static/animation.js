@@ -1,6 +1,7 @@
 import anime from './anime.es.js'
 import {Wave, Blob} from './shapes.js'
 
+// main animation function for all cover art images
 export function animateCoverArt() {
   anime({
     targets: '.cover-art',
@@ -13,22 +14,27 @@ export function animateCoverArt() {
   });
 };
 
+// animates waves randomly using Wave class
 export function animateWaves(method) {
+  // create an instance of Wave class
   const theWave = new Wave(method);
 
   anime({
     targets: '#wave-path-3',
     d: [
       {
+        // get random shape
         value: theWave.getWave()['d'],
         duration: 300,
         easing: 'easeInOutBack'
       }
     ],
+    // get particular color (depends on 'method')
     fill: theWave.getWave()['fill']
   });
 };
 
+// animates time span numbers change (e.g. 1960 - 2015)
 export function animateTimeSpan(timeBefore, timeAfter) {
   if (timeBefore[0] !== timeAfter[0]) {
     anime({
@@ -49,6 +55,7 @@ export function animateTimeSpan(timeBefore, timeAfter) {
   };
 };
 
+// animates music genre appearance TODO: fix animation. doesn't really show
 export function animateMusicGenreOn(musicGenreElement) {
   console.log('genre show up!', musicGenreElement)
   anime({
@@ -60,6 +67,7 @@ export function animateMusicGenreOn(musicGenreElement) {
   });
 };
 
+// animates any sort of block disappearance (e.g. music genre)
 export function animateBlockOff(block) {
   console.log(`animating! ${block}`)
   anime({
@@ -72,6 +80,7 @@ export function animateBlockOff(block) {
   });
 };
 
+// shows blinking animation for the guessed albums
 export function animateHighlightGuessedAlbum(album) {
   anime({
     targets: album,
@@ -82,6 +91,7 @@ export function animateHighlightGuessedAlbum(album) {
   });
 };
 
+// animates appearance of a music genres container
 export function animateMusicGenresContainer() {
   anime({
     targets: '.music-genres-container',
@@ -93,6 +103,7 @@ export function animateMusicGenresContainer() {
   });
 }
 
+// animates a random winning message
 export function animateWinningMessage() {
   anime({
     targets: '.winning-text',
@@ -109,13 +120,13 @@ export function animateWinningMessage() {
     ],
     fontSize: ['0.1rem', '2rem'],
     padding: ['0rem', '1rem'],
-//    borderRadius: ['50% 0% 50% 0%', '0%'],
     backgroundColor: ['#911a1a', '#243d00'],
     easing: 'easeOutExpo',
     duration: 500
   })
 };
 
+// animates  appearance of 'blobs' inside of a music genres container
 export function animateBlob() {
   const blobs = document.querySelectorAll('.blob');
   blobs.forEach(blob => {
@@ -130,6 +141,7 @@ export function animateBlob() {
   })
 }
 
+// morphs blobs
 export function animateMorphBlob() {
   const a_blob = new Blob();
   anime({
@@ -153,7 +165,7 @@ export function animateMorphBlob() {
     });
 };
 
-
+// animates vinyl blocks, circles inside of them, and text on About page
 export function animateAboutItems() {
   anime({
     targets: '.about-item',
@@ -181,7 +193,7 @@ export function animateAboutItems() {
   })
 };
 
-
+// animates bottom frame play buttons (e.g. save collage, guess albums, guess artists)
 export function animatePlayButtons(elementsList, delay) {
  anime({
    targets: elementsList,
@@ -193,7 +205,7 @@ export function animatePlayButtons(elementsList, delay) {
  })
 }
 
-
+// animates user's avatar
 export function animateAvatar(delay) {
   const avatarjke = document.querySelector('.avatar-container');
   console.log(avatarjke);
@@ -217,21 +229,3 @@ export function animateAvatar(delay) {
     scale: [2, 1],
     opacity: [0.5, 1],
   })
-
-
-//  anime({
-//    targets: '.avatar-container',
-//    scale: [0.5, 1],
-//    translateY: [50, 0],
-//    opacity: [0, 1],
-//    borderRadius: ['200px', '0px'],
-//    delay: 90 * delay,
-//    duration: 500
-//  });
-//  anime({
-//    targets: ".username",
-//    backgroundColor: ["#FFF", "#005191"],
-//    scale: [2, 1],
-//    opacity: [0.5, 1],
-//  });
-}
