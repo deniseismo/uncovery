@@ -7,7 +7,9 @@ import {animateTimeSpan, animateMusicGenreOn, animateBlockOff,
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
+  // remove unnecessary elements
   removeAvatarContainer();
+  // create slider, filter, etc. containers
   createSliderContainer();
   createSlider();
   createMusicGenresContainer();
@@ -15,14 +17,15 @@ export async function prepareToExplore() {
   const formContainer = document.getElementById("submit-form");
   formContainer.id = "tags-form";
   const tagsSearchInput = document.querySelector('#tag-field');
+  // handle adding tags to the list of selected tags
   tagsSearchInput.addEventListener('input', handleTags);
-  tagsSearchInput.addEventListener('focus', autocompletjke);
+  // handle auto completion
+  tagsSearchInput.addEventListener('focus', autocompleteTags);
 };
 
-
-function autocompletjke() {
+// autocomplete tags
+function autocompleteTags() {
   if (!(theGame.status)) {
-    console.log('autocompletjke!')
     $('#tag-field').autocomplete({
     serviceUrl: '/get_tags',
     type: "GET",
@@ -54,9 +57,6 @@ export async function handleTags(e) {
     // useExtendedSearch: false,
     // ignoreLocation: false,
     // ignoreFieldNorm: false,
-    keys: [
-      "names",
-    ]
   };
   // get current tags list
   const tags_list = await fetchTags(e.target.value);
@@ -115,21 +115,30 @@ function createMusicGenresContainer() {
   });
 };
 
+// creates container for music tags
 function createMusicGenreElement(musicGenre) {
   const musicGenreElement = document.createElement('p');
   musicGenreElement.classList.add('music-genre-element', 'shadow-main');
+  // remove spaces to create an appropriate id
   musicGenreElement.id = `tag-${musicGenre.replace(/\s/g, '')}`;
+  // use dataset for storing the original tag name (used for adding/removing form list of selected tags)
   musicGenreElement.dataset.tagName = musicGenre;
   musicGenreElement.textContent = `${musicGenre}`;
   const musicGenresContainer = document.querySelector('.music-genres-container');
   musicGenresContainer.appendChild(musicGenreElement);
+  // animate music tags on
   animateMusicGenreOn(musicGenreElement);
+  // add event listener to each music tag (remove on click)
   document.querySelectorAll('.music-genre-element').forEach(genre => {
     genre.addEventListener('click', (e) => {
+      // removes from list of selected tags
       musicFilters.removeMusicGenre(e.target.dataset.tagName);
+      // animate random blob morphing
       animateMorphBlob();
+      // animate tag off
       animateBlockOff(e.target);
       setTimeout(() => {
+        // remove element
         e.target.remove();
       }, 250);
     });
@@ -137,6 +146,7 @@ function createMusicGenreElement(musicGenre) {
 };
 
 
+// add 'blobs' to the container
 function addBlob(parentElement, numberOfBlobs) {
   const a_blob = new Blob();
   for (let i = 0; i < numberOfBlobs; i++) {
@@ -183,7 +193,7 @@ function createSlider() {
         padding: 0,
         step: 1,
         range: {
-            'min': 1950,
+            'min': 1946,
             'max': 2020
         },
         pips: {
@@ -207,13 +217,11 @@ function createSlider() {
         const timeAfter = musicFilters.timeSpanInfo;
         const timeSpanElement = document.querySelector('.time-span');
         animateTimeSpan(timeBefore, timeAfter);
-//        timeSpanElement.textContent = `ticking away ${musicFilters.timeSpanInfo[0]}–${musicFilters.timeSpanInfo[1]}`;
     });
 };
 
 
-
-
+// add music tag to the list of music tags
 function addMusicTags() {
   // add current chosen music tag to the list
   if (frequentElements.activeButtonID() === 'explore') {
