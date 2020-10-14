@@ -69,7 +69,8 @@ def get_filtered_name(album_name):
         # no super deluxe
         r"((super)?\s?(deluxe)\s?).*",
         r"((\d+)?\s?(Remaster)\s?).*",
-        r"((\d+)?\s?(Complete)\s?).*"
+        r"((\d+)?\s?(Complete)\s?).*",
+        r"((\d+)?\s?(International Version)\s?).*",
         r"\d+?(th)?\s?Anniversary\s?\w*",
         # no weird characters
         r"[“”:\(\)\":…]"
@@ -81,7 +82,14 @@ def get_filtered_name(album_name):
     return ultimate_filtered_name
 
 
-def get_filtered_names_list(album_name):
+def remove_punctuation(name: str):
+    if not name:
+        return None
+    pattern = "[^\w\s]"
+    return re.sub(pattern, '', name, flags=re.IGNORECASE)
+
+
+def get_filtered_names_list(album_name: str):
     """
     filters out some articles, incorrect symbols & redundant words (e.g. Deluxe Edition)
     :param album_name: album's title
@@ -114,4 +122,3 @@ def log_artist_missing_from_db(artist_name: str):
         writer = csv.writer(file)
         writer.writerow([artist_name])
         return True
-

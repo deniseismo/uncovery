@@ -246,6 +246,7 @@ function addMusicTags() {
   }
 };
 
+// get tags filtered list
 async function fetchTags(value) {
   // fetches current tags list
   const response = await fetch('get_tags', {
@@ -259,6 +260,7 @@ async function fetchTags(value) {
   return tags;
 };
 
+// remove explore-pertaining elements
 export function cleanAfterExplore() {
   const sliderContainer = document.querySelector('.slider-container');
   const musicGenresContainer = document.querySelector('.music-genres-container');

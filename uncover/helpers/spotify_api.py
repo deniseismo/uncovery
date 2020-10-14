@@ -36,6 +36,7 @@ def spotify_get_users_playlist_albums(playlist_id: str):
     for track in playlist_info["tracks"]["items"]:
         name = track['track']['album']['name']
         filtered_title = utils.get_filtered_name(name)
+        filtered_title = utils.remove_punctuation(filtered_title)
         an_album_dict = {
             "title": track['track']['album']['name'],
             "names": [name.lower()] + utils.get_filtered_names_list(name),
