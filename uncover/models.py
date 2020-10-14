@@ -1,5 +1,6 @@
 from uncover import db
 
+
 tags = db.Table(
     'tags',
     db.Column('artist_id', db.Integer, db.ForeignKey('artist.id')),
@@ -9,7 +10,7 @@ tags = db.Table(
 
 class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(), unique=True, nullable=False)
+    name = db.Column(db.String(), unique=True, index=True, nullable=False)
     albums = db.relationship('Album', backref='artist', lazy=True)
     music_genres = db.relationship('Tag', secondary=tags,
                                    backref=db.backref('artists', lazy='dynamic'))
@@ -35,7 +36,8 @@ class Album(db.Model):
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    tag_name = db.Column(db.String(), nullable=False, unique=True)
+    tag_name = db.Column(db.String(), nullable=False, index=True, unique=True)
 
     def __repr__(self):
         return f"Genre('{self.tag_name}')"
+

@@ -229,3 +229,4 @@ export function animateAvatar(delay) {
     scale: [2, 1],
     opacity: [0.5, 1],
   })
+}
