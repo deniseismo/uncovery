@@ -127,11 +127,11 @@ function createMusicGenreElement(musicGenre) {
   document.querySelectorAll('.music-genre-element').forEach(genre => {
     genre.addEventListener('click', (e) => {
       musicFilters.removeMusicGenre(e.target.dataset.tagName);
-      animateBlockOff(e.target.id);
       animateMorphBlob();
+      animateBlockOff(e.target);
       setTimeout(() => {
         e.target.remove();
-      }, 100);
+      }, 250);
     });
   });
 };

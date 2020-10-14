@@ -56,18 +56,18 @@ export function animateMusicGenreOn(musicGenreElement) {
     scale: [5, 1],
     translateY: [150, 0],
     opacity: [0, 1],
-    duration: 600
+    duration: 300
   });
 };
 
 export function animateBlockOff(block) {
   console.log(`animating! ${block}`)
   anime({
-    targets: `#${block}`,
-    scale: [1, 0],
+    targets: block,
+    scale: [10, 0],
     translateY: [0, 50],
     opacity: [1, 0],
-    duration: 500,
+    duration: 150,
     backgroundColor: "#ed6663"
   });
 };

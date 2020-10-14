@@ -123,6 +123,8 @@ header {
 .form-field:focus {
   border-color: #3B4A3A;
   box-shadow: 0 0 0 .2rem rgba(0,123,255,.25);
+  border-radius: 0 !important;
+  outline: none;
 }
 
 .button {
@@ -987,4 +989,10 @@ label.tooltipText:after {
 
 .winning-text:hover {
   cursor: pointer;
+}
+
+.noUi-handle:focus {
+  outline: 0;
+  background-color: #3b444b;
+  box-shadow: none;
 }

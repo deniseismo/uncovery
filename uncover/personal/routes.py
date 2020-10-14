@@ -74,6 +74,10 @@ def get_albums_by_spotify():
 
 @personal.route("/get_user_avatar", methods=["POST"])
 def get_avatar_image():
+    """
+    gets user's avatar image
+    :return: a jsonified dict with user avatar image url in it
+    """
     content = request.get_json()
     if not content:
         return None
