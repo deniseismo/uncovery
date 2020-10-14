@@ -28,7 +28,7 @@ export class Game {
 
 }
 
-
+// a list of current albums
 export class AlbumGameInfo {
   constructor() {
     this.albumsList = [];
@@ -69,6 +69,7 @@ export class AlbumGameInfo {
   };
 };
 
+// initialize all the necessary event listeners for play buttons
 export function playInit() {
 // play button
   const playButtons = document.querySelectorAll('.play-buttons-container .guess');
@@ -88,10 +89,7 @@ export function playInit() {
   })
 }
 
-
-
-
-
+// handles album/artist guesses (depends on the game mode)
 function handleGuesses(e) {
   let searchMode = "names";
   if (theGame.playMode === 'artists') {
@@ -111,7 +109,7 @@ function handleGuesses(e) {
     // ignoreLocation: false,
     // ignoreFieldNorm: false,
     keys: [
-      searchMode,
+      searchMode, // albums/artists
     ]
   };
   const fuse = new Fuse(albumGame.notGuessedAlbums, options);
@@ -126,7 +124,6 @@ function handleGuesses(e) {
     frequentElements.textField.value ='';
   }
 };
-
 
 // highlights the guessed album with animation & puts the success icon over the image
 function highlightGuessedAlbum(albumID) {
@@ -189,7 +186,7 @@ function createWinningContainer() {
   });
 }
 
-
+// handles game preparation
 function prepareGame(buttonPressed) {
   theGame.status = true;
   let mode = 'albums';
@@ -216,6 +213,7 @@ function prepareGame(buttonPressed) {
   input.oninput = handleGuesses;
 };
 
+// creates a score container
 function createScoreContainer() {
   const scoreContainer = document.createElement("div");
   scoreContainer.classList.add("flex-container", "shadow-main", "score-container");

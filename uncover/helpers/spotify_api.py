@@ -34,22 +34,25 @@ def spotify_get_users_playlist_albums(playlist_id: str):
     list_of_titles = set()
     # iterate through tracks
     for track in playlist_info["tracks"]["items"]:
-        name = track['track']['album']['name']
-        filtered_title = utils.get_filtered_name(name)
-        filtered_title = utils.remove_punctuation(filtered_title)
-        an_album_dict = {
-            "title": track['track']['album']['name'],
-            "names": [name.lower()] + utils.get_filtered_names_list(name),
-            "image": track["track"]["album"]["images"][0]["url"],
-            "rating": track["track"]['popularity']
-        }
-        an_album_dict['names'] = list(set(an_album_dict['names']))
-        # filter duplicates:
-        if filtered_title not in list_of_titles:
-            # append a title to a set of titles
-            list_of_titles.add(filtered_title)
-            # adds an album info only if a title hasn't been seen before
-            album_info["albums"].append(an_album_dict)
+        if track['track']['album']['album_type'] == "album":
+            name = track['track']['album']['name']
+            filtered_title = utils.get_filtered_name(name)
+            filtered_title = utils.remove_punctuation(filtered_title)
+            artist_name = track['track']['album']['artists'][0]['name']
+            an_album_dict = {
+                "artist_name": artist_name,
+                "title": track['track']['album']['name'],
+                "names": [name.lower()] + utils.get_filtered_names_list(name),
+                "image": track["track"]["album"]["images"][0]["url"],
+                "rating": track["track"]['popularity']
+            }
+            an_album_dict['names'] = list(set(an_album_dict['names']))
+            # filter duplicates:
+            if filtered_title not in list_of_titles:
+                # append a title to a set of titles
+                list_of_titles.add(filtered_title)
+                # adds an album info only if a title hasn't been seen before
+                album_info["albums"].append(an_album_dict)
     # shuffles a list of albums to get random results
     random.shuffle(album_info["albums"])
     # adds ids to albums
@@ -205,3 +208,4 @@ def spotify_get_artists_albums_images(artist: str):
     album_info['albums'] = sorted(albums_list, key=lambda item: item['rating'], reverse=True)
 
     return album_info
+
