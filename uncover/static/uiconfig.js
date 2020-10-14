@@ -115,6 +115,7 @@ export function createAvatarBox(avatarURL, username) {
   userName.classList.add('username');
   userName.textContent = username;
   const avatarImage = document.createElement('img');
+  avatarImage.classList.add("avatar-image");
   avatarImage.src = avatarURL;
   avatarContainer.appendChild(userName);
   avatarContainer.appendChild(avatarImage);

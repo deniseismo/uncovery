@@ -996,3 +996,8 @@ label.tooltipText:after {
   background-color: #3b444b;
   box-shadow: none;
 }
+
+.avatar-image {
+  width: 200px;
+  height: 200px;
+}
