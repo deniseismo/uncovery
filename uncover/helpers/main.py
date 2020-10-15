@@ -85,7 +85,7 @@ def get_artists_top_albums_images(artist: str, sorting):
     for album in list(albums):
         album_image = ultimate_album_image_finder(album_title=album['title'],
                                                   artist=artist,
-                                                  mbid=album['id'],
+                                                  mbid=album['mbid'],
                                                   fast=True)
         if album_image:
             album['image'] = album_image

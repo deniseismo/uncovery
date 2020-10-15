@@ -119,6 +119,7 @@ def spotify_get_artist_top_albums(artist: str):
     return album_info
 
 
+@cache.memoize(timeout=6000)
 def spotify_get_artist_id(artist_name: str):
     """
     search for an artist's id
@@ -144,6 +145,7 @@ def spotify_get_artist_id(artist_name: str):
     return artist_id
 
 
+@cache.memoize(timeout=6000)
 def spotify_get_artists_genres(artist_id: str):
     """
     gets artist's top music genres
@@ -221,4 +223,6 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
         album_info['albums'] = albums_list
     else:
         album_info['albums'] = sorted(albums_list, key=lambda item: item[ORDER[sorting][0]], reverse=ORDER[sorting][1])
+    for count, album in enumerate(album_info['albums']):
+        album['id'] = count
     return album_info

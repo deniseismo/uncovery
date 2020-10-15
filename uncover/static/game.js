@@ -1,9 +1,8 @@
-import {frequentElements, addTooltips} from './utils.js'
+import {frequentElements, addTooltips, insertAfter} from './utils.js'
 import {theGame, albumGame} from './main.js'
 import {setPlaceholder} from './uiconfig.js'
 import {handleTags} from './explore.js'
 import {hideOptions, resetPlayButtons} from './uiconfig.js'
-import {insertAfter} from './utils.js'
 import {winningMessage} from './info.js'
 import {animateHighlightGuessedAlbum, animateBlockOff, animateWinningMessage} from './animation.js'
 

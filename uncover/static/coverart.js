@@ -1,4 +1,4 @@
-import {frequentElements} from "./utils.js"
+import {frequentElements, insertAfter} from "./utils.js"
 
 // loads cover art images to the main game frame
 export function loadCoverArt(data) {

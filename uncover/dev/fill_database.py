@@ -12,10 +12,11 @@ from tqdm import tqdm
 
 from uncover import db, create_app
 from uncover.helpers.discogs_api import get_album_discogs_id
-from uncover.helpers.lastfm_api import lastfm_get_response
+from uncover.helpers.lastfm_api import lastfm_get_response, lastfm_get_artist_correct_name
 from uncover.helpers.main import ultimate_album_image_finder
 from uncover.helpers.musicbrainz_api import mb_get_artists_albums, mb_get_album_release_date
-from uncover.helpers.spotify_api import spotify_get_artist_id, spotify_get_artists_genres
+from uncover.helpers.spotify_api import spotify_get_artist_id, spotify_get_artists_genres, \
+    spotify_get_artists_albums_images
 from uncover.helpers.utilities import timeit
 from uncover.models import Artist, Album, Tag
 
@@ -77,16 +78,20 @@ def database_populate():
         for artist in tqdm(reader):
             print(artist)
             artist_name = artist[0]
-            # correct_name = lastfm_get_artist_correct_name(artist_name)
-            # if correct_name:
-            #     artist_name = correct_name
+            correct_name = lastfm_get_artist_correct_name(artist_name)
+            if correct_name:
+                artist_name = correct_name
             if Artist.query.filter_by(name=artist_name).first():
                 continue
             print(f'ARTIST: {artist_name}')
 
             artist_albums = mb_get_artists_albums(artist_name)
             if not artist_albums:
-                continue
+                artist_albums = spotify_get_artists_albums_images(artist_name)
+                if artist_albums:
+                    artist_albums = artist_albums['albums']
+                else:
+                    continue
             artist_entry = Artist(name=artist_name)
             add_artist_music_genres(artist_entry)
 
@@ -95,16 +100,24 @@ def database_populate():
             artist_id = Artist.query.filter_by(name=artist_name).first().id
 
             for album in tqdm(artist_albums):
-                mb_id = album['id']
                 title = album['title']
                 rating = album['rating']
+                try:
+                    mb_id = album['mbid']
+                except (KeyError, TypeError):
+                    mb_id = None
+                try:
+                    image_url = album['image']
+                except (KeyError, TypeError):
+                    image_url = None
+
                 try:
                     alternative_title = album['altenative_name']
                 except KeyError:
                     alternative_title = None
                 discogs_id = get_album_discogs_id(title, artist_name)
-
-                image_url = ultimate_album_image_finder(title, artist_name, mbid=mb_id)
+                if not image_url:
+                    image_url = ultimate_album_image_finder(title, artist_name, mbid=mb_id)
                 cover_art = save_image(image_url)
 
                 if image_url and cover_art:
@@ -113,11 +126,21 @@ def database_populate():
                                         rating=rating,
                                         mb_id=mb_id,
                                         cover_art=cover_art)
+
+                    if mb_id:
+                        album_entry.mb_id = mb_id
                     if alternative_title:
                         album_entry.alternative_title = alternative_title
                     if discogs_id:
                         album_entry.discogs_id = discogs_id
-                    add_album_release_date(album_entry)
+                    try:
+                        release_date = album['release_date']
+                    except (KeyError, TypeError):
+                        release_date = None
+                    if release_date:
+                        album_entry.release_date = release_date
+                    else:
+                        add_album_release_date(album_entry)
                     db.session.add(album_entry)
 
         db.session.commit()
@@ -230,4 +253,4 @@ def get_all_tags():
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
-# database_populate()
+database_populate()

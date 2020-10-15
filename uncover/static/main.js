@@ -1,7 +1,7 @@
-import {AlbumGameInfo, Game, playInit} from "./game.js"
-import {MusicFilter} from './musicFilter.js'
 import {addTooltips, frequentElements, insertAfter, removeAllChildNodes,
         loadSpinner, fetchAvatar, fixInputData} from './utils.js'
+import {AlbumGameInfo, Game, playInit} from "./game.js"
+import {MusicFilter} from './musicFilter.js'
 import {configureOptionsStyle, removePlayButtons, createPlayButtons,
         resetPlayButtons, createAvatarBox, removeAvatarContainer} from './uiconfig.js'
 import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar} from './animation.js'
@@ -95,7 +95,7 @@ export const submitInput = function(desiredMethod) {
       if (desiredMethod === "by_username") {
         // shows avatar if it's username method
         const username = data['info'];
-        fetchAvatar(qualifier)
+        fetchAvatar(username)
         .then(avatar => avatar['avatar'])
         .then(avatar => createAvatarBox(avatar, username))
         .then(() => {
@@ -222,6 +222,7 @@ let timerID;
     if (
     (frequentElements.activeButtonID() === 'by_username' || frequentElements.activeButtonID() === 'by_artist')
       && !(theGame.status)
+
     ) {
       frequentElements.selectOptions.style.display = 'block';
     };

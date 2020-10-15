@@ -16,6 +16,7 @@ requests_cache.install_cache()
 musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
 
 
+@cache.memoize(timeout=60000)
 def mb_get_album_alternative_name(album_id: str):
     """
     gets the alternative name for the album (e. g. White Album for 'The Beatles')
@@ -35,6 +36,7 @@ def mb_get_album_alternative_name(album_id: str):
     return alternative
 
 
+@cache.memoize(timeout=60000)
 def mb_get_album_release_date(album_id: str):
     """
     :param album_id: album_id from MusicBrainz
@@ -55,7 +57,23 @@ def mb_get_album_release_date(album_id: str):
     return release_date
 
 
+@utils.timeit
+@cache.memoize(timeout=60000)
 def mb_get_artist_mbid(artist_name: str):
+    artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
+    artists_found = musicbrainzngs.search_artists(artist_name, limit=2)
+    mbid = None
+    if not artists_found['artist-count']:
+        # nothing found
+        return None
+    for artist in artists_found['artist-list']:
+        if artist['name'].replace("’", "'").replace('‐', '-').replace(',', '') == artist_fixed:
+            mbid = artist['id']
+            return mbid
+    return None
+
+
+def mb_get_artist_mbid_backup(artist_name: str):
     """
     search for an artist's mbid on MusicBrainz
     :param artist_name: artist's name (e.g. MGMT, The Prodigy, etc.)
@@ -107,7 +125,7 @@ def mb_get_artist_mbid_v2(artist: str):
     return mbid
 
 
-@cache.memoize(timeout=3600)
+@cache.memoize(timeout=60000)
 def mb_get_album_mbid(album: str, artist: str):
     """
     search for an album's mbid on MusicBrainz
@@ -170,11 +188,12 @@ def mb_get_artists_albums(artist: str, sorting="popular"):
         an_album_dict = {
             "title": full_title,
             "names": [correct_title] + utils.get_filtered_names_list(full_title),
-            "id": release['id'],
+            "mbid": release['id'],
             "rating": rating if rating else 0
         }
         if sorting in ["earliest", "latest"]:
             release_date = mb_get_album_release_date(release['id'])
+            release_date = datetime.strptime(release_date[:4], '%Y')
             an_album_dict["release_date"] = release_date
         # add an alternative album name if exists
         if alternative_name:
