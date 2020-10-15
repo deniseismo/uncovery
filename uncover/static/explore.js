@@ -30,6 +30,7 @@ function autocompleteTags() {
     serviceUrl: '/get_tags',
     type: "GET",
     minChars: 2,
+    maxHeight: 114,
     onSelect: function () {
       const tagsSearchInput = document.querySelector('.form-field');
       tagsSearchInput.dispatchEvent(new Event('input'));
