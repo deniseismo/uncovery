@@ -6,7 +6,7 @@ import re
 import time
 
 
-def display_failure_art(list_of_images):
+def display_failure_art(list_of_images: list):
     """
     picks a random 'failure' cover art from a list
     :return: a 'failure' cover art location
@@ -54,7 +54,22 @@ def timeit(method):
     return timed
 
 
-def get_filtered_name(album_name):
+def get_filtered_artist_names(artist_name: str):
+    if not artist_name:
+        return None
+    filtered_names = set()
+    correct_name = artist_name.lower().replace("“", "").replace("”", "").replace("’", "'")
+    no_article = correct_name.lower().replace('the ', '')
+    with_and = correct_name.replace(" and ", " & ")
+    with_ampersand = correct_name.replace(" & ", " and ")
+    filtered_names.add(correct_name)
+    filtered_names.add(with_and)
+    filtered_names.add(with_ampersand)
+    filtered_names.add(no_article)
+    return list(filtered_names)
+
+
+def get_filtered_name(album_name: str):
     """
     :param album_name: an album name to filter
     :return: a fitlered name

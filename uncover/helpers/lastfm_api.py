@@ -168,8 +168,10 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
                     "title": album_name,
                     "names": [album_name.lower()] + utils.get_filtered_names_list(album_name),
                     "image": album_image,
-                    "artist_name": artist_name
+                    "artist_name": artist_name,
+                    "artist_names": [artist_name] + utils.get_filtered_artist_names(artist_name)
                 }
+                an_album_dict['artist_names'] = list(set(an_album_dict["artist_names"]))
                 an_album_dict['names'] = list(set(an_album_dict['names']))
                 # appends an album dict with all the info to the list
                 if filtered_name not in a_set_of_titles:

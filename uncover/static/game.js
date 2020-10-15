@@ -100,7 +100,7 @@ export function playInit() {
 function handleGuesses(e) {
   let searchMode = "names";
   if (theGame.playMode === 'artists') {
-    searchMode = "artist_name";
+    searchMode = "artist_names";
   }
   const options = {
     // isCaseSensitive: false,

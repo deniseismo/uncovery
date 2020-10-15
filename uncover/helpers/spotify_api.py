@@ -46,11 +46,13 @@ def spotify_get_users_playlist_albums(playlist_id: str):
             artist_name = track['track']['album']['artists'][0]['name']
             an_album_dict = {
                 "artist_name": artist_name,
+                "artist_names": [artist_name] + utils.get_filtered_artist_names(artist_name),
                 "title": track['track']['album']['name'],
                 "names": [name.lower()] + utils.get_filtered_names_list(name),
                 "image": track["track"]["album"]["images"][0]["url"],
                 "rating": track["track"]['popularity']
             }
+            an_album_dict["artist_names"] = list(set(an_album_dict["artist_names"]))
             an_album_dict['names'] = list(set(an_album_dict['names']))
             # filter duplicates:
             if filtered_title not in list_of_titles:
@@ -210,6 +212,8 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
                         "rating": rating if rating else 0,
                         "release_date": release_date
                     }
+                    # remove duplicates
+                    an_album['names'] = list(set(an_album['names']))
                     albums_list.append(an_album_dict)
 
             except (KeyError, IndexError):

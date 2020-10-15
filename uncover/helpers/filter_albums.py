@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import func
 
-from uncover.helpers.utilities import get_filtered_names_list
+from uncover.helpers.utilities import get_filtered_names_list, get_filtered_artist_names
 from uncover.models import Album, Artist, Tag, tags
 
 
@@ -45,7 +45,11 @@ def explore_filtered_albums(genres: list, time_span: list):
             "title": album_entry.title,
             "names": [album_entry.title.lower()] + get_filtered_names_list(album_name),
             "image": 'static/cover_art_images/' + album_entry.cover_art + ".png",
-            "artist_name": album_entry.artist.name
+            "artist_name": album_entry.artist.name,
+            "artist_names": [album_entry.artist.name] + get_filtered_artist_names(album_entry.artist.name)
         }
+        # remove duplicates
+        an_album_dict['artist_names'] = list(set(an_album_dict["artist_names"]))
+        an_album_dict['names'] = list(set(an_album_dict['names']))
         album_info["albums"].append(an_album_dict)
     return album_info
