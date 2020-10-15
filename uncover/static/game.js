@@ -24,7 +24,6 @@ export class Game {
   set playMode(theMode) {
     this.mode = theMode;
   }
-
 }
 
 // a list of current albums
@@ -33,6 +32,7 @@ export class AlbumGameInfo {
     this.albumsList = [];
     this.notGuessedAlbumsList = [];
     this.guessedAlbumsCount = 0;
+    this.query = '';
   };
   set albums(albums) {
     this.albumsList = albums;
@@ -54,6 +54,12 @@ export class AlbumGameInfo {
   }
   set albumsCount(newCount) {
     this.guessedAlbumsCount = newCount;
+  }
+  get currentQuery() {
+    return this.query;
+  }
+  set currentQuery(value) {
+    this.query = value;
   }
   removeGuessedAlbum(guessedAlbumID) {
     console.log(this);
@@ -83,6 +89,8 @@ export function playInit() {
       } else {
         console.log('cancel');
         cancelGame(e.target);
+        const formField = document.querySelector('.form-field');
+        formField.value = albumGame.currentQuery;
       };
     })
   })
@@ -187,6 +195,7 @@ function createWinningContainer() {
 
 // handles game preparation
 function prepareGame(buttonPressed) {
+  const formField = document.querySelector('.form-field');
   theGame.status = true;
   let mode = 'albums';
   if (buttonPressed.id == 'guess-artists') {
@@ -195,7 +204,6 @@ function prepareGame(buttonPressed) {
   theGame.playMode = mode;
   hideOptions('on');
   createScoreContainer();
-  const formField = document.querySelector('.form-field');
   formField.removeEventListener("input", handleTags);
   $('.form-field').autocomplete('disable');
   frequentElements.textField.id = 'play-field';

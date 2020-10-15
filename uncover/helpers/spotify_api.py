@@ -5,14 +5,18 @@ from datetime import datetime
 import requests_cache
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth
 
 import uncover.helpers.lastfm_api as lastfm_api
 import uncover.helpers.musicbrainz_api as musicbrainz
 import uncover.helpers.utilities as utils
 from uncover import cache
 
+scope = "user-top-read"
+
 auth_manager = SpotifyClientCredentials()
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
 requests_cache.install_cache()
 
@@ -226,3 +230,9 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
     for count, album in enumerate(album_info['albums']):
         album['id'] = count
     return album_info
+
+
+def spotify_get_users_top_albums():
+    tracks = sp.current_user_top_tracks(limit=20, offset=0, time_range='medium_term')
+    for track in tracks:
+        print(track)

@@ -55,7 +55,9 @@ export const submitInput = function(desiredMethod) {
   })
   .then(data => {
     /* storing album info in a global object */
+    console.log(data);
     albumGame.albums = data['albums'];
+    albumGame.currentQuery = data['info'];
     console.log(albumGame);
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
