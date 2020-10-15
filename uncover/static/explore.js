@@ -240,6 +240,8 @@ function addMusicTags() {
       // creates a DOM element with the tag
       createMusicGenreElement(musicFilters.currentTag);
       animateMorphBlob();
+      const formField = document.querySelector('.form-field');
+      formField.value = '';
       console.log(`${musicFilters.currentTag} was successfully added to the tags.`);
       console.log(musicFilters.tagsPickedInfo);
     } else {
