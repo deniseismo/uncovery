@@ -67,9 +67,10 @@ def mb_get_artist_mbid(artist_name: str):
         # nothing found
         return None
     for artist in artists_found['artist-list']:
-        if artist['name'].replace("’", "'").replace('‐', '-').replace(',', '') == artist_fixed:
+        if artist['name'].lower().replace("’", "'").replace('‐', '-').replace(',', '') == artist_fixed:
             mbid = artist['id']
             return mbid
+    print(f'found artists mbid: {mbid}')
     return None
 
 
