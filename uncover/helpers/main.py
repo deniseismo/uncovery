@@ -158,6 +158,7 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     :return:
     """
     artist = Artist.query.filter_by(name=artist_name).first()
+    print(f'artist found in sql: {artist}')
     if not artist:
         # no such artist found
         print('no artist found')
@@ -168,9 +169,15 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     album_entries = Album.query.filter_by(artist=artist).all()
     album_found = None
     ratio_threshold = 94
+    an_album_to_find = an_album_to_find.lower()
     for album in album_entries:
+        album_title = album.title.lower()
+        print(album.title, an_album_to_find)
         # implements a fuzzy match algorithm function
-        current_ratio = fuzz.ratio(album.title, an_album_to_find)
+        current_ratio = fuzz.ratio(album_title, an_album_to_find)
+        partial_ratio = fuzz.partial_ratio(album_title, an_album_to_find)
+        if partial_ratio == 100:
+            album_found = album.cover_art
         if current_ratio > 98:
             # found perfect match, return immediately
             return 'static/cover_art_images/' + album.cover_art + ".png"
@@ -180,3 +187,6 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     if not album_found:
         return None
     return 'static/cover_art_images/' + album_found + ".png"
+
+
+fuzz.partial_ratio("Led Zeppelin I", "Led Zeppelin II")

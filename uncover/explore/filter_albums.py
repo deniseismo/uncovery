@@ -37,7 +37,7 @@ def explore_filtered_albums(genres: list, time_span: list):
     # build an album info dict
     if not album_entries:
         return None
-    album_info = {"info": f"Albums from {start_year} to {end_year}, {genres}", "albums": []}
+    album_info = {"info": "", "albums": []}
     for counter, album_entry in enumerate(album_entries):
         album_name = album_entry.title
         an_album_dict = {

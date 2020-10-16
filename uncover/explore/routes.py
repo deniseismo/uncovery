@@ -2,7 +2,7 @@ import json
 
 from flask import request, url_for, Blueprint, make_response, jsonify
 
-from uncover.helpers.filter_albums import explore_filtered_albums
+from uncover.explore.filter_albums import explore_filtered_albums
 from uncover.helpers.main import sql_select_artist_albums, get_artists_top_albums_images
 from uncover.helpers.utilities import display_failure_art, get_failure_images
 
