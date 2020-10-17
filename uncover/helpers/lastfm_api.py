@@ -104,6 +104,8 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     if time_period == "shuffle":
         shuffle = True
         time_period = random.choice(possible_time_periods)
+    else:
+        amount = 9
     # time_period_table = {
     #     "overall": "of all time",
     #     "7day": "for the past 7 days",
@@ -115,7 +117,8 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     response = lastfm_get_response({
         'method': 'user.getTopAlbums',
         'username': username,
-        'period': time_period
+        'period': time_period,
+        'limit': amount
     })
     # in case of an error, return None
     if response.status_code != 200:
@@ -126,7 +129,8 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
         response = lastfm_get_response({
             'method': 'user.getTopAlbums',
             'username': username,
-            'period': time_period
+            'period': time_period,
+            'limit': amount
         })
     # initialize a dict to avoid KeyErrors
     try:
@@ -141,7 +145,7 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     #     album_info["info"] = f"{username} random albums {time_period_table[time_period]}"
     try:
         a_set_of_titles = set()
-        for album in response.json()['topalbums']['album'][:amount]:
+        for album in response.json()['topalbums']['album']:
             # gets the correct artist's name
             artist_name = album['artist']['name']
             artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
@@ -154,6 +158,7 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
             # try getting the album image through database
             album_image = main.sql_find_specific_album(artist_name, album_name)
             if not album_image:
+                print(f'second sql attempt for {album_name}')
                 # second attempt in case the album name was badly written
                 album_image = main.sql_find_specific_album(artist_name, album_correct_name)
             # try getting through the ultimate image finder function if database doesn't have the image

@@ -61,7 +61,7 @@ def mb_get_album_release_date(album_id: str):
 @cache.memoize(timeout=60000)
 def mb_get_artist_mbid(artist_name: str):
     artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
-    artists_found = musicbrainzngs.search_artists(artist_name, limit=2)
+    artists_found = musicbrainzngs.search_artists(artist_name, limit=4)
     mbid = None
     if not artists_found['artist-count']:
         # nothing found
