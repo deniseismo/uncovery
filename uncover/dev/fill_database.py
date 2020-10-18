@@ -85,7 +85,7 @@ def database_populate():
                 continue
             print(f'ARTIST: {artist_name}')
 
-            artist_albums = mb_get_artists_albums(artist_name)
+            artist_albums = mb_get_artists_albums(artist_name, limit=100)
             if not artist_albums:
                 artist_albums = spotify_get_artists_albums_images(artist_name)
                 if artist_albums:

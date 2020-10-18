@@ -16,6 +16,7 @@ requests_cache.install_cache()
 musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
 
 
+@utils.timeit
 @cache.memoize(timeout=60000)
 def mb_get_album_alternative_name(album_id: str):
     """
@@ -36,6 +37,7 @@ def mb_get_album_alternative_name(album_id: str):
     return alternative
 
 
+@utils.timeit
 @cache.memoize(timeout=60000)
 def mb_get_album_release_date(album_id: str):
     """
@@ -148,8 +150,9 @@ def mb_get_album_mbid(album: str, artist: str):
 
 
 @utils.timeit
-def mb_get_artists_albums(artist: str, sorting="popular"):
+def mb_get_artists_albums(artist: str, sorting="popular", limit=9):
     """
+    :param limit: a number of albums retrieved
     :param sorting: sorting by: popularity, release date, random
     :param artist: artist's name
     :return:
@@ -183,6 +186,7 @@ def mb_get_artists_albums(artist: str, sorting="popular"):
     for release in response.json()["release-groups"]:
         alternative_name = mb_get_album_alternative_name(release['id'])
         full_title = release['title'].replace("’", "'")
+        print(full_title)
         correct_title = full_title.lower()
         rating = lastfm.lastfm_get_album_listeners(correct_title, artist)
         filtered_name = utils.get_filtered_name(full_title)
@@ -212,10 +216,10 @@ def mb_get_artists_albums(artist: str, sorting="popular"):
     if sorting == "shuffle":
         random.seed(datetime.now())
         random.shuffle(albums)
-        return albums
+        return albums[:limit]
     else:
         sorted_albums = sorted(albums, key=lambda item: item[ORDER[sorting][0]], reverse=ORDER[sorting][1])
-    return sorted_albums
+    return sorted_albums[:limit]
 
 
 @cache.memoize(timeout=3600)

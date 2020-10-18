@@ -23,6 +23,8 @@ def lastfm_get_response(payload: dict):
     return response
 
 
+@utils.timeit
+@cache.memoize(timeout=60000)
 def lastfm_get_album_listeners(album: str, artist: str):
     """
     gets the number of listeners of a particular album

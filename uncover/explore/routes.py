@@ -29,6 +29,7 @@ def sql_get_albums_by_artist():
                                     filename=failure_art_filename)}
         ),
             404)
+    artist = artist.strip()
     # get albums images
     albums = sql_select_artist_albums(artist, sorting)
     if not albums:

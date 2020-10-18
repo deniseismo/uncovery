@@ -187,6 +187,3 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     if not album_found:
         return None
     return 'static/cover_art_images/' + album_found + ".png"
-
-
-fuzz.partial_ratio("Led Zeppelin I", "Led Zeppelin II")
