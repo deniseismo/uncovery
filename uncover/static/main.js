@@ -7,6 +7,8 @@ import {configureOptionsStyle, removePlayButtons, createPlayButtons,
 import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar} from './animation.js'
 import {loadCoverArt, loadFailureArt} from "./coverart.js";
 
+let controller = null;
+
 export const theGame = new Game(false);
 
 export const albumGame = new AlbumGameInfo();
@@ -20,6 +22,11 @@ export const musicFilters = new MusicFilter({
 // main submit function
 export const submitInput = function(desiredMethod) {
   // remove unnecessary elements
+  if (controller) {
+    controller.abort();
+  };
+  controller = new AbortController();
+  const signal = controller.signal;
   removePlayButtons();
   removeAvatarContainer();
   frequentElements.gameFrame.classList.remove('shadow-main');
@@ -32,6 +39,7 @@ export const submitInput = function(desiredMethod) {
   // fetch!
   fetch(`${desiredMethod}`, {
     method: 'POST',
+    signal: signal,
     headers: new Headers({
       'Content-Type': 'application/json'
     }),
