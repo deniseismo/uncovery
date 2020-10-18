@@ -23,6 +23,7 @@ def create_app(config_class=Config):
     db.init_app(app)
 
     from uncover.personal.routes import personal
+    from uncover.musician.routes import musician
     from uncover.explore.routes import explore
     from uncover.main.routes import main
 

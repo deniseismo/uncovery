@@ -85,7 +85,7 @@ function createMusicGenresContainer() {
   const musicGenresContainer = document.createElement('div');
   musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
-  selectedFilters.textContent = "FILTERS APPLIED";
+  selectedFilters.textContent = "FILTERS";
   const timeSpanElement = document.createElement('p');
   timeSpanElement.classList.add('time-span');
   const timeSpanBegin = document.createElement('span');

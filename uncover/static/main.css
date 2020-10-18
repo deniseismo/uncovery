@@ -783,6 +783,7 @@ label.tooltipText:after {
   font-size: 1.25rem;
   text-align: center;
   overflow: hidden;
+  width: 400px;
 }
 
 .avatar-container {

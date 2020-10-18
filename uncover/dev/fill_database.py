@@ -244,7 +244,7 @@ def get_all_tags():
     tag_entries = Tag.query.all()
     tags_list = [tag.tag_name for tag in tag_entries]
     import json
-    with open('tagss.json', 'w') as f:
+    with open('music_tags_all.json', 'w') as f:
         json.dump(tags_list, f, ensure_ascii=False, indent=4)
 
 
@@ -253,4 +253,4 @@ def get_all_tags():
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
-database_populate()
+# database_populate()
