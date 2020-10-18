@@ -53,7 +53,7 @@ function setSelectOptions(targetButtonID) {
     option.selected = selected;
     return option;
   }
-  if (targetButtonID === "by_username") {
+  if (targetButtonID === "by_lastfm_username") {
     const sevenDays = createOption("7day", "7 days");
     const threeMonths = createOption("3month", "3 months");
     const twelveMonths = createOption("12month", "1 year");
@@ -75,7 +75,7 @@ function setSelectOptions(targetButtonID) {
 
 export function setPlaceholder(targetButtonID) {
   const options = {
-    "by_username": "last.fm username",
+    "by_lastfm_username": "last.fm username",
     "by_artist": "artist name",
     "by_spotify": "Spotify Playlist Link",
     "explore": "music tags/genres"

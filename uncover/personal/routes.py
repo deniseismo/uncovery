@@ -7,7 +7,7 @@ from uncover.helpers.utilities import display_failure_art, get_failure_images
 personal = Blueprint('personal', __name__)
 
 
-@personal.route("/by_username", methods=["POST"])
+@personal.route("/by_lastfm_username", methods=["POST"])
 def get_albums_by_username():
     """
     gets user's top albums based on their last.fm stats

@@ -94,7 +94,7 @@ export const submitInput = function(desiredMethod) {
       waves.forEach(wave => wave.classList.remove('falldown'));
       downloadInit();
       playInit();
-      if (desiredMethod === "by_username") {
+      if (desiredMethod === "by_lastfm_username") {
         // shows avatar if it's username method
         const username = data['info'];
         fetchAvatar(username)
@@ -222,7 +222,7 @@ let timerID;
     clearTimeout(timerID);
     // make sure the button's 'username' and the game is off
     if (
-    (frequentElements.activeButtonID() === 'by_username' || frequentElements.activeButtonID() === 'by_artist')
+    (frequentElements.activeButtonID() === 'by_lastfm_username' || frequentElements.activeButtonID() === 'by_artist')
       && !(theGame.status)
 
     ) {

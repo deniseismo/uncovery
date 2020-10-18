@@ -15,7 +15,7 @@ export class Wave {
         "d": this.shapes[Math.floor(Math.random() * this.shapes.length)],
         "fill": "#1DB954"
       },
-      "by_username": {
+      "by_lastfm_username": {
         "d": this.shapes[Math.floor(Math.random() * this.shapes.length)],
         "fill": "#d51007"
       },
