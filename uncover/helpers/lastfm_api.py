@@ -71,6 +71,7 @@ def lastfm_get_artist_mbid(artist: str):
     return artist_mbid
 
 
+@cache.memoize(timeout=60000)
 def lastfm_get_artist_correct_name(artist: str):
     """
     Use the last.fm corrections data to check whether the supplied artist has a correction to a canonical artist
@@ -145,9 +146,11 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     }
     # if shuffle:
     #     album_info["info"] = f"{username} random albums {time_period_table[time_period]}"
+    albums_found = response.json()['topalbums']['album']
+    print(f'albums found: {albums_found}')
     try:
         a_set_of_titles = set()
-        for album in response.json()['topalbums']['album']:
+        for album in albums_found:
             # gets the correct artist's name
             artist_name = album['artist']['name']
             artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
@@ -166,8 +169,14 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
             # try getting through the ultimate image finder function if database doesn't have the image
             if not album_image:
                 album_image = main.ultimate_album_image_finder(album_title=album_name,
-                                                               artist=artist_name, fast=True)
-
+                                                               artist=artist_name,
+                                                               fast=True,
+                                                               ultrafast=True)
+            if not album_image:
+                try:
+                    album_image = album['image'][3]['#text']
+                except (TypeError, IndexError, KeyError):
+                    album_image = None
             # checks for incorrect/broken images
             if album_image:
                 filtered_name = utils.get_filtered_name(album['name'])

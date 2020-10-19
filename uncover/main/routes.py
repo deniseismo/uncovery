@@ -14,14 +14,6 @@ def home():
     return render_template("home.html")
 
 
-@main.errorhandler(404)
-def page_not_found():
-    """
-    :return: a 404 page
-    """
-    return render_template('404.html', title='Page Not Found'), 404
-
-
 @main.route("/save_collage", methods=["POST"])
 def get_collage():
     """

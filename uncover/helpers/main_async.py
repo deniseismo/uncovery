@@ -1,3 +1,4 @@
+import asyncio
 from fuzzywuzzy import fuzz
 from sqlalchemy import func
 
@@ -12,7 +13,6 @@ from uncover.models import Artist, Album
 
 
 @utils.timeit
-@cache.memoize(timeout=3600)
 async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
@@ -55,7 +55,7 @@ async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, 
 
 
 @utils.timeit
-async def fetch_artists_top_albums_images(artist: str, sorting):
+def fetch_artists_top_albums_images(artist: str, sorting):
     """
     get artist's top album images (default way), no database
     :param artist: artist's name
@@ -67,7 +67,7 @@ async def fetch_artists_top_albums_images(artist: str, sorting):
         artist = correct_name
         print(f'the correct name is {correct_name}')
 
-    albums = await mb_fetch_artists_albums(artist, sorting)
+    albums = asyncio.run(mb_fetch_artists_albums(artist, sorting))
     print(f'albums found: {albums}')
 
     if not albums:
@@ -83,8 +83,7 @@ async def fetch_artists_top_albums_images(artist: str, sorting):
             return None
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": []}
-    for album in albums:
-        await fetch_and_assign_images(album=album, artist=artist)
+    asyncio.run(fetch_and_assign_images(albums_list=albums, artist=artist))
     print(f'albums {albums}')
     for count, album in enumerate(albums):
         print('this loop worked!')
@@ -102,13 +101,22 @@ async def fetch_artists_top_albums_images(artist: str, sorting):
 
 
 @utils.timeit
-async def fetch_and_assign_images(album, artist):
+async def fetch_and_assign_images(albums_list, artist):
+    tasks = []
+    for album in albums_list:
+        task = asyncio.create_task(add_album_image(album, artist))
+        tasks.append(task)
+
+    await asyncio.gather(*tasks)
+
+
+async def add_album_image(album, artist):
     album_image = await ultimate_album_image_finder(album_title=album['title'],
                                                     artist=artist,
                                                     mbid=album['mbid'],
                                                     fast=True)
-    print(album_image)
     if album_image:
+        print('this workedjke')
         album['image'] = album_image
 
 

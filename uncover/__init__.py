@@ -26,11 +26,13 @@ def create_app(config_class=Config):
     from uncover.musician.routes import musician
     from uncover.explore.routes import explore
     from uncover.main.routes import main
+    from uncover.errors.handlers import errors
 
     # register all blueprints
     app.register_blueprint(personal)
     app.register_blueprint(explore)
     app.register_blueprint(main)
     app.register_blueprint(musician)
+    app.register_blueprint(errors)
 
     return app

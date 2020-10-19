@@ -2,9 +2,12 @@ import os
 
 import discogs_client
 
+from uncover import cache
+
 discogs = discogs_client.Client('uncover', user_token=os.environ.get('DISCOGS_USER_TOKEN'))
 
 
+@cache.memoize(timeout=3600)
 def get_album_discogs_id(album: str, artist: str):
     """
     :param artist: artist's name
@@ -19,6 +22,7 @@ def get_album_discogs_id(album: str, artist: str):
     return album_id
 
 
+@cache.memoize(timeout=3600)
 def discogs_get_album_image(album_discogs_id: str):
     """
     :param album_discogs_id: album's discogs id

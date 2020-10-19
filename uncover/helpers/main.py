@@ -12,7 +12,7 @@ from uncover.models import Artist, Album
 
 @utils.timeit
 @cache.memoize(timeout=360)
-def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False):
+def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False, ultrafast=False):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
     :param fast: a faster way to get the image (through Spotify first)
@@ -25,6 +25,8 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
     # -- MusicBrainz
     if fast:
         album_image = spotify.spotify_get_album_image(album_title, artist)
+    if ultrafast:
+        return album_image
     if not mbid and fast and not album_image:
         print(f'getting through musicbrainz with no mbid for {album_title}')
         mbid = musicbrainz.mb_get_album_mbid(album_title, artist)

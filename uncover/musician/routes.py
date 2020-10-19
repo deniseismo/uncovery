@@ -1,9 +1,7 @@
-import asyncio
 from flask import request, url_for, Blueprint, make_response, jsonify
 
 import uncover.helpers.utilities as utils
 from uncover.helpers.main_async import fetch_artists_top_albums_images, sql_select_artist_albums
-# from uncover.helpers.main import sql_select_artist_albums, get_artists_top_albums_images
 from uncover.helpers.utilities import display_failure_art, get_failure_images
 
 musician = Blueprint('musician', __name__)
@@ -11,7 +9,7 @@ musician = Blueprint('musician', __name__)
 
 @utils.timeit
 @musician.route("/by_artist", methods=["POST"])
-def sql_get_albums_by_artist():
+def get_albums_by_artist():
     """
     gets artist's top albums
     :return: jsonified dictionary {album_name: cover_art}
@@ -32,13 +30,11 @@ def sql_get_albums_by_artist():
         ),
             404)
     artist = artist.strip()
-    albums = None
     # get albums images
-
     albums = sql_select_artist_albums(artist, sorting)
     if not albums:
         print('this worked!')
-        albums = asyncio.run(fetch_artists_top_albums_images(artist, sorting))
+        albums = fetch_artists_top_albums_images(artist, sorting)
         # TODO: add saving data to db if it doesn't exist yet
     if not albums:
         # if the given username has no albums or the username's incorrect
