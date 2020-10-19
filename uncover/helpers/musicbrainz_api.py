@@ -5,19 +5,19 @@ from datetime import datetime
 
 import musicbrainzngs
 import requests
-import requests_cache
 
 import uncover.helpers.lastfm_api as lastfm
 import uncover.helpers.utilities as utils
-from uncover import cache
 
-requests_cache.install_cache()
+# from uncover import cache
+
+# requests_cache.install_cache()
 
 musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
 
 
 @utils.timeit
-@cache.memoize(timeout=60000)
+# @cache.memoize(timeout=60000)
 def mb_get_album_alternative_name(album_id: str):
     """
     gets the alternative name for the album (e. g. White Album for 'The Beatles')
@@ -38,7 +38,7 @@ def mb_get_album_alternative_name(album_id: str):
 
 
 @utils.timeit
-@cache.memoize(timeout=60000)
+# @cache.memoize(timeout=60000)
 def mb_get_album_release_date(album_id: str):
     """
     :param album_id: album_id from MusicBrainz
@@ -60,7 +60,7 @@ def mb_get_album_release_date(album_id: str):
 
 
 @utils.timeit
-@cache.memoize(timeout=60000)
+# @cache.memoize(timeout=60000)
 def mb_get_artist_mbid(artist_name: str):
     artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
     artists_found = musicbrainzngs.search_artists(artist_name, limit=4)
@@ -128,7 +128,7 @@ def mb_get_artist_mbid_v2(artist: str):
     return mbid
 
 
-@cache.memoize(timeout=60000)
+# @cache.memoize(timeout=60000)
 def mb_get_album_mbid(album: str, artist: str):
     """
     search for an album's mbid on MusicBrainz
@@ -222,7 +222,7 @@ def mb_get_artists_albums(artist: str, sorting="popular", limit=9):
     return sorted_albums[:limit]
 
 
-@cache.memoize(timeout=3600)
+# @cache.memoize(timeout=3600)
 def mb_get_album_image(mbid: str, size='large', fast=False):
     """
     :param fast: a faster way to get the cover image
@@ -259,3 +259,8 @@ def mb_get_album_image(mbid: str, size='large', fast=False):
         except (KeyError, IndexError):
             return None
     return image
+
+
+if __name__ == '__main__':
+    albums = mb_get_artists_albums("Exhumed")
+    print(albums)

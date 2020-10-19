@@ -7,12 +7,13 @@ import uncover.helpers.musicbrainz_api as musicbrainz
 import uncover.helpers.spotify_api as spotify
 import uncover.helpers.utilities as utils
 from uncover import cache
+from uncover.helpers.musicbrainz_api_async import mb_fetch_artists_albums
 from uncover.models import Artist, Album
 
 
 @utils.timeit
-@cache.memoize(timeout=360)
-def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False):
+@cache.memoize(timeout=3600)
+async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
     :param fast: a faster way to get the image (through Spotify first)
@@ -54,7 +55,7 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
 
 
 @utils.timeit
-def get_artists_top_albums_images(artist: str, sorting):
+async def fetch_artists_top_albums_images(artist: str, sorting):
     """
     get artist's top album images (default way), no database
     :param artist: artist's name
@@ -65,16 +66,13 @@ def get_artists_top_albums_images(artist: str, sorting):
     if correct_name:
         artist = correct_name
         print(f'the correct name is {correct_name}')
-    try:
-        # gets album titles
-        # albums = asyncio.run(mb_get_artists_albums(artist, sorting))
-        albums = musicbrainz.mb_get_artists_albums(artist, sorting)
-        print(type(albums))
-        print(albums)
-    except AttributeError:
-        return None
+
+    albums = await mb_fetch_artists_albums(artist, sorting)
+    print(f'albums found: {albums}')
+
     if not albums:
         try:
+            print('trying spotifyjke')
             albums = spotify.spotify_get_artists_albums_images(artist, sorting)
             if albums:
                 utils.log_artist_missing_from_db(artist_name=artist)
@@ -85,15 +83,11 @@ def get_artists_top_albums_images(artist: str, sorting):
             return None
     # initialize a dict to avoid KeyErrors
     album_info = {"info": artist, "albums": []}
-    for album in list(albums):
-        album_image = ultimate_album_image_finder(album_title=album['title'],
-                                                  artist=artist,
-                                                  mbid=album['mbid'],
-                                                  fast=True)
-        if album_image:
-            album['image'] = album_image
-
+    for album in albums:
+        await fetch_and_assign_images(album=album, artist=artist)
+    print(f'albums {albums}')
     for count, album in enumerate(albums):
+        print('this loop worked!')
         if 'image' in album:
             album['id'] = count
             album_info['albums'].append(album)
@@ -105,6 +99,17 @@ def get_artists_top_albums_images(artist: str, sorting):
         print(f'search through APIs was successful')
         utils.log_artist_missing_from_db(artist_name=artist)
     return album_info
+
+
+@utils.timeit
+async def fetch_and_assign_images(album, artist):
+    album_image = await ultimate_album_image_finder(album_title=album['title'],
+                                                    artist=artist,
+                                                    mbid=album['mbid'],
+                                                    fast=True)
+    print(album_image)
+    if album_image:
+        album['image'] = album_image
 
 
 def sql_select_artist_albums(artist_name: str, sorting: str):

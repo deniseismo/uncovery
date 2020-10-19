@@ -78,7 +78,7 @@ export function setPlaceholder(targetButtonID) {
     "by_lastfm_username": "last.fm username",
     "by_artist": "artist name",
     "by_spotify": "Spotify Playlist Link",
-    "explore": "music tags/genres"
+    "explore": "music tags/genres: up to three tags"
   }
   frequentElements.textField.placeholder = options[targetButtonID];
 };

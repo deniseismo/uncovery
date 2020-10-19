@@ -54,6 +54,7 @@ def timeit(method):
     return timed
 
 
+@timeit
 def get_filtered_artist_names(artist_name: str):
     if not artist_name:
         return None
@@ -69,6 +70,7 @@ def get_filtered_artist_names(artist_name: str):
     return list(filtered_names)
 
 
+@timeit
 def get_filtered_name(album_name: str):
     """
     :param album_name: an album name to filter
@@ -104,6 +106,7 @@ def remove_punctuation(name: str):
     return re.sub(pattern, '', name, flags=re.IGNORECASE)
 
 
+@timeit
 def get_filtered_names_list(album_name: str):
     """
     filters out some articles, incorrect symbols & redundant words (e.g. Deluxe Edition)

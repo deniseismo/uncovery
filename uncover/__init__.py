@@ -31,5 +31,6 @@ def create_app(config_class=Config):
     app.register_blueprint(personal)
     app.register_blueprint(explore)
     app.register_blueprint(main)
+    app.register_blueprint(musician)
 
     return app
