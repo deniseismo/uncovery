@@ -1,4 +1,3 @@
-import os
 import random
 import time
 from datetime import datetime
@@ -7,6 +6,7 @@ import aiohttp
 import asyncio
 import musicbrainzngs
 import requests
+from flask import current_app
 
 import uncover.helpers.lastfm_api_async as lastfm
 import uncover.helpers.utilities as utils
@@ -37,7 +37,7 @@ async def mb_fetch_album_release_date(album_id: str, session):
     :param album_id: album_id from MusicBrainz
     :return: album release date
     """
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"fmt": "json"}
     async with session.get(url=url, params=params, headers=headers) as response:
@@ -59,7 +59,7 @@ async def mb_fetch_album_alternative_name(album_id: str, session):
     :param album_id: album_id from MusicBrainz
     :return: alternative name for an album
     """
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"inc": "ratings", "fmt": "json"}
     async with session.get(url=url, params=params, headers=headers) as response:
@@ -88,7 +88,7 @@ async def mb_fetch_artists_albums(artist: str, sorting="popular", limit=9):
         "latest": ("release_date", True),
         "earliest": ("release_date", False)
     }
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     artist_mbid = mb_get_artist_mbid(artist)
     print(artist_mbid)
 

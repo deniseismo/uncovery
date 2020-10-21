@@ -5,6 +5,7 @@ import {handleTags} from './explore.js'
 import {hideOptions, resetPlayButtons} from './uiconfig.js'
 import {winningMessage} from './info.js'
 import {animateHighlightGuessedAlbum, animateBlockOff, animateWinningMessage} from './animation.js'
+import {uncoverModeOne, removeInfoBoxDescription, updateInfoBoxDescription, hideUncoverModeForGame} from './explore.js'
 
 
 export class Game {
@@ -200,6 +201,9 @@ function prepareGame(buttonPressed) {
   let mode = 'albums';
   if (buttonPressed.id == 'guess-artists') {
     mode = 'artists';
+  }
+  if (frequentElements.activeButtonID() === 'explore') {
+    hideUncoverModeForGame();
   }
   theGame.playMode = mode;
   hideOptions('on');

@@ -6,6 +6,7 @@ import {configureOptionsStyle, removePlayButtons, createPlayButtons,
         resetPlayButtons, createAvatarBox, removeAvatarContainer} from './uiconfig.js'
 import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar} from './animation.js'
 import {loadCoverArt, loadFailureArt} from "./coverart.js";
+import {createMusicInfoBox, removeMusicInfoBox} from "./explore.js";
 
 let controller = null;
 
@@ -29,6 +30,7 @@ export const submitInput = function(desiredMethod) {
   const signal = controller.signal;
   removePlayButtons();
   removeAvatarContainer();
+  removeMusicInfoBox();
   frequentElements.gameFrame.classList.remove('shadow-main');
   // empty html
   removeAllChildNodes(frequentElements.gameFrame);
@@ -113,7 +115,11 @@ export const submitInput = function(desiredMethod) {
             .done(() => animateAvatar(9));
           }
         );
-    }
+      } else if (desiredMethod === "explore") {
+        //
+        createMusicInfoBox();
+      }
+
 
     }, function(loaded, count, success) {
       /* animate progress bar */
@@ -126,6 +132,7 @@ export const submitInput = function(desiredMethod) {
   })
   .catch((error) => {
     // Handle the error
+    removeAllChildNodes(frequentElements.gameFrame);
     console.log(`error is ${error}`);
   });
 };

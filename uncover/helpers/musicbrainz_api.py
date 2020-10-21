@@ -1,10 +1,10 @@
-import os
 import random
 import time
 from datetime import datetime
 
 import musicbrainzngs
 import requests
+from flask import current_app
 
 import uncover.helpers.lastfm_api as lastfm
 import uncover.helpers.utilities as utils
@@ -24,7 +24,7 @@ def mb_get_album_alternative_name(album_id: str):
     :param album_id: album_id from MusicBrainz
     :return: alternative name for an album
     """
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"inc": "ratings", "fmt": "json"}
     response = requests.get(url=url, params=params, headers=headers)
@@ -44,7 +44,7 @@ def mb_get_album_release_date(album_id: str):
     :param album_id: album_id from MusicBrainz
     :return: album release date
     """
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"fmt": "json"}
     response = requests.get(url=url, params=params, headers=headers)
@@ -82,7 +82,7 @@ def mb_get_artist_mbid_backup(artist_name: str):
     :param artist_name: artist's name (e.g. MGMT, The Prodigy, etc.)
     :return: mbid (MusicBrainz ID)
     """
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/artist/"
     params = {"query": "artist:" + artist_name, "limit": "10", "fmt": "json"}
     response = requests.get(url=url, params=params, headers=headers)
@@ -136,7 +136,7 @@ def mb_get_album_mbid(album: str, artist: str):
     :param artist: artist's name (e.g. MGMT, The Prodigy, etc.)
     :return: mbid (MusicBrainz ID)
     """
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/?query=release:"
     album_query_filter = f'%20AND%20artist:{artist}%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json'
     response = requests.get(url + album + album_query_filter, headers=headers)
@@ -162,7 +162,7 @@ def mb_get_artists_albums(artist: str, sorting="popular", limit=9):
         "latest": ("release_date", True),
         "earliest": ("release_date", False)
     }
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     artist_mbid = mb_get_artist_mbid(artist)
     print(artist_mbid)
 
@@ -230,7 +230,7 @@ def mb_get_album_image(mbid: str, size='large', fast=False):
     :param size: small, etc.
     :return: an album cover location
     """
-    headers = {'User-Agent': os.environ.get('MUSIC_BRAINZ_USER_AGENT')}
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     # /release-group/{mbid}/front[-(250|500|1200)]
     if not mbid:
         return None

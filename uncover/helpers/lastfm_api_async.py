@@ -1,16 +1,15 @@
-import os
-
 import asyncio
+from flask import current_app
 
 import uncover.helpers.utilities as utils
 
 
 async def lastfm_fetch_response(payload: dict, session):
     # define headers and URL
-    headers = {'user-agent': os.environ.get('USER_AGENT')}
+    headers = {'user-agent': current_app.config['USER_AGENT']}
     url = 'http://ws.audioscrobbler.com/2.0/'
     # Add API key and format to the payload
-    payload['api_key'] = os.environ.get('API_KEY')
+    payload['api_key'] = current_app.config['API_KEY']
     payload['format'] = 'json'
     async with session.get(url, headers=headers, params=payload) as response:
         if not getattr(response, 'from_cache', False):

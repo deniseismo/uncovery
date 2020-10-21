@@ -1,10 +1,14 @@
-import os
-
 import discogs_client
+from flask import current_app
 
 from uncover import cache
 
-discogs = discogs_client.Client('uncover', user_token=os.environ.get('DISCOGS_USER_TOKEN'))
+
+def get_discogs():
+    discogs = discogs_client.Client(
+        'uncover',
+        user_token=current_app.config['DISCOGS_USER_TOKEN'])
+    return discogs
 
 
 @cache.memoize(timeout=3600)
@@ -14,6 +18,7 @@ def get_album_discogs_id(album: str, artist: str):
     :param album: album name
     :return: discogs ID for the album
     """
+    discogs = get_discogs()
     results = discogs.search(album, type='release', artist=artist)
     try:
         album_id = results[0].id
@@ -28,6 +33,7 @@ def discogs_get_album_image(album_discogs_id: str):
     :param album_discogs_id: album's discogs id
     :return:
     """
+    discogs = get_discogs()
     album_image = None
     if not album_discogs_id:
         return None

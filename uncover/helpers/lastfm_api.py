@@ -1,9 +1,9 @@
 import json
-import os
 import random
 
 import requests
 import requests_cache
+from flask import current_app
 
 import uncover.helpers.main as main
 import uncover.helpers.utilities as utils
@@ -14,10 +14,10 @@ requests_cache.install_cache()
 
 def lastfm_get_response(payload: dict):
     # define headers and URL
-    headers = {'user-agent': os.environ.get('USER_AGENT')}
+    headers = {'user-agent': current_app.config['USER_AGENT']}
     url = 'http://ws.audioscrobbler.com/2.0/'
     # Add API key and format to the payload
-    payload['api_key'] = os.environ.get('API_KEY')
+    payload['api_key'] = current_app.config['API_KEY']
     payload['format'] = 'json'
     response = requests.get(url, headers=headers, params=payload)
     return response

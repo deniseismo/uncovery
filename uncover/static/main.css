@@ -1024,3 +1024,49 @@ label.tooltipText:after {
     color: #7a911a;
   }
 }
+
+.music-info-box {
+  display: flex;
+  flex-flow: column nowrap;
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  padding: 1rem;
+  border: 1px solid #3B444B;
+  border-radius: 10px;
+  font-size: 1.25rem;
+  text-align: center;
+  overflow: hidden;
+  width: 400px;
+  align-items: center;
+}
+
+.album-info-card {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  display: none;
+}
+
+.album-name-info {
+	font-size: 2rem;
+	font-style: italic;
+	margin-bottom: 0.5rem;
+	margin-top: 0.5rem;
+	font-weight: 700;
+	background: white;
+	padding: 0.25rem 0.75rem;
+}
+
+.artist-name-info {
+	font-size: 2rem;
+	margin: 0;
+}
+
+.by {
+  margin: 0;
+}
+
+.uncoverable:hover {
+  cursor: pointer;
+}

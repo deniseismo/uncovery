@@ -4,19 +4,28 @@ from datetime import datetime
 
 import requests_cache
 import spotipy
+from flask import current_app
 from spotipy.oauth2 import SpotifyClientCredentials
-from spotipy.oauth2 import SpotifyOAuth
 
 import uncover.helpers.lastfm_api as lastfm_api
 import uncover.helpers.musicbrainz_api as musicbrainz
 import uncover.helpers.utilities as utils
 from uncover import cache
 
-scope = "user-top-read"
 
-auth_manager = SpotifyClientCredentials()
-spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+# scope = "user-top-read"
+# sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+
+# auth_manager = SpotifyClientCredentials()
+
+
+def get_spotify():
+    spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
+        client_id=current_app.config['SPOTIPY_CLIENT_ID'],
+        client_secret=current_app.config['SPOTIPY_CLIENT_SECRET']
+    ))
+    return spotify
+
 
 requests_cache.install_cache()
 
@@ -27,6 +36,7 @@ def spotify_get_users_playlist_albums(playlist_id: str):
     :param playlist_id: spotify's playlist ID or a playlist's URL
     :return: a dict {album_title: album_image_url}
     """
+    spotify = get_spotify()
     try:
         playlist_info = spotify.playlist(playlist_id)
     except spotipy.exceptions.SpotifyException:
@@ -76,6 +86,7 @@ def spotify_get_album_image(album: str, artist: str):
     :param artist: artist's name
     :return: album_image_url
     """
+    spotify = get_spotify()
     query = "album:" + album + " artist:" + artist
     try:
         album_info = spotify.search(q=query, type="album", limit=5, market='SE')
@@ -132,6 +143,7 @@ def spotify_get_artist_id(artist_name: str):
     :param artist_name: artist's name
     :return: album_image_url
     """
+    spotify = get_spotify()
     try:
         artist_info = spotify.search(q=artist_name, type="artist", limit=5, market='SE')
     except spotipy.exceptions.SpotifyException:
@@ -157,6 +169,7 @@ def spotify_get_artists_genres(artist_id: str):
     gets artist's top music genres
     :return:
     """
+    spotify = get_spotify()
     artist_info = spotify.artist(artist_id)
     if not artist_info:
         return None
@@ -176,6 +189,7 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
     :param artist: artist's name
     :return:
     """
+    spotify = get_spotify()
     ORDER = {
         "popular": ("rating", True),
         "latest": ("release_date", True),
@@ -235,8 +249,7 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
         album['id'] = count
     return album_info
 
-
-def spotify_get_users_top_albums():
-    tracks = sp.current_user_top_tracks(limit=20, offset=0, time_range='medium_term')
-    for track in tracks:
-        print(track)
+# def spotify_get_users_top_albums():
+#     tracks = sp.current_user_top_tracks(limit=20, offset=0, time_range='medium_term')
+#     for track in tracks:
+#         print(track)
