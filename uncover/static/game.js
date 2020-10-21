@@ -5,13 +5,14 @@ import {handleTags} from './explore.js'
 import {hideOptions, resetPlayButtons} from './uiconfig.js'
 import {winningMessage} from './info.js'
 import {animateHighlightGuessedAlbum, animateBlockOff, animateWinningMessage} from './animation.js'
-import {uncoverModeOne, removeInfoBoxDescription, updateInfoBoxDescription, hideUncoverModeForGame} from './explore.js'
+import {hideUncoverModeForGame, backToRealityFromTheGame} from './albuminfobox.js'
 
 
 export class Game {
   constructor(status) {
     this.isOn = status;
     this.mode = '';
+    this.uncovery = false;
   }
   get status() {
     return this.isOn;
@@ -25,6 +26,12 @@ export class Game {
   set playMode(theMode) {
     this.mode = theMode;
   }
+  set uncoveryStatus(mode) {
+    this.uncovery = mode;
+  }
+  get uncoveryStatus() {
+    return this.uncovery;
+  }
 }
 
 // a list of current albums
@@ -34,6 +41,7 @@ export class AlbumGameInfo {
     this.notGuessedAlbumsList = [];
     this.guessedAlbumsCount = 0;
     this.query = '';
+    this.type = '';
   };
   set albums(albums) {
     this.albumsList = albums;
@@ -61,6 +69,12 @@ export class AlbumGameInfo {
   }
   set currentQuery(value) {
     this.query = value;
+  }
+  get currentType() {
+    return this.type;
+  }
+  set currentType(value) {
+    this.type = value;
   }
   removeGuessedAlbum(guessedAlbumID) {
     console.log(this);
@@ -202,9 +216,7 @@ function prepareGame(buttonPressed) {
   if (buttonPressed.id == 'guess-artists') {
     mode = 'artists';
   }
-  if (frequentElements.activeButtonID() === 'explore') {
-    hideUncoverModeForGame();
-  }
+  hideUncoverModeForGame();
   theGame.playMode = mode;
   hideOptions('on');
   createScoreContainer();
@@ -247,15 +259,7 @@ export function cancelGame(buttonPressed) {
   const formContainer = document.querySelector(".form-container");
   let defaultForm = 'submit-form';
   if (frequentElements.activeButtonID() === 'explore') {
-    console.log('canceled but explore')
-    const formField = document.querySelector('.form-field');
-    formField.addEventListener("input", handleTags);
-    $('.form-field').autocomplete('enable');
     defaultForm = 'tags-form';
-    const sliderContainer = document.querySelector('.slider-container');
-    if (sliderContainer) {
-      sliderContainer.style.display = 'flex';
-    };
   } else {
     const formField = document.querySelector('.form-field');
     formField.id = 'text-field';
@@ -270,6 +274,7 @@ export function cancelGame(buttonPressed) {
   okButton.style.display = "block";
   setPlaceholder(frequentElements.activeButtonID());
   resetGame();
+  backToRealityFromTheGame();
 };
 
 // resets the game

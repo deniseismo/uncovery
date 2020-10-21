@@ -1053,8 +1053,8 @@ label.tooltipText:after {
 	font-style: italic;
 	margin-bottom: 0.5rem;
 	margin-top: 0.5rem;
-	font-weight: 700;
-	background: white;
+	font-weight: 500;
+	background: #FFDB57;
 	padding: 0.25rem 0.75rem;
 }
 
@@ -1063,8 +1063,12 @@ label.tooltipText:after {
 	margin: 0;
 }
 
-.by {
+.by, .info-box-description, .year {
   margin: 0;
+}
+
+#uncover-info {
+	margin-top: 0.5rem;
 }
 
 .uncoverable:hover {

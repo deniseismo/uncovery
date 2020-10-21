@@ -141,7 +141,10 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
     except (KeyError, IndexError, TypeError):
         return None
     album_info = {
-        "info": f"{username_correct}",
+        "info": {
+            "type": "user",
+            "query": username_correct
+        },
         "albums": list()
     }
     # if shuffle:

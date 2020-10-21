@@ -43,8 +43,13 @@ def spotify_get_users_playlist_albums(playlist_id: str):
         # Invalid playlist ID
         return None
     # initialize a dict to avoid KeyErrors
-    album_info = {"info": f"'{playlist_info['name']}' by {playlist_info['owner']['display_name']}",
-                  "albums": []}
+    album_info = {
+        "info": {
+            "type": "playlist",
+            "query": f"'{playlist_info['name']}' by {playlist_info['owner']['display_name']}"
+        },
+        "albums": []
+    }
     # initialize a set of titles used to filter duplicate titles
     list_of_titles = set()
     # iterate through tracks
@@ -127,7 +132,13 @@ def spotify_get_artist_top_albums(artist: str):
     if not album_titles:
         return None
     # initialize a dict to avoid KeyErrors
-    album_info = {"info": artist, "albums": dict()}
+    album_info = {
+        "info": {
+            "type": "artist",
+            "query": artist
+        },
+        "albums": dict()
+    }
     for album_title in album_titles:
         album_image = spotify_get_album_image(album_title, artist)
         if album_image:
@@ -207,7 +218,13 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
     albums = spotify.artist_albums(artist_id=artist_spotify_id, album_type="album", country="SE", limit=50)
     if not albums:
         return None
-    album_info = {"info": artist, "albums": []}
+    album_info = {
+        "info": {
+            "type": "artist",
+            "query": artist
+        },
+        "albums": []
+    }
     albums_list = []
     try:
         for an_album in albums['items']:

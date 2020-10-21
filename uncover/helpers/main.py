@@ -86,7 +86,13 @@ def get_artists_top_albums_images(artist: str, sorting):
         except TypeError:
             return None
     # initialize a dict to avoid KeyErrors
-    album_info = {"info": artist, "albums": []}
+    album_info = {
+        "info": {
+            "type": "artist",
+            "query": artist
+        },
+        "albums": []
+    }
     for album in list(albums):
         album_image = ultimate_album_image_finder(album_title=album['title'],
                                                   artist=artist,
@@ -137,7 +143,14 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
     album_entries = Album.query.filter_by(artist=artist).order_by(ORDER[sorting]).limit(ALBUM_LIMIT).all()
 
     # initialize the album info dict
-    album_info = {"info": artist_name, "albums": []}
+    album_info = {
+        "info":
+            {
+                "type": "artist",
+                "query": artist_name
+            },
+        "albums": []
+    }
     for count, album in enumerate(album_entries):
         an_album_dict = {
             "title": album.title,
@@ -146,6 +159,8 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
             "rating": album.rating,
             "image": 'static/cover_art_images/' + album.cover_art + ".png"
         }
+        if album.release_date:
+            an_album_dict['year'] = album.release_date
         if album.alternative_title:
             an_album_dict['names'] += [album.alternative_title]
             an_album_dict["names"] += utils.get_filtered_names_list(album.alternative_title)

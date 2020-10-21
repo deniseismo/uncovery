@@ -1,6 +1,7 @@
 import {frequentElements, removeAllChildNodes, insertAfter} from './utils.js'
 import {animateAboutItems} from "./animation.js";
 import {removePlayButtons, removeAvatarContainer} from "./uiconfig.js";
+import {removeMusicInfoBox} from "./albuminfobox.js";
 
 // renders About 'Chapter'
 export function renderAboutPage() {
@@ -8,6 +9,7 @@ export function renderAboutPage() {
   removeAllChildNodes(frequentElements.gameFrame);
   removeAvatarContainer();
   removePlayButtons();
+  removeMusicInfoBox();
   const searchBar = document.querySelector(".search-and-options-container");
   searchBar.style.display = 'none';
   // display 'vinyl' blocks

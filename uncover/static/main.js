@@ -6,7 +6,8 @@ import {configureOptionsStyle, removePlayButtons, createPlayButtons,
         resetPlayButtons, createAvatarBox, removeAvatarContainer} from './uiconfig.js'
 import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar} from './animation.js'
 import {loadCoverArt, loadFailureArt} from "./coverart.js";
-import {createMusicInfoBox, removeMusicInfoBox} from "./explore.js";
+import {createMusicInfoBox, removeMusicInfoBox} from "./albuminfobox.js";
+
 
 let controller = null;
 
@@ -31,6 +32,7 @@ export const submitInput = function(desiredMethod) {
   removePlayButtons();
   removeAvatarContainer();
   removeMusicInfoBox();
+  theGame.uncoveryStatus = false;
   frequentElements.gameFrame.classList.remove('shadow-main');
   // empty html
   removeAllChildNodes(frequentElements.gameFrame);
@@ -67,7 +69,8 @@ export const submitInput = function(desiredMethod) {
     /* storing album info in a global object */
     console.log(data);
     albumGame.albums = data['albums'];
-    albumGame.currentQuery = data['info'];
+    albumGame.currentQuery = data['info']['query'];
+    albumGame.currentType = data['info']['type'];
     console.log(albumGame);
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
@@ -78,7 +81,7 @@ export const submitInput = function(desiredMethod) {
     frequentElements.gameFrame.classList.add('loading');
     /* load/add cover art images */
     loadCoverArt(data);
-    fixInputData(desiredMethod, data['info']);
+    fixInputData(desiredMethod, data['info']['query']);
     /* add a progress bar */
     const progressBar = document.createElement("div");
     progressBar.id = "progress-bar";
@@ -104,9 +107,10 @@ export const submitInput = function(desiredMethod) {
       waves.forEach(wave => wave.classList.remove('falldown'));
       downloadInit();
       playInit();
+      createMusicInfoBox();
       if (desiredMethod === "by_lastfm_username") {
         // shows avatar if it's username method
-        const username = data['info'];
+        const username = data['info']['query'];
         fetchAvatar(username)
         .then(avatar => avatar['avatar'])
         .then(avatar => createAvatarBox(avatar, username))
@@ -115,10 +119,7 @@ export const submitInput = function(desiredMethod) {
             .done(() => animateAvatar(9));
           }
         );
-      } else if (desiredMethod === "explore") {
-        //
-        createMusicInfoBox();
-      }
+      };
 
 
     }, function(loaded, count, success) {
