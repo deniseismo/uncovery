@@ -9,18 +9,34 @@
          url('font/argestadisplay-regular-webfont.ttf') format('truetype');
 }
 
+:root {
+  --dark-color: #3b444b;
+  --bg-color: #ebecf1;
+
+}
+
 html, main {
   height: 100%;
 }
 
+
+
+
 body {
-  height: 100%;
-  background-color: #ebecf1;
+  width: 100%;
+  background-color: var(--bg-color);
  /* main background light gray color */
   font-family: 'argesta_displayregular', sans-serif;
-  color: #3b444b;
+  color: var(--dark-color);
  /* main grayish color */;
 }
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+
 /* a container for for a 'wave' svg at the bottom of the screen */
 .wave-container {
   position: absolute;
@@ -96,14 +112,95 @@ header {
   background: #3b444b;
   color: white !important;
   height: 60px;
+  width: 100%;
+  min-height: 6vh;
 }
 
 .logo-title-container {
-  margin-right: 230px;
   display: flex;
   align-items: flex-start;
-  width: 230px;
+  width: 25%;
 }
+
+.navigation-bar {
+  display: flex;
+  justify-content: space-around;
+  width: 50%;
+}
+
+.hamburger-menu {
+  display: none;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.hamburger-menu div {
+  background-color: var(--bg-color);
+  width: 25px;
+  height: 3px;
+  margin: 5px;
+  transition: all 0.3s ease-out;
+}
+
+.search-and-options-container {
+  width: 75%;
+  max-width: 600px;
+  min-width: 300px;
+  transition: width 0.3s ease-in;
+}
+
+
+.hamburger-menu-active .line-1 {
+  transform: rotate(45deg) translate(5px, 6px);
+}
+.hamburger-menu-active .line-2 {
+   opacity: 0;
+   transform: translateX(-10px);
+}
+.hamburger-menu-active .line-3 {
+  transform: rotate(-45deg) translate(5px, -6px);
+}
+
+
+@media screen and (max-width: 850px) {
+  body {
+    overflow-x: hidden;
+  }
+  .navigation-bar {
+    position: absolute;
+    right: 0;
+    height: 92vh;
+    top: 6vh;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--dark-color);
+    z-index: 55;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in;
+    width: 33%;
+    opacity: 0;
+  }
+  .method {
+    width: 100% !important;
+    opacity: hidden;
+  }
+  .hamburger-menu {
+    display: block;
+/*    position: absolute;
+    right: 0;
+    margin-right: 0.5rem;*/
+  }
+  header {
+    justify-content: space-between;
+  }
+}
+
+
+.nav-active {
+  transform: translateX(0%) !important;
+  opacity: 1 !important;
+}
+
 
 /* a default style for all the fields, forms & buttons */
 .default-field {
@@ -113,6 +210,11 @@ header {
   line-height: 1.5;
   color: #495057;
   border: 1px solid #ced4da;
+}
+
+
+#submit-container {
+  width: 100%;
 }
 
 .form-field {
@@ -316,21 +418,24 @@ it encapsulates all the content with the navigation except 'waves'
 
 /* a div for all the cover art pictures and/or other media */
 .game-frame {
-    width: 600px;
+    width: 75%;
 	height: auto;
-	margin: 0 auto;
+	margin: 0;
     flex-flow: row wrap;
     justify-content: center;
+    max-width: 600px;
 }
 
 /* a container for a search/guessing input field and an 'ok' button */
 .form-container {
-    width: 600px;
+    width: 100%;
+    display: flex;
 }
+
 
 /* an input field */
 .text-field {
-    width: 400px;
+    width: 75%;
     display: flex;
     flex: 1 0 auto;
 }
@@ -341,9 +446,11 @@ it encapsulates all the content with the navigation except 'waves'
 
 /* options */
 .select-options {
+    width: 25%;
     display: none;
     flex: 1 1 auto;
 	border-radius: 0;
+	flex-grow: 1;
 }
 
 .select-options:focus {
@@ -353,13 +460,13 @@ it encapsulates all the content with the navigation except 'waves'
 
 /* a container for an input field an options */
 .text-field-container {
+    width: 100%;
     display: flex;
     overflow: hidden;
 }
 
 .ok-btn {
     font-weight: 500;
-    float: right;
     background-color: #3b444b;
     color: #ebecf1;
     border-radius: 0;
@@ -446,6 +553,15 @@ it encapsulates all the content with the navigation except 'waves'
   width: 150px;
   height: 150px;
 }
+
+@media screen and (max-width: 850px) {
+  .game-frame {
+    width: 75%;
+    max-width: 600px;
+  }
+}
+
+
 
 .seven-albums-special-container {
   display: flex;
@@ -755,7 +871,7 @@ label.tooltipText:after {
 .slider-bar {
     margin-bottom: 40px;
     padding: 10px 0;
-    width: 600px;
+    width: 100%;
 }
 .slider-label {
   margin-bottom: 1rem;
@@ -783,7 +899,8 @@ label.tooltipText:after {
   font-size: 1.25rem;
   text-align: center;
   overflow: hidden;
-  width: 400px;
+  width: 20%;
+  transition: margin-left 0.3s ease-out;
 }
 
 .avatar-container {
@@ -799,6 +916,7 @@ label.tooltipText:after {
   opacity: 0;
   width: 200px;
   height: 200px;
+  transition: all 0.3s ease-out;
 }
 
 .username {
@@ -1037,8 +1155,9 @@ label.tooltipText:after {
   font-size: 1.25rem;
   text-align: center;
   overflow: hidden;
-  width: 400px;
+  width: 20%;
   align-items: center;
+  transition: right 0.3s ease-out;
 }
 
 .album-info-card {
@@ -1074,3 +1193,71 @@ label.tooltipText:after {
 .uncoverable:hover {
   cursor: pointer;
 }
+
+
+@media screen and (max-width: 1850px) {
+
+  .music-info-box {
+    right: 5%;
+
+  }
+
+  .music-genres-container, .avatar-container  {
+    margin-left: 5%;
+
+  }
+}
+@media screen and (max-width: 1550px) {
+
+  .music-info-box {
+    right: 0%;
+
+  }
+
+  .music-genres-container, .avatar-container {
+    margin-left: 0%;
+
+  }
+}
+
+@media screen and (max-width: 1200px) {
+
+  .music-info-box h1 {
+    font-size: 1.5rem;
+  }
+  .info-box-description, .time-span {
+    font-size: 1rem;
+  }
+  .album-name-info, .artist-name-info, .music-genre-element  {
+    font-size: 1rem;
+  }
+
+  .music-genres-container h1 {
+    font-size: 1.5rem;
+  }
+  .avatar-container {
+    width: 150px;
+    height: 150px;
+  }
+}
+@media screen and (max-width: 1000px) {
+  .music-info-box {
+    left: 0%;
+    top: 50%;
+  }
+  .splash {
+    align-items: flex-end;
+  }
+   .search-and-options-container {
+    width: 75%;
+    max-width: 600px;
+  }
+  .music-genres-container {
+    top: 25%;
+  }
+  .logo-title-container {
+    width: 40%;
+  }
+}
+
+

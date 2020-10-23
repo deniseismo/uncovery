@@ -230,3 +230,15 @@ export function animateAvatar(delay) {
     opacity: [0.5, 1],
   })
 }
+
+export function animateNavigationBar() {
+  anime({
+    targets: '.method',
+    translateX: [
+      {value: "50%", easing: 'easeOutQuad', duration: 50},
+      {value: "0%", easing: 'easeOutQuad', duration: 50}
+    ],
+    opacity: [0, 1],
+    delay: anime.stagger(110, {easing: 'easeOutQuad'}),
+  });
+};

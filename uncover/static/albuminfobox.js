@@ -118,8 +118,11 @@ export function hideUncoverModeForGame() {
 export function backToRealityFromTheGame() {
   console.log('canceled but explore')
   const formField = document.querySelector('.form-field');
-  formField.addEventListener("input", handleTags);
-  $('.form-field').autocomplete('enable');
+  const activeButton = document.querySelector('.method.active');
+  if (activeButton === 'explore') {
+    formField.addEventListener("input", handleTags);
+    $('.form-field').autocomplete('enable');
+  }
   const sliderContainer = document.querySelector('.slider-container');
   const albumItems = document.querySelectorAll('.flex-item');
   if (theGame.uncoveryStatus) {

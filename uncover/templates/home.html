@@ -20,12 +20,13 @@
 </div>
 
 <header class="shadow-main">
+
     <div class="logo-title-container">
         <img src="{{ url_for('static', filename='images/logo/turntable.png') }}" class="logo"
              alt="logo image depicting a turntable"/>
         <h1 class="uncover-title"><a class='title-link' href="{{ url_for('main.home') }}">uncovery</a></h1>
     </div>
-    <div class="navigation-bar flex-container" id="buttons-container">
+    <div class="navigation-bar" id="buttons-container">
         <input class="method btn btn-light button" type="submit" id="explore" name="submit_button"
                value="explore">
         <input class="method btn btn-light button" id="by_artist" type="submit" name="submit_button"
@@ -38,6 +39,14 @@
                value="about">
 
     </div>
+    <div class="hamburger-menu">
+        <div class="line line-1">
+        </div>
+        <div class="line line-2">
+        </div>
+        <div class="line line-3">
+        </div>
+    </div>
 </header>
 
 <div class="flex-container splash" id="splash">
@@ -45,7 +54,6 @@
         <div class="flex-container" id="submit-container">
             <form class="form-container" action="" id="submit-form" onsubmit="return false;"
                   enctype="multipart/form-data">
-                <input class="btn btn-submit ok-btn shadow-main" type="submit" value="OK">
                 <div class="text-field-container shadow-main">
                     <input type="text" class="default-field form-field text-field" id="text-field"
                            placeholder="last.fm username">
@@ -57,6 +65,7 @@
                         <option value="shuffle">Shuffle</option>
                     </select>
                 </div>
+                <input class="btn btn-submit ok-btn shadow-main" type="submit" value="OK">
             </form>
         </div>
     </div>

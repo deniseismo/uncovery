@@ -269,6 +269,7 @@ export function cancelGame(buttonPressed) {
   buttonPressed.value = 'GUESS ALBUMS';
   if (buttonPressed.classList.contains('on')) {
     buttonPressed.classList.remove('on');
+    buttonPressed.classList.remove('won');
   };
   const okButton = document.querySelector(".ok-btn");
   okButton.style.display = "block";
@@ -281,6 +282,8 @@ export function cancelGame(buttonPressed) {
 function resetGame() {
   // resets game state
   // reset a number of guessed albums
+  const input = document.querySelector('.form-field');
+  input.removeEventListener('oninput', handleGuesses);
   albumGame.albumsCount = 0;
   const successIconList = document.querySelectorAll('.success-icon');
   // remove 'check mark' icons

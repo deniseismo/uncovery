@@ -4,7 +4,7 @@ import {AlbumGameInfo, Game, playInit} from "./game.js"
 import {MusicFilter} from './musicFilter.js'
 import {configureOptionsStyle, removePlayButtons, createPlayButtons,
         resetPlayButtons, createAvatarBox, removeAvatarContainer} from './uiconfig.js'
-import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar} from './animation.js'
+import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar, animateNavigationBar} from './animation.js'
 import {loadCoverArt, loadFailureArt} from "./coverart.js";
 import {createMusicInfoBox, removeMusicInfoBox} from "./albuminfobox.js";
 
@@ -133,7 +133,6 @@ export const submitInput = function(desiredMethod) {
   })
   .catch((error) => {
     // Handle the error
-    removeAllChildNodes(frequentElements.gameFrame);
     console.log(`error is ${error}`);
   });
 };
@@ -200,6 +199,20 @@ function downloadInit() {
     });
   });
 };
+
+const navBarSlideHandler = () => {
+  const hamburgerMenu = document.querySelector('.hamburger-menu');
+  const navigationBar = document.querySelector('.navigation-bar');
+  hamburgerMenu.addEventListener("click", () => {
+    navigationBar.classList.toggle('nav-active');
+    hamburgerMenu.classList.toggle('hamburger-menu-active');
+    if (navigationBar.classList.contains('nav-active')) {
+      animateNavigationBar();
+    }
+  })
+}
+
+navBarSlideHandler();
 
 // activate buttons
 const buttonsContainer = document.querySelector('#buttons-container');
