@@ -214,6 +214,33 @@ const navBarSlideHandler = () => {
 
 navBarSlideHandler();
 
+
+const infoBlocksSlideHandler = () => {
+  const toolIcon = document.querySelector('.tools-icon');
+  toolIcon.addEventListener("click", () => {
+    console.log('clicked!');
+    const musicInfoBox = document.querySelector('.music-info-box');
+    const musicGenresContainer = document.querySelector('.music-genres-container');
+    const avatar = document.querySelector('.avatar-container');
+    toolIcon.classList.toggle('tools-active');
+    if (toolIcon.classList.contains('tools-active')) {
+        [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
+      if (item) {
+        item.classList.add('info-block-active');
+      }
+    });
+    } else {
+    [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
+      if (item) {
+        item.classList.remove('info-block-active');
+      }
+    });
+    }
+  })
+
+}
+infoBlocksSlideHandler();
+
 // activate buttons
 const buttonsContainer = document.querySelector('#buttons-container');
 // add an event listener to a buttons wrapper (event bubbling)

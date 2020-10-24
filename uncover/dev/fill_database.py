@@ -16,7 +16,7 @@ from uncover.helpers.lastfm_api import lastfm_get_response, lastfm_get_artist_co
 from uncover.helpers.main import ultimate_album_image_finder
 from uncover.helpers.musicbrainz_api import mb_get_artists_albums, mb_get_album_release_date
 from uncover.helpers.spotify_api import spotify_get_artist_id, spotify_get_artists_genres, \
-    spotify_get_artists_albums_images
+    spotify_get_artists_albums_images, spotify_get_album_id
 from uncover.helpers.utilities import timeit
 from uncover.models import Artist, Album, Tag
 
@@ -248,9 +248,27 @@ def get_all_tags():
         json.dump(tags_list, f, ensure_ascii=False, indent=4)
 
 
+def populate_spotify_album_ids():
+    all_albums = Album.query.all()
+    for album in tqdm(all_albums):
+        if album.spotify_id:
+            continue
+        artist_name = album.artist.name
+        album_name = album.title
+        spotify_id = spotify_get_album_id(album_name, artist_name)
+        if spotify_id:
+            print(f'adding {artist_name} - {album_name}: {spotify_id}')
+            album.spotify_id = spotify_id
+            db.session.commit()
+
+    db.session.commit()
+
+
 # get_all_tags()
 
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
 # database_populate()
+
+populate_spotify_album_ids()

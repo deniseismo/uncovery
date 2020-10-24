@@ -5,6 +5,7 @@ from datetime import datetime
 import requests_cache
 import spotipy
 from flask import current_app
+from fuzzywuzzy import fuzz
 from spotipy.oauth2 import SpotifyClientCredentials
 
 import uncover.helpers.lastfm_api as lastfm_api
@@ -12,11 +13,11 @@ import uncover.helpers.musicbrainz_api as musicbrainz
 import uncover.helpers.utilities as utils
 from uncover import cache
 
-
 # scope = "user-top-read"
 # sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
 # auth_manager = SpotifyClientCredentials()
+requests_cache.install_cache()
 
 
 def get_spotify():
@@ -25,9 +26,6 @@ def get_spotify():
         client_secret=current_app.config['SPOTIPY_CLIENT_SECRET']
     ))
     return spotify
-
-
-requests_cache.install_cache()
 
 
 @utils.timeit
@@ -266,7 +264,38 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
         album['id'] = count
     return album_info
 
-# def spotify_get_users_top_albums():
-#     tracks = sp.current_user_top_tracks(limit=20, offset=0, time_range='medium_term')
-#     for track in tracks:
-#         print(track)
+
+def spotify_get_album_id(album: str, artist: str):
+    """
+    search for an album's id
+    :param album: album's title
+    :param artist: artist's name
+    :return: album id
+    """
+    if not album or not artist:
+        return None
+    spotify = get_spotify()
+    query = "album:" + album + " artist:" + artist
+    try:
+        album_info = spotify.search(q=query, type="album", limit=5, market='SE')
+    except spotipy.exceptions.SpotifyException:
+        return None
+    if not album_info:
+        return None
+    try:
+        album_items = album_info['albums']['items']
+    except (KeyError, TypeError, IndexError):
+        return None
+    if not album_items:
+        return None
+    for album in album_items:
+        try:
+            artist_name = album['artists'][0]['name']
+            album_id = album['id']
+            if fuzz.ratio(artist_name, artist) > 90:
+                return album_id
+        except (KeyError, TypeError, IndexError):
+            continue
+    if not getattr(album_info, 'from_cache', False):
+        time.sleep(1)
+    return None

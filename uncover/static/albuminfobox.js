@@ -8,6 +8,7 @@ export function createMusicInfoBox() {
   musicInfoBox.classList.add('music-info-box', 'shadow-main');
   const infoText = document.createElement('h1');
   infoText.textContent = "ALBUM INFO";
+  infoText.classList.add('album-info-header');
   const uncover = document.createElement('input');
   uncover.id = 'uncover-info';
   uncover.type = 'submit';
@@ -119,8 +120,10 @@ export function backToRealityFromTheGame() {
   console.log('canceled but explore')
   const formField = document.querySelector('.form-field');
   const activeButton = document.querySelector('.method.active');
-  if (activeButton === 'explore') {
+  if (activeButton.id === 'explore') {
+    console.log('yeah boy!');
     formField.addEventListener("input", handleTags);
+    formField.id = "tag-field";
     $('.form-field').autocomplete('enable');
   }
   const sliderContainer = document.querySelector('.slider-container');

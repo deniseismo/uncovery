@@ -39,9 +39,17 @@ export function configureOptionsStyle(targetButtonID) {
 
     // change the placeholder to the correct one
     setPlaceholder(targetButtonID);
+    setCurrentPageTitle(targetButtonID);
     frequentElements.textField.value = '';
   }
 };
+
+function setCurrentPageTitle(buttonID) {
+  const theButton = document.getElementById(buttonID);
+  const title = theButton.value;
+  const currentPageTitle = document.querySelector('.current-page-title');
+  currentPageTitle.textContent = title;
+}
 
 
 function setSelectOptions(targetButtonID) {
@@ -156,3 +164,11 @@ export function removeAvatarContainer() {
     avatarContainer.remove();
   }
 }
+
+//export showToolsIcon() {
+//  const avatarContainer = document.querySelector('.avatar-container');
+//  const musicGenresContainer = document.querySelector('.music-genres-container');
+//  const musicInfoBox = document.querySelector('.music-info-box');
+//  [avatarContainer, musicGenresContainer
+//}
+//

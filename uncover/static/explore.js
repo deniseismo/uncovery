@@ -86,6 +86,7 @@ function createMusicGenresContainer() {
   musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
   selectedFilters.textContent = "FILTERS";
+  selectedFilters.classList.add('filters-header');
   const timeSpanElement = document.createElement('p');
   timeSpanElement.classList.add('time-span');
   const timeSpanBegin = document.createElement('span');
@@ -267,6 +268,7 @@ async function fetchTags(value) {
 
 // remove explore-pertaining elements
 export function cleanAfterExplore() {
+  console.log('cleaning up after explore')
   const sliderContainer = document.querySelector('.slider-container');
   const musicGenresContainer = document.querySelector('.music-genres-container');
   [sliderContainer, musicGenresContainer].forEach(container => {

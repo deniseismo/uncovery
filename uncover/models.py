@@ -29,6 +29,7 @@ class Album(db.Model):
     mb_id = db.Column(db.Integer)
     discogs_id = db.Column(db.Integer)
     release_date = db.Column(db.DateTime)
+    spotify_id = db.Column(db.String())
 
     def __repr__(self):
         return f"Album('{self.title}', '{self.cover_art}')"
