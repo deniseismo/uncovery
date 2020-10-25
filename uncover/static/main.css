@@ -16,20 +16,37 @@
 }
 
 html, main {
-  height: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+div.widget-wrapper {
+  margin-top: 0.5rem;
+  width: 100%;
+  display: none;
 }
 
 
-
-
 body {
-  width: 100%;
   background-color: var(--bg-color);
  /* main background light gray color */
   font-family: 'argesta_displayregular', sans-serif;
   color: var(--dark-color);
  /* main grayish color */;
  overflow-y: hidden;
+ overflow-x: hidden;
+ width: 100%;
+ -webkit-box-sizing: border-box;
+ -moz-box-sizing: border-box;
+ box-sizing: border-box;
+}
+
+
+.wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 img {
@@ -141,7 +158,6 @@ header {
 .hamburger-menu {
   display: none;
   cursor: pointer;
-  margin-right: 0.5rem;
 }
 
 .hamburger-menu div {
@@ -194,7 +210,7 @@ header {
   }
   .method {
     width: 100% !important;
-    opacity: hidden;
+    opacity: 0;
   }
   .hamburger-menu {
     display: block;
@@ -257,7 +273,7 @@ header {
   font-size: 1.2rem;
 }
 
-.method::hover {
+.method:hover {
   background-color: #ebecf1 !important;
 
 }
@@ -584,78 +600,6 @@ it encapsulates all the content with the navigation except 'waves'
   height: 300px;
 }
 
-
-/*@keyframes show-on-load {
-  90% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes bounce {
-  90% {
-    transform: scale(0.8);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.art-0 {
-  animation: show-on-load 0.6s .25s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .25s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-1 {
-  animation: show-on-load 0.6s .3s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .3s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-2 {
-  animation: show-on-load 0.6s .35s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .35s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-3 {
-  animation: show-on-load 0.6s .4s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .4s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-4 {
-  animation: show-on-load 0.6s .45s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .45s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-5 {
-  animation: show-on-load 0.6s .5s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .5s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-6 {
-  animation: show-on-load 0.6s .55s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .55s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-7 {
-  animation: show-on-load 0.6s .6s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .6s cubic-bezier(0,1.6,.6,1) none;
-}
-.art-8 {
-  animation: show-on-load 0.6s .65s cubic-bezier(0,1.6,.6,1) forwards,
-             bounce 0.6s .65s cubic-bezier(0,1.6,.6,1) none;
-}*/
-
-/* TODO: hover effect on cover arts */
-/* magnifies cover art on hover */
-/*.cover-art:hover {
-  transform: scale(1.35);
-  transition: transform .3s cubic-bezier(.17,.67,.49,1.53);
-  z-index: 1;
-}
-
-.cover-art.cover-big:hover {
-  transform: scale(1.15);
-}
-
-.cover-art.cover-medium:hover {
-  transform: scale(1.25);
-}*/
-
 /* failure art width & height */
 .failure-art {
   filter: drop-shadow(16px 16px 10px rgba(0,0,0,0.9));
@@ -705,12 +649,6 @@ it encapsulates all the content with the navigation except 'waves'
   margin-top: 0.45rem;
 }
 
-/*.logo:hover {
-  border: 0.5px solid #1D2225;
-  margin-right: calc(0.35rem - 2px);
-  border-radius: 50%;
-}*/
-
 .loading *,
 .loading *:before,
 .loading *:after {
@@ -743,7 +681,6 @@ it encapsulates all the content with the navigation except 'waves'
 .play-buttons-container {
   width: 600px;
 }
-
 
 .play-button {
   font-weight: 500;
@@ -839,6 +776,8 @@ label.tooltipText:after {
   opacity: 1;
   margin: 0;
 }
+
+
 
 .success-icon {
   position: absolute;
@@ -1161,7 +1100,7 @@ label.tooltipText:after {
   position: absolute;
   top: 20%;
   right: 10%;
-  padding: 1rem;
+  padding-top: 1rem;
   border: 1px solid #3B444B;
   border-radius: 10px;
   font-size: 1.25rem;
@@ -1189,6 +1128,11 @@ label.tooltipText:after {
 	padding: 0.25rem 0.75rem;
 }
 
+.info-box-description {
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+}
+
 .artist-name-info {
 	font-size: 2rem;
 	margin: 0;
@@ -1209,6 +1153,7 @@ label.tooltipText:after {
 .tools-and-menu-hidden-elements {
 	display: flex;
 	align-items: center;
+	margin-right: 1rem;
 }
 
 .tools-icon {
@@ -1243,25 +1188,19 @@ label.tooltipText:after {
 
 @media screen and (max-width: 1200px) {
 
-  .music-info-box h1 {
+  .music-info-box h1, .music-genres-container h1 {
     font-size: 1.5rem;
   }
-  .info-box-description, .time-span {
-    font-size: 1rem;
-  }
-  .album-name-info, .artist-name-info, .music-genre-element  {
+  .info-box-description, .time-span,
+  .album-name-info, .artist-name-info,
+  .music-genre-element, .year,
+  .about-text p, .username, .by  {
     font-size: 1rem;
   }
 
-  .music-genres-container h1 {
-    font-size: 1.5rem;
-  }
   .avatar-container {
     width: 150px;
     height: 150px;
-  }
-  .username {
-    font-size: 1rem;
   }
 }
 @media screen and (max-width: 1000px) {
@@ -1305,7 +1244,7 @@ label.tooltipText:after {
   .splash {
     align-items: center;
   }
-  .music-info-box, .music-genres-container, .avatar-container {
+  .music-info-box, .music-genres-container {
     width: 35%;
     transform: translateX(-100%) !important;
     opacity: 0 !important;
@@ -1314,6 +1253,10 @@ label.tooltipText:after {
   .music-info-box, .music-genres-container {
     background: var(--bg-color);
   }
+  .avatar-container {
+    transform: translateX(-100%) !important;
+    opacity: 0 !important;
+    transition: all 0.3s ease-out;
 }
 
 .info-block-active {
@@ -1323,7 +1266,73 @@ label.tooltipText:after {
 }
 
 
-@media (max-width: 575px) { ... }
+@media screen and (max-width: 599px) {
+  body {
+    width: 100vw;
+    height: 100vh;
+  }
+  .cover-art {
+    height: calc(200px * 0.75);
+    width: calc(200px * 0.75);
+  }
+  .cover-big {
+    height: calc(600px * 0.75);
+    width: calc(600px * 0.75);
+  }
+  .cover-medium {
+    height: calc(300px * 0.75);
+    width: calc(300px * 0.75);
+  }
+  .cover-small {
+    height: calc(150px * 0.75);
+    width: calc(150px * 0.75);
+  }
+  .play-buttons-container {
+    width: 100%;
+  }
 
+}
 
-@media (max-width: 991px) { ... }
+@media screen and (max-width: 449px) {
+  .cover-art {
+    height: calc(200px * 0.5625);
+    width: calc(200px * 0.5625);
+  }
+  .cover-big {
+    height: calc(600px * 0.5625);
+    width: calc(600px * 0.5625);
+  }
+  .cover-medium {
+    height: calc(300px * 0.5625);
+    width: calc(300px * 0.5625);
+  }
+  .cover-small {
+    height: calc(150px * 0.5625);
+    width: calc(150px * 0.5625);
+  }
+  .music-info-box h1, .music-genres-container h1 {
+    font-size: 1rem;
+  }
+  .info-box-description, .time-span,
+  .album-name-info, .artist-name-info,
+  .music-genre-element, .year, .about-text p, .username, .by  {
+    font-size: 0.75rem;
+  }
+  .music-info-box {
+    width: 100%;
+    top: auto;
+    bottom: 0;
+  }
+  .album-info-card {
+    flex-flow: row wrap;
+  }
+  .album-info-card p {
+    padding: 0.5rem;
+  }
+  .uncover-title {
+    font-size: 2rem;
+  }
+  .logo-title-container {
+    align-items: flex-end;
+  }
+}

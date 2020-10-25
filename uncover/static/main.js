@@ -222,7 +222,15 @@ const infoBlocksSlideHandler = () => {
     const musicInfoBox = document.querySelector('.music-info-box');
     const musicGenresContainer = document.querySelector('.music-genres-container');
     const avatar = document.querySelector('.avatar-container');
-    toolIcon.classList.toggle('tools-active');
+
+    const exist = (element) => element;
+    [musicInfoBox, musicGenresContainer, avatar].some(exist);
+    console.log([musicInfoBox, musicGenresContainer, avatar].some(exist));
+    if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
+      toolIcon.classList.toggle('tools-active');
+    } else {
+      toolIcon.classList.add('tools-active');
+    }
     if (toolIcon.classList.contains('tools-active')) {
         [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
       if (item) {
@@ -230,12 +238,12 @@ const infoBlocksSlideHandler = () => {
       }
     });
     } else {
-    [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
+      [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
       if (item) {
         item.classList.remove('info-block-active');
       }
     });
-    }
+    };
   })
 
 }

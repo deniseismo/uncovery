@@ -169,6 +169,8 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
             "rating": album.rating,
             "image": 'static/cover_art_images/' + album.cover_art + ".png"
         }
+        if album.spotify_id:
+            an_album_dict['spotify_id'] = album.spotify_id
         if album.release_date:
             an_album_dict['year'] = album.release_date.strftime("%Y")
         if album.alternative_title:

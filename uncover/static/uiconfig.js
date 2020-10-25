@@ -48,7 +48,7 @@ function setCurrentPageTitle(buttonID) {
   const theButton = document.getElementById(buttonID);
   const title = theButton.value;
   const currentPageTitle = document.querySelector('.current-page-title');
-  currentPageTitle.textContent = title;
+  currentPageTitle.textContent = `/${title}`;
 }
 
 
@@ -146,7 +146,7 @@ export function createAvatarBox(avatarURL, username) {
   }
   console.log(avatarURL);
   const avatarContainer = document.createElement('div');
-  avatarContainer.classList.add('avatar-container', 'shadow-main');
+  avatarContainer.classList.add('avatar-container', 'shadow-main', 'info-block-active');
   const userName = document.createElement('p');
   userName.classList.add('username');
   userName.textContent = username;

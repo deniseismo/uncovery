@@ -5,7 +5,7 @@ import {handleTags} from "./explore.js"
 
 export function createMusicInfoBox() {
   const musicInfoBox = document.createElement('div');
-  musicInfoBox.classList.add('music-info-box', 'shadow-main');
+  musicInfoBox.classList.add('music-info-box', 'shadow-main', 'info-block-active');
   const infoText = document.createElement('h1');
   infoText.textContent = "ALBUM INFO";
   infoText.classList.add('album-info-header');
@@ -19,10 +19,12 @@ export function createMusicInfoBox() {
   description.classList.add('info-box-description');
   description.textContent = "I ain't playing, I really need to know what these albums are!";
   const albumInfoCard = createAlbumInfoCard();
+  const spotifyWidget = createSpotifyWidget();
   musicInfoBox.appendChild(infoText);
   musicInfoBox.appendChild(description);
   musicInfoBox.appendChild(uncover);
   musicInfoBox.appendChild(albumInfoCard);
+  musicInfoBox.appendChild(spotifyWidget);
   document.querySelector('main').appendChild(musicInfoBox);
   animateMusicGenresContainer(musicInfoBox);
   animatePlayButtons(uncover, 1);
@@ -78,7 +80,34 @@ function uncoverAlbumInfo(album) {
   if (album.year) {
     year.textContent = `(${album.year})`;
   };
+  if (album.spotify_id) {
+    console.log('spotify! ura!')
+    const spotifyWidget = document.querySelector('.spotify-widget');
+    spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
+    const widgetWrapper = document.querySelector('.widget-wrapper');
+    widgetWrapper.style.display = 'flex';
+  } else {
+    const widgetWrapper = document.querySelector('.widget-wrapper');
+    widgetWrapper.style.display = 'none';
+  }
 }
+
+function createSpotifyWidget() {
+  const iFrame = document.createElement('iframe');
+  iFrame.classList.add('spotify-widget');
+  iFrame.src = '';
+  iFrame.width = '100%';
+  iFrame.height = '300px';
+  iFrame.frameborder = '0';
+  iFrame.allowtransparency = 'true';
+  iFrame.allow = "encrypted-media";
+  const widgetWrapper = document.createElement('div');
+  widgetWrapper.classList.add('widget-wrapper');
+  widgetWrapper.style.display = 'none';
+  widgetWrapper.appendChild(iFrame);
+  return widgetWrapper;
+}
+
 
 
 function createAlbumInfoCard() {

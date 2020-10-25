@@ -13,7 +13,7 @@ async def lastfm_fetch_response(payload: dict, session):
     payload['format'] = 'json'
     async with session.get(url, headers=headers, params=payload) as response:
         if not getattr(response, 'from_cache', False):
-            asyncio.sleep(0.2)
+            await asyncio.sleep(0.2)
         return await response.json()
 
 

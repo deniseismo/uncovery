@@ -102,6 +102,7 @@ def database_populate():
             for album in tqdm(artist_albums):
                 title = album['title']
                 rating = album['rating']
+                spotify_id = spotify_get_album_id(title, artist_name)
                 try:
                     mb_id = album['mbid']
                 except (KeyError, TypeError):
@@ -126,7 +127,8 @@ def database_populate():
                                         rating=rating,
                                         mb_id=mb_id,
                                         cover_art=cover_art)
-
+                    if spotify_id:
+                        album_entry.spotify_id = spotify_id
                     if mb_id:
                         album_entry.mb_id = mb_id
                     if alternative_title:
@@ -252,6 +254,7 @@ def populate_spotify_album_ids():
     all_albums = Album.query.all()
     for album in tqdm(all_albums):
         if album.spotify_id:
+            print(f'{album.title} already has spotify id, skipping')
             continue
         artist_name = album.artist.name
         album_name = album.title

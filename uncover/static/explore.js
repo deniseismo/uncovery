@@ -83,7 +83,7 @@ export async function handleTags(e) {
 // a container with music tags/genres filters chosen
 function createMusicGenresContainer() {
   const musicGenresContainer = document.createElement('div');
-  musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
+  musicGenresContainer.classList.add('music-genres-container', 'shadow-main', 'info-block-active');
   const selectedFilters = document.createElement('h1');
   selectedFilters.textContent = "FILTERS";
   selectedFilters.classList.add('filters-header');

@@ -54,6 +54,8 @@ def explore_filtered_albums(genres: list, time_span: list):
             "artist_name": album_entry.artist.name,
             "artist_names": [album_entry.artist.name] + get_filtered_artist_names(album_entry.artist.name),
         }
+        if album_entry.spotify_id:
+            an_album_dict['spotify_id'] = album_entry.spotify_id
         if album_entry.release_date:
             an_album_dict['year'] = album_entry.release_date.strftime("%Y")
         # remove duplicates

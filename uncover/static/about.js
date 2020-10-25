@@ -44,8 +44,8 @@ function addAboutText() {
   ifYouLike.classList.add('if-you-like');
 
   createdBy.textContent = "Created by Denis Kostarev";
-  thanks.textContent = "Thanks to The MetaBrainz Foundation, Discogs, and Last.fm";
-  forWhat.textContent = "for their immense databases.";
+  thanks.textContent = "A huge thanks goes out to The MetaBrainz Foundation, Last.fm, Discogs, and Spotify";
+  forWhat.textContent = "for their incredible resources.";
   ifYouLike.textContent = "If you like this project, consider supporting it";
 
   aboutText.appendChild(createdBy);
