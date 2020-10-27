@@ -251,7 +251,7 @@ def get_all_tags():
 
 
 def populate_spotify_album_ids():
-    all_albums = Album.query.all()
+    all_albums = Album.query.filter(Album.id > 16131).all()
     for album in tqdm(all_albums):
         if album.spotify_id:
             print(f'{album.title} already has spotify id, skipping')

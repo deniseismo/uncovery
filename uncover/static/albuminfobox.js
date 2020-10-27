@@ -5,7 +5,7 @@ import {handleTags} from "./explore.js"
 
 export function createMusicInfoBox() {
   const musicInfoBox = document.createElement('div');
-  musicInfoBox.classList.add('music-info-box', 'shadow-main', 'info-block-active');
+  musicInfoBox.classList.add('music-info-box', 'shadow-main');
   const infoText = document.createElement('h1');
   infoText.textContent = "ALBUM INFO";
   infoText.classList.add('album-info-header');
@@ -86,9 +86,13 @@ function uncoverAlbumInfo(album) {
     spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
     const widgetWrapper = document.querySelector('.widget-wrapper');
     widgetWrapper.style.display = 'flex';
+    const musicInfoBox = document.querySelector('.music-info-box');
+    musicInfoBox.classList.add('no-bottom-padding');
   } else {
     const widgetWrapper = document.querySelector('.widget-wrapper');
     widgetWrapper.style.display = 'none';
+    const musicInfoBox = document.querySelector('.music-info-box');
+    musicInfoBox.classList.remove('no-bottom-padding');
   }
 }
 
@@ -138,6 +142,10 @@ export function hideUncoverModeForGame() {
   albumInfoCard.style.display = 'none';
   const uncoverButton = document.getElementById("uncover-info");
   uncoverButton.style.display = 'none';
+  const widgetWrapper = document.querySelector('.widget-wrapper');
+  widgetWrapper.style.display = 'none';
+  const musicInfoBox = document.querySelector('.music-info-box');
+  musicInfoBox.classList.remove('no-bottom-padding');
   updateInfoBoxDescription("Game is on. No peeking!");
   const albumItems = document.querySelectorAll('.flex-item');
   albumItems.forEach(item => {

@@ -17,7 +17,7 @@
 
 html, main {
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 div.widget-wrapper {
@@ -33,7 +33,6 @@ body {
   font-family: 'argesta_displayregular', sans-serif;
   color: var(--dark-color);
  /* main grayish color */;
- overflow-y: hidden;
  overflow-x: hidden;
  width: 100%;
  -webkit-box-sizing: border-box;
@@ -43,21 +42,15 @@ body {
 
 
 .wrapper {
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-img {
-  max-width: 100%;
-  display: block;
-}
-
-
 /* a container for for a 'wave' svg at the bottom of the screen */
 .wave-container {
-  position: absolute;
+  position: fixed;
   bottom: 0%;
   width: 100%;
   z-index: -500;
@@ -132,6 +125,9 @@ header {
   height: 60px;
   width: 100%;
   min-height: 6vh;
+  position: sticky;
+  top: 0;
+  z-index: 999;
 }
 
 .logo-title-container {
@@ -867,7 +863,6 @@ label.tooltipText:after {
   opacity: 0;
   width: 200px;
   height: 200px;
-  transition: margin-left 0.3s ease-out;
 }
 
 .username {
@@ -924,8 +919,8 @@ label.tooltipText:after {
 
 .about-item::before{
     content: '';
-    width: 150px;
-    height: 150px;
+    width: 75%;
+    height: 75%;
     border-radius: 100%;
     position: absolute;
     background-color: #000;
@@ -936,8 +931,8 @@ label.tooltipText:after {
 
 .about-item::after{
     content: '';
-    width: 5px;
-    height: 5px;
+    width: 2.5%;
+    height: 2.5%;
     border-radius: 100%;
     position: absolute;
     background-color: #eee;
@@ -1101,6 +1096,7 @@ label.tooltipText:after {
   top: 20%;
   right: 10%;
   padding-top: 1rem;
+  padding-bottom: 1rem;
   border: 1px solid #3B444B;
   border-radius: 10px;
   font-size: 1.25rem;
@@ -1109,6 +1105,10 @@ label.tooltipText:after {
   width: 20%;
   align-items: center;
   transition: right 0.3s ease-out, width 0.3s ease-out;
+}
+
+.no-bottom-padding {
+  padding-bottom: 0;
 }
 
 .album-info-card {
@@ -1250,6 +1250,22 @@ label.tooltipText:after {
     opacity: 0 !important;
     transition: all 0.3s ease-out;
   }
+  .music-info-box {
+    width: 100%;
+    top: auto;
+    bottom: 0;
+  }
+  .album-info-card p {
+    margin-right: 0.25rem !important;
+  }
+  .album-info-card {
+    flex-flow: row !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+  .spotify-widget {
+    height: 80px !important;
+  }
   .music-info-box, .music-genres-container {
     background: var(--bg-color);
   }
@@ -1257,6 +1273,29 @@ label.tooltipText:after {
     transform: translateX(-100%) !important;
     opacity: 0 !important;
     transition: all 0.3s ease-out;
+  }
+  .lcd-i-heard {
+    font-size: 2.5rem !important;
+    margin-left: 0% !important;
+    white-space: nowrap;
+  }
+  .lcd-you-have {
+    font-size: 3rem !important;
+    margin-left: 5% !important;
+  }
+  .lcd-a-compilation {
+    font-size: 1.5rem !important;
+  }
+  .lcd-every-good-song {
+    font-size: 3rem !important;
+  }
+  .lcd-ever {
+    font-size: 8rem !important;
+    margin-top: 3rem !important;
+  }
+  .lcd-done, .lcd-by-anybody {
+    font-size: 2.5rem !important;
+  }
 }
 
 .info-block-active {
@@ -1290,7 +1329,21 @@ label.tooltipText:after {
   .play-buttons-container {
     width: 100%;
   }
-
+  .about-item {
+    width: 150px;
+    height: 150px;
+  }
+  .thanks {
+    top: 20% !important;
+    left: 5% !important;
+  }
+  .if-you-like  {
+    left: 0% !important;
+    top: 40% !important;
+  }
+  .for-what {
+    top: 30% !important;
+  }
 }
 
 @media screen and (max-width: 449px) {
@@ -1334,5 +1387,9 @@ label.tooltipText:after {
   }
   .logo-title-container {
     align-items: flex-end;
+  }
+  .about-item {
+    width: calc(150px * 0.75);
+    height: calc(150px * 0.75);
   }
 }

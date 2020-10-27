@@ -146,7 +146,7 @@ export function createAvatarBox(avatarURL, username) {
   }
   console.log(avatarURL);
   const avatarContainer = document.createElement('div');
-  avatarContainer.classList.add('avatar-container', 'shadow-main', 'info-block-active');
+  avatarContainer.classList.add('avatar-container', 'shadow-main');
   const userName = document.createElement('p');
   userName.classList.add('username');
   userName.textContent = username;
@@ -155,7 +155,7 @@ export function createAvatarBox(avatarURL, username) {
   avatarImage.src = avatarURL;
   avatarContainer.appendChild(userName);
   avatarContainer.appendChild(avatarImage);
-  document.querySelector('main').appendChild(avatarContainer);
+  document.querySelector('.wrapper').appendChild(avatarContainer);
 }
 
 export function removeAvatarContainer() {

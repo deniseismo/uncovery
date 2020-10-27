@@ -115,8 +115,13 @@ export const submitInput = function(desiredMethod) {
         .then(avatar => avatar['avatar'])
         .then(avatar => createAvatarBox(avatar, username))
         .then(() => {
-          $('.avatar-container').waitForImages()
-            .done(() => animateAvatar(9));
+          $('.wrapper')
+          .waitForImages()
+          .done(() => {
+          animateAvatar(9);
+//          document.querySelector('.avatar-container')
+//            .classList.add('info-block-active');
+          });
           }
         );
       };

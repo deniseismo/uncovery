@@ -13,7 +13,7 @@ from uncover.models import Artist, Album
 
 
 @utils.timeit
-async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False):
+async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False, ultrafast=False):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
     :param fast: a faster way to get the image (through Spotify first)
@@ -26,6 +26,8 @@ async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, 
     # -- MusicBrainz
     if fast:
         album_image = spotify.spotify_get_album_image(album_title, artist)
+    if ultrafast:
+        return album_image
     if not mbid and fast and not album_image:
         print(f'getting through musicbrainz with no mbid for {album_title}')
         mbid = musicbrainz.mb_get_album_mbid(album_title, artist)
@@ -167,7 +169,9 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
             "names": [album.title.lower()] + utils.get_filtered_names_list(album.title),
             "id": count,
             "rating": album.rating,
-            "image": 'static/cover_art_images/' + album.cover_art + ".png"
+            "image": 'static/optimized_cover_art_images/' + album.cover_art + ".jpg",
+            "image_small": 'static/optimized_cover_art_images/' + album.cover_art + "-size200.jpg",
+            "image_medium": 'static/optimized_cover_art_images/' + album.cover_art + "-size300.jpg"
         }
         if album.spotify_id:
             an_album_dict['spotify_id'] = album.spotify_id
@@ -212,10 +216,10 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
             album_found = album.cover_art
         if current_ratio > 98:
             # found perfect match, return immediately
-            return 'static/cover_art_images/' + album.cover_art + ".png"
+            return album.cover_art
         elif current_ratio > ratio_threshold:
             ratio_threshold = current_ratio
             album_found = album.cover_art
     if not album_found:
         return None
-    return 'static/cover_art_images/' + album_found + ".png"
+    return album_found

@@ -50,7 +50,9 @@ def explore_filtered_albums(genres: list, time_span: list):
             "id": counter,
             "title": album_entry.title,
             "names": [album_entry.title.lower()] + get_filtered_names_list(album_name),
-            "image": 'static/cover_art_images/' + album_entry.cover_art + ".png",
+            "image": 'static/optimized_cover_art_images/' + album_entry.cover_art + ".jpg",
+            "image_small": 'static/optimized_cover_art_images/' + album_entry.cover_art + "-size200.jpg",
+            "image_medium": 'static/optimized_cover_art_images/' + album_entry.cover_art + "-size300.jpg",
             "artist_name": album_entry.artist.name,
             "artist_names": [album_entry.artist.name] + get_filtered_artist_names(album_entry.artist.name),
         }

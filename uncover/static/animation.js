@@ -114,8 +114,8 @@ export function animateWinningMessage() {
       {value: 1, easing: 'linear'}
     ],
     scale: [
-      {value: 1.5, easing: 'easeOutExpo'},
-      {value: 2, delay: 500},
+      {value: 0.8, easing: 'easeOutExpo'},
+      {value: 1.5, delay: 500},
       {value: 1, duration: 500}
     ],
     fontSize: ['0.1rem', '2rem'],

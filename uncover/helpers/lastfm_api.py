@@ -6,6 +6,7 @@ import requests_cache
 from flask import current_app
 
 import uncover.helpers.main as main
+import uncover.helpers.main_async as main_async
 import uncover.helpers.utilities as utils
 from uncover import cache
 
@@ -155,6 +156,7 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
         a_set_of_titles = set()
         for album in albums_found:
             # gets the correct artist's name
+            resizable = True
             artist_name = album['artist']['name']
             artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
             if artist_correct_name:
@@ -164,13 +166,14 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
             album_correct_name = utils.get_filtered_name(album_name)
 
             # try getting the album image through database
-            album_image = main.sql_find_specific_album(artist_name, album_name)
+            album_image = main_async.sql_find_specific_album(artist_name, album_name)
             if not album_image:
                 print(f'second sql attempt for {album_name}')
                 # second attempt in case the album name was badly written
-                album_image = main.sql_find_specific_album(artist_name, album_correct_name)
+                album_image = main_async.sql_find_specific_album(artist_name, album_correct_name)
             # try getting through the ultimate image finder function if database doesn't have the image
             if not album_image:
+                resizable = False
                 album_image = main.ultimate_album_image_finder(album_title=album_name,
                                                                artist=artist_name,
                                                                fast=True,
@@ -186,10 +189,15 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
                 an_album_dict = {
                     "title": album_name,
                     "names": [album_name.lower()] + utils.get_filtered_names_list(album_name),
-                    "image": album_image,
                     "artist_name": artist_name,
                     "artist_names": [artist_name] + utils.get_filtered_artist_names(artist_name)
                 }
+                if resizable:
+                    an_album_dict['image_small'] = 'static/optimized_cover_art_images/' + album_image + "-size200.jpg"
+                    an_album_dict['image_medium'] = 'static/optimized_cover_art_images/' + album_image + "-size300.jpg"
+                    an_album_dict['image'] = 'static/optimized_cover_art_images/' + album_image + ".jpg"
+                else:
+                    an_album_dict['image'] = album_image
                 an_album_dict['artist_names'] = list(set(an_album_dict["artist_names"]))
                 an_album_dict['names'] = list(set(an_album_dict['names']))
                 # appends an album dict with all the info to the list

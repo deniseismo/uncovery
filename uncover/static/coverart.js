@@ -11,7 +11,7 @@ export function loadCoverArt(data) {
     const coverArt = document.createElement("img");
     coverArt.classList.add(`art-${id}`);
     coverArt.classList.add('cover-art');
-    coverArt.src = `${imageURL}`;
+//    coverArt.src = `${imageURL}`;
     coverArt.alt = "album cover art";
     const successIcon = document.createElement('img');
     successIcon.id = `success-${id}`;
@@ -25,35 +25,81 @@ export function loadCoverArt(data) {
     flexItem.appendChild(successIcon);
     frequentElements.gameFrame.appendChild(flexItem);
   }
-  resizeCoverArtImages(length);
+  resizeCoverArtImages(data, length);
 };
 
-function resizeCoverArtImages(amountOfAlbums) {
+function resizeCoverArtImages(data, amountOfAlbums) {
+  const allCoverArtElements = document.querySelectorAll('.cover-art');
   console.log(amountOfAlbums);
   switch (amountOfAlbums) {
+    case 3:
+    case 6:
+    case 9:
+      for (let i = 0; i < allCoverArtElements.length; i++) {
+        let imageURL = data['albums'][i]['image'];
+        if (data['albums'][i].hasOwnProperty('image_small')) {
+          imageURL = data['albums'][i]['image_small'];
+        }
+        allCoverArtElements[i].src = `${imageURL}`;
+      }
+      break;
     case 1:
-      const albumImage = document.querySelector(".cover-art");
-      albumImage.classList.add('cover-big');
+      allCoverArtElements[0].classList.add('cover-big');
+      const imageURL = data['albums'][0]['image'];
+      allCoverArtElements[0].src = `${imageURL}`;
       break;
     case 2:
     case 4:
-      const albumImagesList = document.querySelectorAll(".cover-art");
-      albumImagesList.forEach((image) => image.classList.add('cover-medium'));
+      for (let i = 0; i < allCoverArtElements.length; i++) {
+        let imageURL = data['albums'][i]['image'];
+        if (data['albums'][i].hasOwnProperty('image_medium')) {
+          imageURL = data['albums'][i]['image_medium'];
+        }
+        allCoverArtElements[i].classList.add('cover-medium');
+        allCoverArtElements[i].src = `${imageURL}`;
+      }
       break;
     case 5:
     case 8:
-      console.log(document.querySelector('.art-0'), document.querySelector('.art-1'));
       [document.querySelector(".art-0"), document.querySelector(".art-1")]
-        .forEach((image) => image.classList.add('cover-medium'));
+        .forEach((image, i) => {
+          let imageURL = data['albums'][i]['image'];
+          if (data['albums'][i].hasOwnProperty('image_medium')) {
+            imageURL = data['albums'][i]['image_medium'];
+          }
+          image.classList.add('cover-medium');
+          image.src = `${imageURL}`;
+        });
+      for (let i = 2; i < allCoverArtElements.length; i++) {
+        let imageURL = data['albums'][i]['image'];
+          if (data['albums'][i].hasOwnProperty('image_small')) {
+            imageURL = data['albums'][i]['image_small'];
+          }
+          allCoverArtElements[i].src = `${imageURL}`;
+      }
       break;
     case 7:
       [document.querySelector(".art-0"), document.querySelector(".art-1"),
       document.querySelector(".art-2")]
-        .forEach((image) => image.classList.add('cover-medium'));
+        .forEach((image, i) => {
+          let imageURL = data['albums'][i]['image'];
+          if (data['albums'][i].hasOwnProperty('image_medium')) {
+            imageURL = data['albums'][i]['image_medium'];
+          }
+          image.classList.add('cover-medium');
+          image.src = `${imageURL}`;
+        });
 
       [document.querySelector(".art-3"), document.querySelector(".art-4"),
       document.querySelector(".art-5"), document.querySelector(".art-6")]
-        .forEach((image) => image.classList.add('cover-small'));
+        .forEach((image, i) => {
+          image.classList.add('cover-small');
+          let imageURL = data['albums'][i + 3]['image'];
+          if (data['albums'][i + 3].hasOwnProperty('image_small')) {
+            imageURL = data['albums'][i + 3]['image_small'];
+          }
+          image.src = `${imageURL}`;
+        });
       const referenceNode = document.querySelector('#item-2');
       const specialContainer = document.createElement('div');
       specialContainer.classList.add('seven-albums-special-container');
