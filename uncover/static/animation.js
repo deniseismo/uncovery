@@ -242,3 +242,16 @@ export function animateNavigationBar() {
     delay: anime.stagger(110, {easing: 'easeOutQuad'}),
   });
 };
+
+
+export function animateSpotifyWidget() {
+  anime({
+    targets: '.widget-wrapper',
+    translateY: [
+      {value: "50%", easing: 'easeOutQuad', duration: 50},
+      {value: "0%", easing: 'easeOutQuad', duration: 50}
+    ],
+    opacity: [0, 1]
+  });
+
+}

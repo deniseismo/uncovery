@@ -108,7 +108,7 @@ function createMusicGenresContainer() {
   addBlob(musicGenresContainer, 3);
   musicGenresContainer.appendChild(selectedFilters);
   musicGenresContainer.appendChild(timeSpanElement);
-  document.querySelector('main').appendChild(musicGenresContainer);
+  document.querySelector('.wrapper').appendChild(musicGenresContainer);
   animateBlob();
   animateMusicGenresContainer(musicGenresContainer);
   // display all the tags already chosen/left from before

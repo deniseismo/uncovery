@@ -1,5 +1,5 @@
 import {theGame, albumGame} from "./main.js"
-import {animateMusicGenresContainer, animatePlayButtons} from './animation.js'
+import {animateMusicGenresContainer, animatePlayButtons, animateSpotifyWidget} from './animation.js'
 import {handleTags} from "./explore.js"
 
 
@@ -25,7 +25,7 @@ export function createMusicInfoBox() {
   musicInfoBox.appendChild(uncover);
   musicInfoBox.appendChild(albumInfoCard);
   musicInfoBox.appendChild(spotifyWidget);
-  document.querySelector('main').appendChild(musicInfoBox);
+  document.querySelector('.wrapper').appendChild(musicInfoBox);
   animateMusicGenresContainer(musicInfoBox);
   animatePlayButtons(uncover, 1);
 }
@@ -84,8 +84,10 @@ function uncoverAlbumInfo(album) {
     console.log('spotify! ura!')
     const spotifyWidget = document.querySelector('.spotify-widget');
     spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
-    const widgetWrapper = document.querySelector('.widget-wrapper');
-    widgetWrapper.style.display = 'flex';
+    spotifyWidget.onload = showSpotifyOnLoad;
+    spotifyWidget.onerror = function() {
+      console.log("something's wrong with the iframe");
+    };
     const musicInfoBox = document.querySelector('.music-info-box');
     musicInfoBox.classList.add('no-bottom-padding');
   } else {
@@ -112,6 +114,13 @@ function createSpotifyWidget() {
   return widgetWrapper;
 }
 
+
+function showSpotifyOnLoad() {
+  console.log("iframe загрузился");
+  const widgetWrapper = document.querySelector('.widget-wrapper');
+    widgetWrapper.style.display = 'flex';
+  animateSpotifyWidget();
+}
 
 
 function createAlbumInfoCard() {
