@@ -91,6 +91,8 @@ function uncoverAlbumInfo(album) {
     const musicInfoBox = document.querySelector('.music-info-box');
     musicInfoBox.classList.add('no-bottom-padding');
   } else {
+    const spotifyWidget = document.querySelector('.spotify-widget');
+    spotifyWidget.classList.remove('spotify-active');
     const widgetWrapper = document.querySelector('.widget-wrapper');
     widgetWrapper.style.display = 'none';
     const musicInfoBox = document.querySelector('.music-info-box');
@@ -116,10 +118,16 @@ function createSpotifyWidget() {
 
 
 function showSpotifyOnLoad() {
-  console.log("iframe загрузился");
+  const spotifyWidget = document.querySelector('.spotify-widget');
+  console.log(spotifyWidget)
+  console.log(spotifyWidget.classList)
+  if (!(spotifyWidget.classList.contains('spotify-active'))) {
+    animateSpotifyWidget();
+    spotifyWidget.classList.add('spotify-active');
+  }
   const widgetWrapper = document.querySelector('.widget-wrapper');
-    widgetWrapper.style.display = 'flex';
-  animateSpotifyWidget();
+  // TODO: show animation only no iframe was present
+  widgetWrapper.style.display = 'flex';
 }
 
 

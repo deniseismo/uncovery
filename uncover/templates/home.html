@@ -55,7 +55,16 @@
                 </div>
             </div>
         </div>
-
+        {% if logged_in %}
+        <div class="spotify-login-container">
+            <p class="spotify-login spotify-logged-in">LOGGED IN</p>
+        </div>
+        {% else %}
+        <div class="spotify-login-container">
+            <a href="{{ url_for('spotify.spotify_login') }}"><p class="spotify-login spotify-logged-out">LOG IN WITH
+                SPOTIFY</p></a>
+        </div>
+        {% endif %}
     </header>
 
     <div class="flex-container splash" id="splash">
