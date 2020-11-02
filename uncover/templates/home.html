@@ -30,22 +30,24 @@
         <div class="navigation-bar" id="buttons-container">
             <input class="method btn btn-light button" type="submit" id="explore" name="submit_button"
                    value="explore">
-            <input class="method btn btn-light button" id="by_artist" type="submit" name="submit_button"
-                   value="artist">
-            <input class="method btn btn-light button active" id="by_lastfm_username" type="submit" name="submit_button"
+            <input class="method btn btn-light button" id="by_lastfm_username" type="submit" name="submit_button"
                    value="last.fm">
+            <input class="method btn btn-light button active" id="by_artist" type="submit" name="submit_button"
+                   value="artist">
             <input class="method btn btn-light button" type="submit" id="by_spotify" name="submit_button"
                    value="spotify">
             <input class="method btn btn-light button" type="submit" id="about" name="submit_button"
                    value="about">
 
         </div>
-        <div class="current-page-header">
-            <p class="current-page-title">/last.fm</p>
-        </div>
+
         <div class="tools-and-menu-hidden-elements">
+            <div class="current-page-header">
+                <p class="current-page-title">/artist</p>
+            </div>
             <img class="tools-icon" src="{{ url_for('static', filename='images/gear.svg') }}"
                  alt="tools (options) icon">
+
             <div class="hamburger-menu">
                 <div class="line line-1">
                 </div>
@@ -54,17 +56,30 @@
                 <div class="line line-3">
                 </div>
             </div>
+            <div class="spotify-login-container">
+                {% if logged_in %}
+                {% if user_info %}
+                <div class="spotify-avatar">
+                    <img class="spotify-avatar-image" src="{{ user_info.user_image }}"/>
+                    <div class="dropdown-content shadow-main">
+                        <p class="spotify-username">{{ user_info.username }}</p>
+                        <a href="{{ url_for('spotify.spotify_logout') }}">
+                            <p class="spotify-login spotify-logged-in">LOG OUT</p>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('spotify.spotify_logout') }}">
+                    <p class="spotify-login spotify-logged-in">LOG OUT</p>
+                </a>
+                {% endif %}
+                {% else %}
+                <a href="{{ url_for('spotify.spotify_login') }}">
+                    <p class="spotify-login spotify-logged-out">LOG IN WITH SPOTIFY</p>
+                </a>
+                {% endif %}
+            </div>
         </div>
-        {% if logged_in %}
-        <div class="spotify-login-container">
-            <p class="spotify-login spotify-logged-in">LOGGED IN</p>
-        </div>
-        {% else %}
-        <div class="spotify-login-container">
-            <a href="{{ url_for('spotify.spotify_login') }}"><p class="spotify-login spotify-logged-out">LOG IN WITH
-                SPOTIFY</p></a>
-        </div>
-        {% endif %}
     </header>
 
     <div class="flex-container splash" id="splash">
@@ -74,13 +89,12 @@
                       enctype="multipart/form-data">
                     <div class="text-field-container shadow-main">
                         <input type="text" class="default-field form-field text-field" id="text-field"
-                               placeholder="last.fm username">
+                               placeholder="artist name">
                         <select class="custom-select default-field select-options">
-                            <option value="7day">7 days</option>
-                            <option value="3month">3 months</option>
-                            <option value="12month">1 year</option>
-                            <option value="overall" selected>All-time</option>
+                            <option value="popular" selected>Popular</option>
                             <option value="shuffle">Shuffle</option>
+                            <option value="latest">Latest</option>
+                            <option value="earliest">Earliest</option>
                         </select>
                     </div>
                     <input class="btn btn-submit ok-btn shadow-main" type="submit" value="OK">

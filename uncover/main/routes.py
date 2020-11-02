@@ -1,7 +1,7 @@
 from flask import render_template, request, Blueprint, url_for, jsonify
 
 from uncover.helpers.collage_creator import save_collage
-from uncover.spotify.routes import check_spotify
+from uncover.spotify.routes import check_spotify, get_spotify_user_info
 
 main = Blueprint('main', __name__)
 
@@ -13,10 +13,12 @@ def home():
     renders home page
     """
     logged_in = False
+    user_info = None
     user, token = check_spotify()
     if user and token:
         logged_in = True
-    return render_template("home.html", logged_in=logged_in)
+        user_info = get_spotify_user_info(token)
+    return render_template("home.html", logged_in=logged_in, user_info=user_info)
 
 
 @main.route("/save_collage", methods=["POST"])

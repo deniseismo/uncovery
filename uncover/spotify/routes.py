@@ -1,3 +1,4 @@
+import pickle
 import random
 
 import tekore as tk
@@ -5,6 +6,8 @@ from flask import current_app
 from flask import request, url_for, Blueprint, redirect, session
 
 import uncover.helpers.utilities as utils
+from uncover import db, cache
+from uncover.models import User
 
 spotify = Blueprint('spotify', __name__)
 
@@ -14,16 +17,16 @@ auths = {}  # Ongoing authorisations: state -> UserAuth
 users = {}  # User tokens: state -> token (use state as a user ID)
 
 
-def get_spotify_oauth():
-    scope = "user-library-read user-read-private user-top-read"
-    # spotify_oauth = oauth2.SpotifyOAuth(
-    #     client_id=current_app.config['SPOTIPY_CLIENT_ID'],
-    #     client_secret=current_app.config['SPOTIPY_CLIENT_SECRET'],
-    #     redirect_uri=current_app.config['SPOTIPY_REDIRECT_URI'],
-    #     scope=scope
-    # )
-    auth_url = f'{"https://accounts.spotify.com"}/authorize?client_id={current_app.config["SPOTIPY_CLIENT_ID"]}&client_secret={current_app.config["SPOTIPY_CLIENT_SECRET"]}&response_type=code&redirect_uri={current_app.config["SPOTIPY_REDIRECT_URI"]}&scope={scope}'
-    return auth_url
+# def get_spotify_oauth():
+#     scope = "user-library-read user-read-private user-top-read"
+#     # spotify_oauth = oauth2.SpotifyOAuth(
+#     #     client_id=current_app.config['SPOTIPY_CLIENT_ID'],
+#     #     client_secret=current_app.config['SPOTIPY_CLIENT_SECRET'],
+#     #     redirect_uri=current_app.config['SPOTIPY_REDIRECT_URI'],
+#     #     scope=scope
+#     # )
+#     auth_url = f'{"https://accounts.spotify.com"}/authorize?client_id={current_app.config["SPOTIPY_CLIENT_ID"]}&client_secret={current_app.config["SPOTIPY_CLIENT_SECRET"]}&response_type=code&redirect_uri={current_app.config["SPOTIPY_REDIRECT_URI"]}&scope={scope}'
+#     return auth_url
 
 
 @spotify.route("/spotify_login", methods=['GET'])
@@ -38,16 +41,22 @@ def spotify_login():
         current_app.config['SPOTIPY_REDIRECT_URI']
     )
     cred = tk.Credentials(*conf)
-    scope = tk.scope.user_top_read
+    scope = tk.Scope(tk.scope.user_top_read, tk.scope.user_read_private)
     auth = tk.UserAuth(cred, scope)
     auths[auth.state] = auth
     return redirect(auth.url, 307)
 
 
+@spotify.route('/spotify_logout', methods=['GET'])
+def spotify_logout():
+    user = session.pop('user', None)
+    return redirect(url_for('main.home'), 307)
+
+
 @spotify.route("/spotify_callback", methods=["GET"])
 def spotify_callback():
     """
-    a function that gets triggered after the user successfully logged in to spotify
+    a function that gets triggered after the user successfully granted the permission
     :return:
     """
     code = request.args.get('code', None)
@@ -56,12 +65,30 @@ def spotify_callback():
     auth = auths.pop(state, None)
 
     if auth is None:
+        # check the state to avoid cross-site forgery
         return 'Invalid state!', 400
-
+    # get the token (Token class)
     token = auth.request_token(code, state)
-    session['user'] = state
-    # session['token'] = token
-    users[state] = token
+
+    # put serialized token in a session
+    session['token'] = pickle.dumps(token)
+    try:
+        with spotify_tekore_client.token_as(token):
+            current_user = spotify_tekore_client.current_user()
+            user_id = current_user.id
+            # put user's id in a session
+            session['user'] = user_id
+            user_entry = User.query.filter_by(spotify_id=user_id).first()
+            if not user_entry:
+                # if the user is not yet registered in db
+                # save user to the db with the refresh token
+                refresh_token = token.refresh_token
+                user_entry = User(spotify_id=user_id, spotify_token=refresh_token)
+                db.session.add(user_entry)
+                db.session.commit()
+
+    except tk.HTTPError:
+        return None
     return redirect(url_for('main.home'), 307)
 
 
@@ -70,43 +97,16 @@ def spotify_get_users_albums():
     :param playlist_id: spotify's playlist ID or a playlist's URL
     :return: a dict {album_title: album_image_url}
     """
-
-    # print('a new spotify function worked!')
-    # user = session.get('user', None)
-    # token = users.get(user, None)
-    # # token = session.get('token', None)
-    # print(f'user: {user}')
-    # print(f'token: {token}')
-    # # Return early if no login or old session
-    # if user is None or token is None:
-    #     print('something is None')
-    #     session.pop('user', None)
-    #     return None
-    #
-    # if token.is_expiring:
-    #     print('token is expiring')
-    #     conf = (
-    #         current_app.config['SPOTIPY_CLIENT_ID'],
-    #         current_app.config['SPOTIPY_CLIENT_SECRET'],
-    #         current_app.config['SPOTIPY_REDIRECT_URI']
-    #     )
-    #     cred = tk.Credentials(*conf)
-    #     token = cred.refresh(token)
-    #     users[user] = token
-
     user, token = check_spotify()
-    print(dir(token))
-    print(type(token))
-    print(token.refresh_token)
-    print(f"user: {user}")
-    print(f"token: {token}")
     if not user or not token:
         print('no user or no token present')
         return None
 
     try:
         with spotify_tekore_client.token_as(token):
-            top_tracks = spotify_tekore_client.current_user_top_tracks()
+            top_tracks = spotify_tekore_client.current_user_top_tracks(limit=50)
+            # current_user = spotify_tekore_client.current_user()
+            # print(current_user.display_name)
     except tk.HTTPError:
         return None
 
@@ -148,6 +148,7 @@ def spotify_get_users_albums():
                 album_info["albums"].append(an_album_dict)
     # shuffles a list of albums to get random results
     random.shuffle(album_info["albums"])
+    album_info['albums'] = album_info['albums'][:9]
     # adds ids to albums
     for count, album in enumerate(album_info['albums']):
         album['id'] = count
@@ -162,10 +163,17 @@ def check_spotify():
     :return: (user, token)
     """
     user = session.get('user', None)
-    token = users.get(user, None)
+    token = session.get('token', None)
+    if token:
+        token = pickle.loads(session.get('token', None))
+    # token = users.get(user, None)
+    # token = session.get('access_token', None)
+
     if user is None or token is None:
         print('something is None')
         session.pop('user', None)
+        # session.pop('access_token', None)
+        session.pop('token', None)
         return None, None
 
     if token.is_expiring:
@@ -175,11 +183,54 @@ def check_spotify():
             current_app.config['SPOTIPY_CLIENT_SECRET'],
             current_app.config['SPOTIPY_REDIRECT_URI']
         )
+        print(user)
         cred = tk.Credentials(*conf)
-        token = cred.refresh(token)
-        users[user] = token
+        user_entry = User.query.filter_by(spotify_id=user).first()
+        if user_entry:
+            print(f'user found: {user}')
+            # get user's refresh token from db
+            refresh_token = user_entry.spotify_token
+            if refresh_token:
+                # get new token via refresh token
+                token = cred.refresh_user_token(refresh_token)
 
     return user, token
+
+
+@cache.memoize(timeout=60000)
+def get_spotify_user_info(token):
+    """
+
+    :param token: a Spotify access token
+    :return: user info {username, user_image}
+    """
+    print('getting user info...')
+    print(token)
+    try:
+        with spotify_tekore_client.token_as(token):
+            print('getting here')
+            current_user = spotify_tekore_client.current_user()
+            username = current_user.display_name
+            user_image = current_user.images[0].url
+    except tk.HTTPError:
+        return None
+    user_info = {
+        "username": username,
+        "user_image": user_image
+    }
+    return user_info
+
+
+@spotify.route('/spotify_user_popup')
+def spotify_user_popup():
+    """
+    :return:
+    """
+    user, token = check_spotify()
+    if not user or not token:
+        return None
+
+    user_info = get_spotify_user_info(token)
 
 # @spotify.after_request
 # def add_header(r):

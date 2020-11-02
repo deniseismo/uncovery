@@ -225,6 +225,7 @@ def lastfm_get_user_avatar(username: str):
     :param username: user's name
     :return:
     """
+    print('getting avatar')
     response = lastfm_get_response({
         'method': 'user.getInfo',
         'user': username

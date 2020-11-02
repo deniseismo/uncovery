@@ -234,7 +234,7 @@ const infoBlocksSlideHandler = () => {
     if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
       toolIcon.classList.toggle('tools-active');
     } else {
-      toolIcon.classList.add('tools-active');
+//      toolIcon.classList.add('tools-active');
     }
     if (toolIcon.classList.contains('tools-active')) {
         [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
