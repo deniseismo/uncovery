@@ -36,6 +36,11 @@ export function configureOptionsStyle(targetButtonID) {
       searchBar.style.display = 'block';
       removeAllChildNodes(frequentElements.gameFrame);
     }
+    if (targetButtonID === "by_spotify") {
+      prepareSpotify();
+    } else if (frequentElements.activeButtonID() === "by_spotify") {
+      cleanAfterSpotify();
+    }
 
     // change the placeholder to the correct one
     setPlaceholder(targetButtonID);
@@ -43,6 +48,23 @@ export function configureOptionsStyle(targetButtonID) {
     frequentElements.textField.value = '';
   }
 };
+
+
+function prepareSpotify() {
+  const okButton = document.querySelector('.ok-btn');
+  okButton.value = 'GET YOUR FAVORITES';
+  const inputField = document.querySelector('.text-field-container');
+  inputField.style.display = 'none';
+}
+
+function cleanAfterSpotify() {
+  const okButton = document.querySelector('.ok-btn');
+  okButton.value = 'OK';
+  const inputField = document.querySelector('.text-field-container');
+  inputField.style.display = 'flex';
+}
+
+
 
 function setCurrentPageTitle(buttonID) {
   const theButton = document.getElementById(buttonID);

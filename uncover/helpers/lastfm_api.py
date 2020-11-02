@@ -79,6 +79,7 @@ def lastfm_get_artist_correct_name(artist: str):
     :param artist: artist's name as is
     :return: corrected version of the artist's name
     """
+    print('getting artist correction')
     response = lastfm_get_response({
         'method': 'artist.getCorrection',
         'artist': artist
@@ -93,7 +94,7 @@ def lastfm_get_artist_correct_name(artist: str):
     return correct_name
 
 
-@utils.timeit
+@cache.memoize(timeout=6000)
 def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", amount=25):
     """
     :param amount: amount ot albums

@@ -32,7 +32,7 @@ def get_albums_by_filter():
         # if no albums found, make a failure response
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
-            {'message': f"couldn't find albums; try picking some other filters",
+            {'message': f"couldn't find any covers",
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),

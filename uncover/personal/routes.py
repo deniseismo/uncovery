@@ -1,8 +1,11 @@
+import random
+
 from flask import request, Blueprint, jsonify, make_response, url_for
 
+from uncover import cache
 from uncover.helpers.lastfm_api import lastfm_get_users_top_albums, lastfm_get_user_avatar
 from uncover.helpers.utilities import display_failure_art, get_failure_images
-from uncover.spotify.routes import spotify_get_users_albums
+from uncover.spotify.routes import spotify_get_users_albums, check_spotify
 
 personal = Blueprint('personal', __name__)
 
@@ -32,17 +35,19 @@ def get_albums_by_username():
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
-            {'message': 'this aint legal!',
+            {'message': 'you are not fooling no one',
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),
             404)
+    if time_period == "shuffle":
+        cache.delete_memoized(lastfm_get_users_top_albums, username=username, time_period='shuffle')
     albums = lastfm_get_users_top_albums(username, time_period=time_period)
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
-            {'message': f"couldn't find {username}'s top albums; are you sure {username} is a username?",
+            {'message': f"couldn't find any albums",
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),
@@ -70,16 +75,31 @@ def get_albums_by_spotify():
     #         404)
     # gets albums info through spotify's api based on playlist's id
     # albums = spotify_get_users_playlist_albums(playlist_id)
-    albums = spotify_get_users_albums()
+    user, token = check_spotify()
+    if not user or not token:
+        failure_art_filename = display_failure_art(get_failure_images())
+        return make_response(jsonify(
+            {'message': f"you are not logged in!",
+             'failure_art': url_for('static',
+                                    filename=failure_art_filename)}
+        ),
+            401)
+    albums = spotify_get_users_albums(token)
     if not albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
-            {'message': f"your playlist's kinda dumb",
+            {'message': f"some things can't be uncovered",
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),
             404)
+    # shuffles a list of albums to get random results
+    random.shuffle(albums["albums"])
+    albums['albums'] = albums['albums'][:9]
+    # adds ids to albums
+    for count, album in enumerate(albums['albums']):
+        album['id'] = count
     return jsonify(albums)
 
 

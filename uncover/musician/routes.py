@@ -40,7 +40,7 @@ def get_albums_by_artist():
         # if the given username has no albums or the username's incorrect
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
-            {'message': f"couldn't find {artist}'s top albums; are you sure {artist} is an artist?",
+            {'message': f"couldn't find any covers",
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),

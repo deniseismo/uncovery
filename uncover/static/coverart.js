@@ -115,6 +115,7 @@ export function loadFailureArt(node, failData) {
   frequentElements.gameFrame.classList.add("shadow-main");
   const failureArt = document.createElement("img");
   const failureArtURL = failData['failure_art'];
+  const failureMessage = failData['message'];
   failureArt.src = failureArtURL;
   failureArt.classList.add("failure-art");
 
@@ -123,7 +124,7 @@ export function loadFailureArt(node, failData) {
 
   const failureArtText = document.createElement("h1");
   failureArtText.classList.add("text-light");
-  failureArtText.textContent = "someone made an oopsie!";
+  failureArtText.textContent = failureMessage;
 
   failureArtBlock.appendChild(failureArtText);
 

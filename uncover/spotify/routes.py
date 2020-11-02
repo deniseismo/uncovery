@@ -1,5 +1,4 @@
 import pickle
-import random
 
 import tekore as tk
 from flask import current_app
@@ -92,16 +91,16 @@ def spotify_callback():
     return redirect(url_for('main.home'), 307)
 
 
-def spotify_get_users_albums():
+@cache.memoize(timeout=3600)
+def spotify_get_users_albums(token):
     """
+    :param token: an access token
     :param playlist_id: spotify's playlist ID or a playlist's URL
     :return: a dict {album_title: album_image_url}
     """
-    user, token = check_spotify()
-    if not user or not token:
-        print('no user or no token present')
+    print('spotify getting albums')
+    if not token:
         return None
-
     try:
         with spotify_tekore_client.token_as(token):
             top_tracks = spotify_tekore_client.current_user_top_tracks(limit=50)
@@ -146,12 +145,8 @@ def spotify_get_users_albums():
                 list_of_titles.add(filtered_title)
                 # adds an album info only if a title hasn't been seen before
                 album_info["albums"].append(an_album_dict)
-    # shuffles a list of albums to get random results
-    random.shuffle(album_info["albums"])
-    album_info['albums'] = album_info['albums'][:9]
-    # adds ids to albums
-    for count, album in enumerate(album_info['albums']):
-        album['id'] = count
+    if not album_info['albums']:
+        return None
     return album_info
 
 
@@ -193,6 +188,7 @@ def check_spotify():
             if refresh_token:
                 # get new token via refresh token
                 token = cred.refresh_user_token(refresh_token)
+                session['token'] = pickle.dumps(token)
 
     return user, token
 

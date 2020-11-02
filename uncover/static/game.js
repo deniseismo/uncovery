@@ -222,6 +222,8 @@ function prepareGame(buttonPressed) {
   createScoreContainer();
   formField.removeEventListener("input", handleTags);
   $('.form-field').autocomplete('disable');
+  const inputField = document.querySelector('.text-field-container');
+  inputField.style.display = 'flex';
   frequentElements.textField.id = 'play-field';
   frequentElements.textField.placeholder = `Can you name all the ${mode}?`;
   frequentElements.textField.value = '';
@@ -264,6 +266,10 @@ export function cancelGame(buttonPressed) {
     const formField = document.querySelector('.form-field');
     formField.id = 'text-field';
   };
+  if (frequentElements.activeButtonID() === 'by_spotify') {
+    const inputField = document.querySelector('.text-field-container');
+    inputField.style.display = 'none';
+  }
   formContainer.id = defaultForm;
 
   buttonPressed.value = 'GUESS ALBUMS';

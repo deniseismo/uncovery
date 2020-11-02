@@ -17,7 +17,7 @@ def home():
     user, token = check_spotify()
     if user and token:
         logged_in = True
-        user_info = get_spotify_user_info(token)
+        user_info = get_spotify_user_info(token.access_token)
     return render_template("home.html", logged_in=logged_in, user_info=user_info)
 
 
