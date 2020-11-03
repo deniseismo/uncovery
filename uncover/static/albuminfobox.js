@@ -1,6 +1,7 @@
 import {theGame, albumGame} from "./main.js"
 import {animateMusicGenresContainer, animatePlayButtons, animateSpotifyWidget} from './animation.js'
 import {handleTags} from "./explore.js"
+import {loadSpinner, insertAfter} from "./utils.js"
 
 
 export function createMusicInfoBox() {
@@ -82,6 +83,7 @@ function uncoverAlbumInfo(album) {
   };
   if (album.spotify_id) {
     console.log('spotify! ura!')
+    spotifyLoadingSpinner();
     const spotifyWidget = document.querySelector('.spotify-widget');
     spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
     spotifyWidget.onload = showSpotifyOnLoad;
@@ -116,8 +118,24 @@ function createSpotifyWidget() {
   return widgetWrapper;
 }
 
+function spotifyLoadingSpinner() {
+  const spotifySpinnerContainer = document.createElement('div');
+  spotifySpinnerContainer.classList.add('spotify-spinner-container');
+  const loadingMessage = document.createElement('p');
+  loadingMessage.classList.add('spotify-loading-message');
+  loadingMessage.textContent = 'fetching Spotify magic…';
+  spotifySpinnerContainer.appendChild(loadingMessage);
+  loadSpinner(spotifySpinnerContainer);
+  const albumInfoCard = document.querySelector('.album-info-card');
+  insertAfter(spotifySpinnerContainer, albumInfoCard);
+}
+
 
 function showSpotifyOnLoad() {
+  const spotifySpinnerContainer = document.querySelector('.spotify-spinner-container');
+  if (spotifySpinnerContainer) {
+    spotifySpinnerContainer.remove();
+  }
   const spotifyWidget = document.querySelector('.spotify-widget');
   console.log(spotifyWidget)
   console.log(spotifyWidget.classList)

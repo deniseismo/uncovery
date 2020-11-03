@@ -53,6 +53,7 @@ export function configureOptionsStyle(targetButtonID) {
 function prepareSpotify() {
   const okButton = document.querySelector('.ok-btn');
   okButton.value = 'GET YOUR FAVORITES';
+  okButton.style.width = '100%';
   const inputField = document.querySelector('.text-field-container');
   inputField.style.display = 'none';
 }
@@ -60,6 +61,7 @@ function prepareSpotify() {
 function cleanAfterSpotify() {
   const okButton = document.querySelector('.ok-btn');
   okButton.value = 'OK';
+  okButton.style.width = 'auto';
   const inputField = document.querySelector('.text-field-container');
   inputField.style.display = 'flex';
 }

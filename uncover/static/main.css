@@ -576,7 +576,6 @@ it encapsulates all the content with the navigation except 'waves'
 }
 
 .spinner {
-  margin-top: 2rem;
   animation: riseUp 600ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
@@ -1202,6 +1201,14 @@ label.tooltipText:after {
   margin-right: 1rem;
 }
 
+.spotify-spinner-container {
+  display: flex;
+  align-items: center;
+}
+
+.spotify-loading-message {
+  margin: 0;
+}
 
 .spotify-avatar {
   position: relative;
