@@ -43,7 +43,7 @@
 
         <div class="tools-and-menu-hidden-elements">
             <div class="current-page-header">
-                <p class="current-page-title">/artist</p>
+                <p class="current-page-title no-margin">/artist</p>
             </div>
             <img class="tools-icon" src="{{ url_for('static', filename='images/gear.svg') }}"
                  alt="tools (options) icon">
@@ -62,15 +62,15 @@
                 <div class="spotify-avatar">
                     <img class="spotify-avatar-image" src="{{ user_info.user_image }}"/>
                     <div class="dropdown-content shadow-main">
-                        <p class="spotify-username">{{ user_info.username }}</p>
+                        <p class="spotify-username no-margin">{{ user_info.username }}</p>
                         <a href="{{ url_for('spotify.spotify_logout') }}">
-                            <p class="spotify-login spotify-logged-in">LOG OUT</p>
+                            <p class="spotify-login no-margin spotify-logged-in">LOG OUT</p>
                         </a>
                     </div>
                 </div>
                 {% else %}
                 <a href="{{ url_for('spotify.spotify_logout') }}">
-                    <p class="spotify-login spotify-logged-in">LOG OUT</p>
+                    <p class="spotify-login no-margin spotify-logged-in">LOG OUT</p>
                 </a>
                 {% endif %}
                 {% else %}
@@ -94,7 +94,7 @@
                     </svg>
                 </a>
                 <a class='login-default-link' href="{{ url_for('spotify.spotify_login') }}">
-                    <p class="spotify-login spotify-logged-out">LOG IN WITH SPOTIFY</p>
+                    <p class="spotify-login no-margin spotify-logged-out">LOG IN WITH SPOTIFY</p>
                 </a>
                 {% endif %}
             </div>
@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <div class="flex-container game-frame" id="game-frame">
+        <div class="flex-container game-frame no-margin" id="game-frame">
             <div class="lcd-quote info-tooltip" data-tooltip="© LCD Soundsystem">
                 <p class="lcd-i-heard">I heard</p>
                 <p class="lcd-you-have">you have</p>
@@ -135,8 +135,8 @@
     </div>
     <div class="flex-container">
         <footer class="copyright flex-container">
-            <p>Copyright 2020 DENIS <span class="italic">seismo</span> KOSTAREV</p>
-            <p>uncover@uncovery.fm</p>
+            <p class="no-margin">Copyright 2020 DENIS <span class="italic">seismo</span> KOSTAREV</p>
+            <p class="no-margin">uncover@uncovery.fm</p>
         </footer>
     </div>
 </div>

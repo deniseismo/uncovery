@@ -13,19 +13,6 @@ spotify = Blueprint('spotify', __name__)
 spotify_tekore_client = tk.Spotify()
 
 auths = {}  # Ongoing authorisations: state -> UserAuth
-users = {}  # User tokens: state -> token (use state as a user ID)
-
-
-# def get_spotify_oauth():
-#     scope = "user-library-read user-read-private user-top-read"
-#     # spotify_oauth = oauth2.SpotifyOAuth(
-#     #     client_id=current_app.config['SPOTIPY_CLIENT_ID'],
-#     #     client_secret=current_app.config['SPOTIPY_CLIENT_SECRET'],
-#     #     redirect_uri=current_app.config['SPOTIPY_REDIRECT_URI'],
-#     #     scope=scope
-#     # )
-#     auth_url = f'{"https://accounts.spotify.com"}/authorize?client_id={current_app.config["SPOTIPY_CLIENT_ID"]}&client_secret={current_app.config["SPOTIPY_CLIENT_SECRET"]}&response_type=code&redirect_uri={current_app.config["SPOTIPY_REDIRECT_URI"]}&scope={scope}'
-#     return auth_url
 
 
 @spotify.route("/spotify_login", methods=['GET'])
@@ -135,7 +122,9 @@ def spotify_get_users_albums(token):
                 "title": name,
                 "names": [name.lower()] + utils.get_filtered_names_list(name),
                 "image": track.album.images[0].url,
-                "rating": track.popularity
+                "rating": track.popularity,
+                "spotify_id": track.album.id,
+                "year": track.album.release_date[:4]
             }
             an_album_dict["artist_names"] = list(set(an_album_dict["artist_names"]))
             an_album_dict['names'] = list(set(an_album_dict['names']))

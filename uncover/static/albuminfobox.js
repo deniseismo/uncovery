@@ -17,7 +17,7 @@ export function createMusicInfoBox() {
   uncover.classList.add('btn', 'button', 'shadow-main', 'play-button', 'visible');
   uncover.addEventListener('click', uncoverModeOn);
   const description = document.createElement("p");
-  description.classList.add('info-box-description');
+  description.classList.add('info-box-description', 'no-margin');
   description.textContent = "I ain't playing, I really need to know what these albums are!";
   const albumInfoCard = createAlbumInfoCard();
   const spotifyWidget = createSpotifyWidget();
@@ -122,7 +122,7 @@ function spotifyLoadingSpinner() {
   const spotifySpinnerContainer = document.createElement('div');
   spotifySpinnerContainer.classList.add('spotify-spinner-container');
   const loadingMessage = document.createElement('p');
-  loadingMessage.classList.add('spotify-loading-message');
+  loadingMessage.classList.add('spotify-loading-message', 'no-margin');
   loadingMessage.textContent = 'fetching Spotify magic…';
   spotifySpinnerContainer.appendChild(loadingMessage);
   loadSpinner(spotifySpinnerContainer);
@@ -153,11 +153,11 @@ function createAlbumInfoCard() {
   const albumName = document.createElement('p');
   albumName.classList.add('album-name-info');
   const by = document.createElement('p');
-  by.classList.add('by');
+  by.classList.add('by', 'no-margin');
   const artistName = document.createElement('p');
-  artistName.classList.add('artist-name-info');
+  artistName.classList.add('artist-name-info', 'no-margin');
   const year = document.createElement('p');
-  year.classList.add('year');
+  year.classList.add('year', 'no-margin');
   const albumInfoCard = document.createElement('div');
   albumInfoCard.classList.add('album-info-card');
   [albumName, by, artistName, year].forEach(item => albumInfoCard.appendChild(item));
