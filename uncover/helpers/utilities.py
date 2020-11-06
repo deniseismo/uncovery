@@ -85,6 +85,7 @@ def get_filtered_name(album_name: str):
         r"((super)?\s?(deluxe)\s?).*",
         r"((\d+)?\s?(Remaster)\s?).*",
         r"((\d+)?\s?(Complete)\s?).*",
+        r"((\d+)?\s?(Bonus Tracks)\s?).*",
         r"((\d+)?\s?(International Version)\s?).*",
         r"\d+?(th)?\s?Anniversary\s?\w*",
         # no weird characters
