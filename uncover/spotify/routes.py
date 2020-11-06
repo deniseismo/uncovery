@@ -263,7 +263,7 @@ def spotify_get_album_id(album_name, artist_name):
         print(len(album_info[0].items))
         album_items = album_info[0].items
         artist_name = artist_name.lower().replace(' & ', ' and ')
-        album_name = album_name.lower()
+        album_name = utils.get_filtered_name(album_name)
         ratio_threshold = 94
         album_id_found = None
         for album in album_items:
