@@ -5,7 +5,7 @@ from flask import request, Blueprint, jsonify, make_response, url_for
 from uncover import cache
 from uncover.helpers.lastfm_api import lastfm_get_users_top_albums, lastfm_get_user_avatar
 from uncover.helpers.utilities import display_failure_art, get_failure_images
-from uncover.spotify.routes import spotify_get_users_albums, check_spotify
+from uncover.spotify.spotify_user_oauth import spotify_get_users_albums, check_spotify
 
 personal = Blueprint('personal', __name__)
 

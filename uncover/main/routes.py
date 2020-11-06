@@ -1,7 +1,7 @@
 from flask import render_template, request, Blueprint, url_for, jsonify
 
 from uncover.helpers.collage_creator import save_collage
-from uncover.spotify.routes import check_spotify, get_spotify_user_info
+from uncover.spotify.spotify_user_oauth import check_spotify, get_spotify_user_info
 
 main = Blueprint('main', __name__)
 
