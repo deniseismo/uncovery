@@ -857,6 +857,7 @@ label.tooltipText:after {
   overflow: hidden;
   width: 20%;
   transition: margin-left 0.3s ease-out;
+  z-index: 3;
 }
 
 .avatar-container {

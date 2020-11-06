@@ -141,6 +141,7 @@ async def add_album(album, set_of_titles, session, albums_list, artist, sorting)
     print(rating)
     filtered_name = utils.get_filtered_name(full_title)
     an_album_dict = {
+        "artist_name": artist,
         "title": full_title,
         "names": [correct_title] + utils.get_filtered_names_list(full_title),
         "mbid": album['id'],

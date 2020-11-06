@@ -2,7 +2,8 @@ import pickle
 
 import tekore as tk
 from flask import current_app
-from flask import request, url_for, Blueprint, redirect, session
+from flask import request, url_for, Blueprint, redirect, session, jsonify, make_response
+from fuzzywuzzy import fuzz
 
 import uncover.helpers.utilities as utils
 from uncover import db, cache
@@ -82,7 +83,6 @@ def spotify_callback():
 def spotify_get_users_albums(token):
     """
     :param token: an access token
-    :param playlist_id: spotify's playlist ID or a playlist's URL
     :return: a dict {album_title: album_image_url}
     """
     print('spotify getting albums')
@@ -216,6 +216,81 @@ def spotify_user_popup():
         return None
 
     user_info = get_spotify_user_info(token)
+
+
+@spotify.route('/fetch_album_id', methods=['POST'])
+def spotify_fetch_album_id():
+    content = request.get_json()
+    if not content:
+        return None
+    album_name = content['album_name']
+    artist_name = content['artist_name']
+    album_id = spotify_get_album_id(album_name, artist_name)
+    print(album_id)
+    if not album_id:
+        return make_response(jsonify(
+            {'message': f"album id could not be found"}
+        ),
+            404)
+    return jsonify({
+        "album_id": album_id
+    })
+
+
+def spotify_get_album_id(album_name, artist_name):
+    """
+    gets Spotify album id with through Tekore
+    :param album_name: album's title
+    :param artist_name: artist's title
+    :return: Spotify album id
+    """
+    artist_name = artist_name.lower().replace('the ', '')
+    query = "album:" + album_name + " artist:" + artist_name
+    user, token = check_spotify()
+    if user and token:
+        try:
+            with spotify_tekore_client.token_as(token):
+                album_info = spotify_tekore_client.search(
+                    query=query,
+                    types=('album',),
+                    market='from_token',
+                    limit=5
+                )
+        except tk.HTTPError:
+            return None
+        if not album_info:
+            return None
+        print(len(album_info[0].items))
+        album_items = album_info[0].items
+        artist_name = artist_name.lower().replace(' & ', ' and ')
+        album_name = album_name.lower()
+        ratio_threshold = 94
+        album_id_found = None
+        for album in album_items:
+            try:
+                current_artist = album.artists[0].name. \
+                    lower().replace(' & ', ' and ').replace('the ', '')
+                current_album = utils.get_filtered_name(album.name)
+                print('album to find:', album_name)
+                print('filtered:', current_album)
+                print(f'item: {current_artist}, {album.id}, {album.name}')
+                print(fuzz.ratio(artist_name, current_artist))
+                print('partial:', fuzz.partial_ratio(album_name, current_album))
+                print('ratio album:', fuzz.ratio(album_name, current_album))
+                # if fuzz.ratio(artist_name, current_artist) > 90:
+                #     return album_id
+                current_artist_ratio = fuzz.ratio(artist_name, current_artist)
+                current_album_ratio = fuzz.ratio(album_name, current_album)
+                if current_album_ratio > 98 and current_artist_ratio > 90:
+                    # found perfect match, return immediately
+                    return album.id
+                elif current_album_ratio > ratio_threshold and current_artist_ratio > 90:
+                    ratio_threshold = current_album_ratio
+                    album_id_found = album.id
+            except (KeyError, TypeError, IndexError):
+                continue
+        return album_id_found
+    return None
 
 # @spotify.after_request
 # def add_header(r):

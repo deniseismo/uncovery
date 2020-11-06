@@ -165,6 +165,7 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
     }
     for count, album in enumerate(album_entries):
         an_album_dict = {
+            "artist_name": artist_name,
             "title": album.title,
             "names": [album.title.lower()] + utils.get_filtered_names_list(album.title),
             "id": count,

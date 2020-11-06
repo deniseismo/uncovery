@@ -64,8 +64,29 @@ function updateInfoBoxDescription(text) {
   }
 }
 
+async function fetchAlbumID(albumName, artistName) {
+  // fetches current tags list
+  const response = await fetch('fetch_album_id', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "album_name": albumName,
+      "artist_name": artistName
+    })
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const albumID = await response.json();
+  return albumID;
+};
+
 
 function uncoverAlbumInfo(album) {
+  const artistJke = album.artist_name
+  const albumJke = album.title
   const albumInfoCard = document.querySelector('.album-info-card');
   albumInfoCard.style.display = 'flex';
   const albumName = document.querySelector('.album-name-info');
@@ -81,25 +102,68 @@ function uncoverAlbumInfo(album) {
   if (album.year) {
     year.textContent = `(${album.year})`;
   };
-  if (album.spotify_id) {
+  fetchAlbumID(album.title, artistJke).then(data => {
+    if (data) {
+    const albumID = data['album_id']
     console.log('spotify! ura!')
     spotifyLoadingSpinner();
     const spotifyWidget = document.querySelector('.spotify-widget');
-    spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
+    spotifyWidget.src = `https://open.spotify.com/embed/album/${albumID}`;
     spotifyWidget.onload = showSpotifyOnLoad;
     spotifyWidget.onerror = function() {
       console.log("something's wrong with the iframe");
     };
     const musicInfoBox = document.querySelector('.music-info-box');
     musicInfoBox.classList.add('no-bottom-padding');
-  } else {
+    }
+    else {
     const spotifyWidget = document.querySelector('.spotify-widget');
     spotifyWidget.classList.remove('spotify-active');
     const widgetWrapper = document.querySelector('.widget-wrapper');
     widgetWrapper.style.display = 'none';
     const musicInfoBox = document.querySelector('.music-info-box');
     musicInfoBox.classList.remove('no-bottom-padding');
-  }
+    }
+  })
+//  if (album.spotify_id) {
+//    console.log('spotify! ura!')
+//    spotifyLoadingSpinner();
+//    const spotifyWidget = document.querySelector('.spotify-widget');
+//    spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
+//    spotifyWidget.onload = showSpotifyOnLoad;
+//    spotifyWidget.onerror = function() {
+//      console.log("something's wrong with the iframe");
+//    };
+//    const musicInfoBox = document.querySelector('.music-info-box');
+//    musicInfoBox.classList.add('no-bottom-padding');
+//  } else {
+//    const spotifyWidget = document.querySelector('.spotify-widget');
+//    spotifyWidget.classList.remove('spotify-active');
+//    const widgetWrapper = document.querySelector('.widget-wrapper');
+//    widgetWrapper.style.display = 'none';
+//    const musicInfoBox = document.querySelector('.music-info-box');
+//    musicInfoBox.classList.remove('no-bottom-padding');
+//  }
+//    if (album.spotify_id) {
+//    console.log('spotify! ura!')
+//    spotifyLoadingSpinner();
+//    const spotifyWidget = document.querySelector('.spotify-widget');
+//    spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
+//    spotifyWidget.onload = showSpotifyOnLoad;
+//    spotifyWidget.onerror = function() {
+//      console.log("something's wrong with the iframe");
+//    };
+//    const musicInfoBox = document.querySelector('.music-info-box');
+//    musicInfoBox.classList.add('no-bottom-padding');
+//  } else {
+//    const spotifyWidget = document.querySelector('.spotify-widget');
+//    spotifyWidget.classList.remove('spotify-active');
+//    const widgetWrapper = document.querySelector('.widget-wrapper');
+//    widgetWrapper.style.display = 'none';
+//    const musicInfoBox = document.querySelector('.music-info-box');
+//    musicInfoBox.classList.remove('no-bottom-padding');
+//  }
+
 }
 
 function createSpotifyWidget() {
@@ -119,6 +183,10 @@ function createSpotifyWidget() {
 }
 
 function spotifyLoadingSpinner() {
+  const spinnerExists = document.querySelector('.spotify-spinner-container');
+  if (spinnerExists) {
+    return;
+  }
   const spotifySpinnerContainer = document.createElement('div');
   spotifySpinnerContainer.classList.add('spotify-spinner-container');
   const loadingMessage = document.createElement('p');

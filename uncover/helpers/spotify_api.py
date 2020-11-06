@@ -28,6 +28,11 @@ def get_spotify():
     return spotify
 
 
+def get_spotify_v2():
+    spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+    return spotify
+
+
 @utils.timeit
 def spotify_get_users_playlist_albums(playlist_id: str):
     """
@@ -195,6 +200,7 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
     """
     a backup function that gets all the info from Spotify
     (in case MusicBrainz has nothing about a particular artist)
+    :param sorting: sorted by shuffle, popular, earliest, latest
     :param artist: artist's name
     :return:
     """
@@ -277,7 +283,7 @@ def spotify_get_album_id(album: str, artist: str):
     spotify = get_spotify()
     query = "album:" + album + " artist:" + artist
     try:
-        album_info = spotify.search(q=query, type="album", limit=5, market='SE')
+        album_info = spotify.search(q=query, type="album", limit=5, market='RU')
     except spotipy.exceptions.SpotifyException:
         return None
     if not album_info:
@@ -299,3 +305,5 @@ def spotify_get_album_id(album: str, artist: str):
     if not getattr(album_info, 'from_cache', False):
         time.sleep(1)
     return None
+
+# print(spotify_get_album_id('ЛЕГЕНДАРНАЯ ПЫЛЬ', 'MORGENSHTERN'))
