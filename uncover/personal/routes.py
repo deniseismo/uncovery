@@ -61,20 +61,6 @@ def get_albums_by_spotify():
     gets album cover art images based on Spotify's playlist
     :return: jsonified dictionary {album_name: cover_art}
     """
-    # input's value from the form
-    # content = request.get_json()
-    # playlist_id = content["qualifier"]
-    # if not playlist_id:
-    #     # if the input's empty, send an error message and a 'failure' image
-    #     failure_art_filename = display_failure_art(get_failure_images())
-    #     return make_response(jsonify(
-    #         {'message': "your playlist's id looks kinda empty to me",
-    #          'failure_art': url_for('static',
-    #                                 filename=failure_art_filename)}
-    #     ),
-    #         404)
-    # gets albums info through spotify's api based on playlist's id
-    # albums = spotify_get_users_playlist_albums(playlist_id)
     user, token = check_spotify()
     if not user or not token:
         failure_art_filename = display_failure_art(get_failure_images())

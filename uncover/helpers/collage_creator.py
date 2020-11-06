@@ -102,7 +102,7 @@ def create_a_collage(a_list_of_images, filename_path):
         arrange_the_images(album_images[2:], collage_image, width, IMAGE_SIZE['default'], (0, 900))
 
     # save the collage to a file
-    collage_image.save(f'{filename_path}.png')
+    collage_image.save(f'{filename_path}.jpg', quality=95)
 
 
 @cache.memoize(timeout=360)
@@ -119,4 +119,4 @@ def save_collage(a_list_of_album_images: list):
     collage_path = os.path.join(current_app.root_path, 'static/collage', collage_filename)
     # trigger collage creator function
     create_a_collage(a_list_of_album_images, collage_path)
-    return collage_filename + '.png'
+    return collage_filename + '.jpg'
