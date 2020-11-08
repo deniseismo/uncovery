@@ -5,6 +5,8 @@ import random
 import re
 import time
 
+from uncover import cache
+
 
 def display_failure_art(list_of_images: list):
     """
@@ -14,6 +16,7 @@ def display_failure_art(list_of_images: list):
     return random.choice(list_of_images)
 
 
+@cache.cached(timeout=3600)
 def get_failure_images():
     """
     gets the list of all 'failure' art images found in the corresponding folder
@@ -54,6 +57,7 @@ def timeit(method):
     return timed
 
 
+@cache.memoize(timeout=3600)
 def get_filtered_artist_names(artist_name: str):
     if not artist_name:
         return None
@@ -69,6 +73,7 @@ def get_filtered_artist_names(artist_name: str):
     return list(filtered_names)
 
 
+@cache.memoize(timeout=3600)
 def get_filtered_name(album_name: str):
     """
     :param album_name: an album name to filter
@@ -98,6 +103,7 @@ def get_filtered_name(album_name: str):
     return ultimate_filtered_name
 
 
+@cache.memoize(timeout=36000)
 def remove_punctuation(name: str):
     if not name:
         return None
@@ -105,6 +111,7 @@ def remove_punctuation(name: str):
     return re.sub(pattern, '', name, flags=re.IGNORECASE)
 
 
+@cache.memoize(timeout=36000)
 def get_filtered_names_list(album_name: str):
     """
     filters out some articles, incorrect symbols & redundant words (e.g. Deluxe Edition)

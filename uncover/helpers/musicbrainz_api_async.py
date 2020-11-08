@@ -10,11 +10,12 @@ from flask import current_app
 
 import uncover.helpers.lastfm_api_async as lastfm
 import uncover.helpers.utilities as utils
+from uncover import cache
 
 musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
 
 
-@utils.timeit
+@cache.memoize(timeout=3600)
 def mb_get_artist_mbid(artist_name: str):
     artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
     artists_found = musicbrainzngs.search_artists(artist_name, limit=4)
@@ -40,12 +41,16 @@ async def mb_fetch_album_release_date(album_id: str, session):
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"fmt": "json"}
+    print('fetching release date for: ', album_id)
     async with session.get(url=url, params=params, headers=headers) as response:
-        if response.status_code != 200:
+        if response.status != 200:
+            print('status not ok')
             return None
         try:
-            release_date = await response.json()['first-release-date']
+            album_info = await response.json()
+            release_date = album_info['first-release-date']
         except (KeyError, IndexError, TypeError):
+            print('some error occurred')
             return None
         if not getattr(response, 'from_cache', False):
             time.sleep(1)
@@ -148,9 +153,12 @@ async def add_album(album, set_of_titles, session, albums_list, artist, sorting)
         "rating": rating if rating else 0
     }
     if sorting in ["earliest", "latest"]:
-        release_date = mb_fetch_album_release_date(album['id'])
-        release_date = datetime.strptime(release_date[:4], '%Y')
-        an_album_dict["release_date"] = release_date
+        release_date = await mb_fetch_album_release_date(album['id'], session)
+        if release_date:
+            release_date = datetime.strptime(release_date[:4], '%Y')
+            an_album_dict["release_date"] = release_date
+        else:
+            an_album_dict["release_date"] = datetime.strptime('1970', '%Y')
     if alternative_name:
         alternative_name = alternative_name.replace("“", "").replace("”", "")
         an_album_dict['altenative_name'] = alternative_name

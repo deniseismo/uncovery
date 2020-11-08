@@ -873,6 +873,7 @@ label.tooltipText:after {
   opacity: 0;
   width: 200px;
   height: 200px;
+  z-index: 3;
 }
 
 .username {
@@ -1062,8 +1063,9 @@ label.tooltipText:after {
 }
 
 .avatar-image {
-  width: 200px;
-  height: 200px;
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: cover;
 }
 
 .wait-for-it {
@@ -1104,6 +1106,7 @@ label.tooltipText:after {
   width: 20%;
   align-items: center;
   transition: right 0.3s ease-out, width 0.3s ease-out;
+  z-index: 3;
 }
 
 .no-bottom-padding {

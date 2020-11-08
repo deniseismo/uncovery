@@ -1,8 +1,6 @@
 // frequently used elements
 export const frequentElements = {
   gameFrame: document.querySelector('#game-frame'),
-  playButton: document.querySelector('#play-button'),
-  downloadButton: document.querySelector('#download-button'),
   textField: document.querySelector('#text-field'),
   selectOptions: document.querySelector('.select-options'),
   searchAndOptionsContainer: document.querySelector('.search-and-options-container'),
@@ -25,4 +23,40 @@ export function addTooltips() {
     tooltip.textContent = element.dataset.tooltip;
     element.appendChild(tooltip);
   });
+};
+
+export function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+};
+
+export function loadSpinner(node) {
+  const spinner = document.createElement("img");
+  const url = "static/images/loading/spinner-vinyl-64.gif";
+  spinner.classList.add('spinner');
+  spinner.src = url;
+  node.appendChild(spinner);
+};
+
+export async function fetchAvatar(qualifier) {
+  // fetches current tags list
+  const response = await fetch('get_user_avatar', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "qualifier": qualifier
+    })
+  });
+  const avatar = await response.json();
+  return avatar;
+};
+
+// fixes artist's/user's name as per last.fm correction
+export function fixInputData(method, info) {
+  if (method === 'by_artist' || method === 'by_lastfm_username') {
+    frequentElements.textField.value = info;
+  };
 };

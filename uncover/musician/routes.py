@@ -1,6 +1,7 @@
 from flask import request, url_for, Blueprint, make_response, jsonify
 
 import uncover.helpers.utilities as utils
+from uncover import cache
 from uncover.helpers.main_async import fetch_artists_top_albums_images, sql_select_artist_albums
 from uncover.helpers.utilities import display_failure_art, get_failure_images
 
@@ -31,6 +32,8 @@ def get_albums_by_artist():
             404)
     artist = artist.strip()
     # get albums images
+    if sorting == "shuffle":
+        cache.delete_memoized(sql_select_artist_albums, artist_name=artist, sorting='shuffle')
     albums = sql_select_artist_albums(artist, sorting)
     if not albums:
         print('this worked!')

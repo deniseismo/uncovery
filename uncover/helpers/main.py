@@ -115,6 +115,7 @@ def get_artists_top_albums_images(artist: str, sorting):
     return album_info
 
 
+@cache.memoize(timeout=3600)
 def sql_select_artist_albums(artist_name: str, sorting: str):
     """
     search the artist through the database

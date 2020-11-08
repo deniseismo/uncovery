@@ -128,6 +128,7 @@ async def add_album_image(album, artist):
         album['image'] = album_image
 
 
+@cache.memoize(timeout=3600)
 def sql_select_artist_albums(artist_name: str, sorting: str):
     """
     search the artist through the database

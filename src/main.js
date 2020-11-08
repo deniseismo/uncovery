@@ -1,10 +1,19 @@
-import {AlbumGameInfo} from "./game.js"
-import {frequentElements, insertAfter, addTooltips} from './utils.js'
-import {winningMessage} from './info.js'
+import {addTooltips, frequentElements, insertAfter, removeAllChildNodes,
+        loadSpinner, fetchAvatar, fixInputData} from './utils.js'
+import {AlbumGameInfo, Game, playInit} from "./game.js"
 import {MusicFilter} from './musicFilter.js'
-import {prepareToExplore, musicTags} from './explore.js'
+import {configureOptionsStyle, removePlayButtons, createPlayButtons,
+        resetPlayButtons, createAvatarBox, removeAvatarContainer} from './uiconfig.js'
+import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar, animateNavigationBar} from './animation.js'
+import {loadCoverArt, loadFailureArt} from "./coverart.js";
+import {createMusicInfoBox, removeMusicInfoBox} from "./albuminfobox.js";
+import './styles/main.css';
 
-const albumGame = new AlbumGameInfo();
+let controller = null;
+
+export const theGame = new Game(false);
+
+export const albumGame = new AlbumGameInfo();
 
 export const musicFilters = new MusicFilter({
   tags: ['hip-hop', 'jazz'],
@@ -12,50 +21,38 @@ export const musicFilters = new MusicFilter({
 })
 
 
-
-export const submitInput = function() {
-  // make 'play-button' disappear
-  frequentElements.playButton.classList.remove("visible");
-  // make 'download-button' disappear
-  frequentElements.downloadButton.classList.remove("visible");
-  // make info at the bottom disappear (if exists)
-  const responseInfo = document.querySelector(".data-info");
-  if (responseInfo) {
-    responseInfo.remove();
+// main submit function
+export const submitInput = function(desiredMethod) {
+  // remove unnecessary elements
+  if (controller) {
+    controller.abort();
   };
-  // gets the desired method by the active button's id: (by_artist, by_username, by_spotify)
-  const desiredMethod = document.querySelector('.method.active').id;
+  controller = new AbortController();
+  const signal = controller.signal;
+  removePlayButtons();
+  removeAvatarContainer();
+  removeMusicInfoBox();
+  theGame.uncoveryStatus = false;
   frequentElements.gameFrame.classList.remove('shadow-main');
   // empty html
   removeAllChildNodes(frequentElements.gameFrame);
   // add spinner while waiting for the response
   loadSpinner(frequentElements.gameFrame);
-  // posts to the flask's route /by_username
-  let qualifier = '';
-  let option = frequentElements.selectOptions.value
-  if (desiredMethod === "explore") {
-    const timeSpanSlider = document.getElementById('time-span-slider');
-
-    option = {
-      "genres": musicFilters.tagsPickedInfo,
-      "time_span": timeSpanSlider.noUiSlider.get()
-    }
-  } else {
-    qualifier = document.querySelector('#text-field').value;
-  };
+  // get stringified JSON body for the fetch function
+  const body = prepareJSONBody(desiredMethod);
+  // fetch!
   fetch(`${desiredMethod}`, {
     method: 'POST',
+    signal: signal,
     headers: new Headers({
       'Content-Type': 'application/json'
     }),
-    body: JSON.stringify({
-      "qualifier": qualifier,
-      "option": option
-    })
-  }).then(response => {
-    // if response is not ok (status ain't no 200)
+    body: body
+  })
+  .then(response => {
+  // if response is not ok (status ain't no 200)
     if (!response.ok) {
-      // we get json with the 'failure' info
+    // we get json with the 'failure' info
       const waves = document.querySelectorAll('.wave');
       waves.forEach(wave => wave.classList.add('falldown'));
       return response.json()
@@ -66,12 +63,14 @@ export const submitInput = function() {
           loadFailureArt(frequentElements.gameFrame, failData);
         });
     }
-
-    return response.json();
-
-  }).then(data => {
+  return response.json();
+  })
+  .then(data => {
     /* storing album info in a global object */
+    console.log(data);
     albumGame.albums = data['albums'];
+    albumGame.currentQuery = data['info']['query'];
+    albumGame.currentType = data['info']['type'];
     console.log(albumGame);
     // restores a 'valid' form style
     frequentElements.textField.classList.remove("is-invalid");
@@ -82,34 +81,52 @@ export const submitInput = function() {
     frequentElements.gameFrame.classList.add('loading');
     /* load/add cover art images */
     loadCoverArt(data);
-    fixArtistName(data);
-    // $('#text-field').val(data["info"]);
+    fixInputData(desiredMethod, data['info']['query']);
     /* add a progress bar */
     const progressBar = document.createElement("div");
     progressBar.id = "progress-bar";
     const referenceNode = document.querySelector(".search-and-options-container");
     insertAfter(progressBar, referenceNode);
-    const waves = document.querySelectorAll('.wave');
-    waves.forEach(wave => wave.classList.add('falldown'));
     /* waiting for all images to load before showing them up*/
+    console.log(document.querySelector('.avatar-container'));
     $('#game-frame').waitForImages(function() {
-      /* remove progress bar once loaded */
+      //remove progress bar once loaded
       progressBar.remove();
-      /* remove 'loading' class that blocks animation of albums images */
+      // remove 'loading' class that blocks animation of albums images
       this.classList.remove("loading");
       const itemsList = document.querySelectorAll(".flex-item");
       itemsList.forEach(item => {
         item.classList.add("loaded");
       });
+      animateCoverArt();
+      createPlayButtons(desiredMethod);
+      const total = Math.min(albumGame.albums.length, 9);
+      animatePlayButtons('.play-buttons-container .play-button', total);
+      animateWaves(desiredMethod);
+      const waves = document.querySelectorAll('.wave');
+      waves.forEach(wave => wave.classList.remove('falldown'));
+      downloadInit();
+      playInit();
+      createMusicInfoBox();
+      if (desiredMethod === "by_lastfm_username") {
+        // shows avatar if it's username method
+        const username = data['info']['query'];
+        fetchAvatar(username)
+        .then(avatar => avatar['avatar'])
+        .then(avatar => createAvatarBox(avatar, username))
+        .then(() => {
+          $('.wrapper')
+          .waitForImages()
+          .done(() => {
+          animateAvatar(9);
+//          document.querySelector('.avatar-container')
+//            .classList.add('info-block-active');
+          });
+          }
+        );
+      };
 
-      frequentElements.playButton.classList.add("visible");
-      frequentElements.downloadButton.classList.add("visible");
-//      const collageURL = document.querySelector('#collage-link');
-//      collageURL.href = data['collage'];
 
-      /*            if ($('.button.active').attr('id') == 'by_username' || $('.button.active').attr('id') == 'by_spotify') {
-                      $('#game-frame').after(`<class="data-info">${data["info"]}</div>`);
-                  };*/
     }, function(loaded, count, success) {
       /* animate progress bar */
       var bar1 = new ldBar("#progress-bar", {
@@ -117,7 +134,9 @@ export const submitInput = function() {
       });
       bar1.set((loaded + 1 / count) * 100);
     });
-  }).catch((error) => {
+
+  })
+  .catch((error) => {
     // Handle the error
     console.log(`error is ${error}`);
   });
@@ -128,125 +147,112 @@ const submitForm = document.querySelector('#submit-form');
 submitForm.addEventListener('submit', () => {
   // checks if the game is not on
   if (submitForm.id === 'submit-form') {
-    submitInput();
+    const desiredMethod = document.querySelector('.method.active').id;
+    submitInput(desiredMethod);
   }
 });
 
+// prepares stringified JSON body for the fetch function
+function prepareJSONBody(method){
+  let qualifier = '';
+  let option = '';
+  if (method === "explore") {
+    // in case of 'explore' tab opened, get different values for the body
+    qualifier = '';
+    option = {
+      "genres": musicFilters.tagsPickedInfo,
+      "time_span": musicFilters.timeSpanInfo
+    };
+  } else {
+    // get the input value
+    qualifier = document.querySelector('#text-field').value;
+    // get the option value from select menu
+    option = frequentElements.selectOptions.value;
+  };
+  const body = {
+    "qualifier": qualifier,
+    "option": option
+  };
+  return JSON.stringify(body);
+};
 
-frequentElements.downloadButton.addEventListener('click', () => {
-  frequentElements.downloadButton.value = "WAIT FOR IT…";
-  fetch("save_collage", {
-    method: 'POST',
-    headers: new Headers({
-      'Content-Type': 'application/json'
-    }),
-    body: JSON.stringify({
-      "images": albumGame.albums.map(album => album.image)
+// initialize all the necessary download handlers
+function downloadInit() {
+  const downloadButton = document.querySelector('#download-button');
+  downloadButton.addEventListener('click', () => {
+    downloadButton.value = "WAIT FOR IT…";
+    downloadButton.classList.add("wait-for-it");
+    downloadButton.disabled = true;
+    fetch("save_collage", {
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify({
+        "images": albumGame.albums.map(album => album.image)
+      })
     })
-  }).then(response => response.json()).then(data => {
-    const myLink = document.createElement('a');
-    myLink.href = data;
-    myLink.target = "_blank";
-    document.body.appendChild(myLink);
-    myLink.click();
-    frequentElements.downloadButton.value = "SAVE COLLAGE";
+    .then(response => response.json()).then(data => {
+      const myLink = document.createElement('a');
+      myLink.href = data;
+      myLink.target = "_blank";
+      document.body.appendChild(myLink);
+      myLink.click();
+      downloadButton.value = "SAVE COLLAGE";
+      downloadButton.classList.remove("wait-for-it");
+      downloadButton.disabled = false;
+    });
   });
-});
-
-// play button
-frequentElements.playButton.onclick = (e) => {
-  // reset score, remove 'success' icons
-  resetGame();
-  e.target.classList.toggle('on');
-  e.target.classList.remove('won');
-  if (e.target.classList.contains('on')) {
-    prepareGame();
-    const input = document.querySelector('#play-field');
-    input.oninput = handleGuesses;
-  } else {
-    cancelGame();
-  };
 };
 
+const navBarSlideHandler = () => {
+  const hamburgerMenu = document.querySelector('.hamburger-menu');
+  const navigationBar = document.querySelector('.navigation-bar');
+  hamburgerMenu.addEventListener("click", () => {
+    navigationBar.classList.toggle('nav-active');
+    hamburgerMenu.classList.toggle('hamburger-menu-active');
+    if (navigationBar.classList.contains('nav-active')) {
+      animateNavigationBar();
+    }
+  })
+}
 
-function handleGuesses(e) {
-  const options = {
-    // isCaseSensitive: false,
-    // includeScore: false,
-    // shouldSort: true,
-    // includeMatches: false,
-    // findAllMatches: false,
-    minMatchCharLength: 12,
-    location: 2,
-    threshold: 0.015,
-    // distance: 100,
-    // useExtendedSearch: false,
-    // ignoreLocation: false,
-    // ignoreFieldNorm: false,
-    keys: [
-      "names",
-    ]
-  };
-  const fuse = new Fuse(albumGame.notGuessedAlbums, options);
-  const pattern = e.target.value;
-  const results = fuse.search(pattern).length;
-  if (results > 0) {
-    const albumID = fuse.search(pattern)[0]['item']['id'];
-    console.log(`search results: ${fuse.search(pattern)[0]['item']['title']}`);
-    highlightGuessedAlbum(albumID);
-    updateScore();
-    albumGame.removeGuessedAlbum(albumID);
-    frequentElements.textField.value ='';
-  }
-};
+navBarSlideHandler();
 
 
-// highlights the guessed album with animation & puts the success icon over the image
-function highlightGuessedAlbum(albumID) {
-  const guessedAlbum = document.querySelector(`.art-${albumID}`);
-  const title = albumGame.albums[albumID]['title'];
+const infoBlocksSlideHandler = () => {
+  const toolIcon = document.querySelector('.tools-icon');
+  toolIcon.addEventListener("click", () => {
+    console.log('clicked!');
+    const musicInfoBox = document.querySelector('.music-info-box');
+    const musicGenresContainer = document.querySelector('.music-genres-container');
+    const avatar = document.querySelector('.avatar-container');
 
-  guessedAlbum.classList.remove("guessed-right");
-  /**
-   trigger a reflow in between removing and adding the class name © css-tricks.com
-   helps restarting animation & playing it again if needed
-  */
-  void guessedAlbum.offsetWidth;
-  guessedAlbum.classList.add("guessed-right");
-  guessedAlbum.alt = title;
-  const successIcon = document.querySelector(`#success-${albumID}`);
-  successIcon.classList.add('visible');
-};
+    const exist = (element) => element;
+    [musicInfoBox, musicGenresContainer, avatar].some(exist);
+    console.log([musicInfoBox, musicGenresContainer, avatar].some(exist));
+    if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
+      toolIcon.classList.toggle('tools-active');
+    } else {
+//      toolIcon.classList.add('tools-active');
+    }
+    if (toolIcon.classList.contains('tools-active')) {
+        [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
+      if (item) {
+        item.classList.add('info-block-active');
+      }
+    });
+    } else {
+      [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
+      if (item) {
+        item.classList.remove('info-block-active');
+      }
+    });
+    };
+  })
 
-// updates score
-function updateScore() {
-  const totalAmountOfAlbums = albumGame.albums.length;
-  const total = Math.min(totalAmountOfAlbums, 9);
-  albumGame.incrementAlbumsCount();
-  const scoreText = document.querySelector(".score-text");
-  if (albumGame.albumsCount === total) {
-    // triggers winning function if all albums guessed
-    gameWon();
-  } else {
-    // updates the message otherwise
-    scoreText.textContent = `Wowee! You've guessed ${albumGame.albumsCount} out of ${total}.`;
-  }
-};
-
-// handles winning
-function gameWon() {
-  const scoreText = document.querySelector(".score-text");
-  const randomIndex = Math.floor(Math.random() * winningMessage.length);
-  scoreText.textContent = winningMessage[randomIndex]["quote"];
-  const scoreContainer = document.querySelector('.score-container');
-  scoreContainer.classList.add('info-tooltip', 'score-game-won');
-  scoreContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
-  addTooltips();
-  frequentElements.playButton.value = 'PLAY SOME MORE';
-  frequentElements.playButton.classList.add('won');
-};
-
-
+}
+infoBlocksSlideHandler();
 
 // activate buttons
 const buttonsContainer = document.querySelector('#buttons-container');
@@ -284,7 +290,11 @@ let timerID;
   item.addEventListener('focusin', () => {
     clearTimeout(timerID);
     // make sure the button's 'username' and the game is off
-    if (frequentElements.activeButtonID() === 'by_username' && !(frequentElements.playButton.classList.contains('on'))) {
+    if (
+    (frequentElements.activeButtonID() === 'by_lastfm_username' || frequentElements.activeButtonID() === 'by_artist')
+      && !(theGame.status)
+
+    ) {
       frequentElements.selectOptions.style.display = 'block';
     };
   });
@@ -298,275 +308,6 @@ let timerID;
   });
 });
 
-// fixes artist's name as per last.fm correction
-function fixArtistName(data) {
-  if (frequentElements.activeButtonID() === 'by_artist') {
-    frequentElements.textField.value = data['info'];
-  };
-};
 
-// loads cover art images to the main game frame
-function loadCoverArt(data) {
-  const totalAmountOfAlbums = data['albums'].length;
-  let length = (totalAmountOfAlbums < 10) ? totalAmountOfAlbums : 9;
-  for (var i = 0; i < length; i++) {
-    const album = data['albums'][i];
-    const imageURL = data['albums'][i]['image'];
-    const id = data['albums'][i]['id']
-    const coverArt = document.createElement("img");
-    coverArt.classList.add(`art-${id}`);
-    coverArt.classList.add('cover-art');
-    coverArt.src = `${imageURL}`;
-    const successIcon = document.createElement('img');
-    successIcon.id = `success-${id}`;
-    successIcon.classList.add('success-icon');
-    successIcon.src = 'static/images/check-mark-contrast.png';
-    successIcon.alt = 'checkmark';
-    const flexItem = document.createElement('div');
-    flexItem.id = `item-${i}`;
-    flexItem.classList.add('flex-item');
-    flexItem.appendChild(coverArt);
-    flexItem.appendChild(successIcon);
-    frequentElements.gameFrame.appendChild(flexItem);
-  }
-  resizeCoverArtImages(length);
-};
-
-function resizeCoverArtImages(amountOfAlbums) {
-  console.log(amountOfAlbums);
-  switch (amountOfAlbums) {
-    case 1:
-      const albumImage = document.querySelector(".cover-art");
-      albumImage.classList.add('cover-big');
-      break;
-    case 2:
-    case 4:
-      const albumImagesList = document.querySelectorAll(".cover-art");
-      albumImagesList.forEach((image) => image.classList.add('cover-medium'));
-      break;
-    case 5:
-    case 8:
-      console.log(document.querySelector('.art-0'), document.querySelector('.art-1'));
-      [document.querySelector(".art-0"), document.querySelector(".art-1")]
-        .forEach((image) => image.classList.add('cover-medium'));
-      break;
-    case 7:
-      [document.querySelector(".art-0"), document.querySelector(".art-1"),
-      document.querySelector(".art-2")]
-        .forEach((image) => image.classList.add('cover-medium'));
-
-      [document.querySelector(".art-3"), document.querySelector(".art-4"),
-      document.querySelector(".art-5"), document.querySelector(".art-6")]
-        .forEach((image) => image.classList.add('cover-small'));
-      const referenceNode = document.querySelector('#item-2');
-      const specialContainer = document.createElement('div');
-      specialContainer.classList.add('seven-albums-special-container');
-      insertAfter(specialContainer, referenceNode);
-      [document.querySelector("#item-3"), document.querySelector("#item-4"),
-        document.querySelector("#item-5"), document.querySelector("#item-6")]
-        .forEach((item) => specialContainer.appendChild(item));
-      break;
-  }
-};
-
-
-function setPlaceholder(targetButtonID) {
-  const options = {
-    "by_username": "last.fm username",
-    "by_artist": "artist name",
-    "by_spotify": "Spotify Playlist Link",
-    "explore": "music tags/genres"
-  }
-  frequentElements.textField.placeholder = options[targetButtonID];
-};
-
-
-function setWavesColors(methodType) {
-      const wavePathOne = document.querySelector("#wave-path-1");
-      const wavePathTwo = document.querySelector("#wave-path-2");
-      const wavePathThree = document.querySelector("#wave-path-3");
-  switch(methodType) {
-    case 'by_spotify':
-      wavePathTwo.setAttribute("style", "fill: #1DB954");
-      wavePathThree.setAttribute("style", "fill: #191414");
-      break;
-    case "by_username":
-      wavePathOne.setAttribute("style", "fill: #000");
-      wavePathTwo.setAttribute("style", "fill: #95A2AC");
-      wavePathThree.setAttribute("style", "fill: #d51007");
-      break;
-    default:
-      wavePathTwo.setAttribute("style", "fill: #95A2AC");
-      wavePathThree.setAttribute("style", "fill: #95A2AC");
-  }
-};
-
-
-
-function prepareGame() {
-  hideOptions('on');
-  createScoreContainer();
-  frequentElements.textField.id = 'play-field';
-  frequentElements.textField.placeholder = 'Can you name all the albums?';
-  frequentElements.textField.value = '';
-  frequentElements.textField.focus();
-  const formContainer = document.querySelector(".form-container");
-  formContainer.id = "guess-form";
-  frequentElements.playButton.value = 'GIVE UP';
-  const okButton = document.querySelector(".ok-btn");
-  okButton.style.display = "none";
-  albumGame.notGuessedAlbums = [...albumGame.albums];
-};
-
-function createScoreContainer() {
-  const scoreContainer = document.createElement("div");
-  scoreContainer.classList.add("flex-container", "shadow-main", "score-container");
-  const scoreText = document.createElement("h1");
-  scoreText.classList.add("score-text");
-  scoreText.textContent = "You haven't guessed any albums yet. 😟";
-  scoreContainer.appendChild(scoreText);
-  const referenceNode = document.querySelector(".search-and-options-container");
-  insertAfter(scoreContainer, referenceNode);
-}
-
-
-function cancelGame() {
-
-  const scoreContainer = document.querySelector('.score-container');
-  if (scoreContainer) {
-    scoreContainer.remove();
-  };
-  const formContainer = document.querySelector(".form-container");
-  let defaultForm = 'submit-form';
-  if (frequentElements.activeButtonID() === 'explore') {
-    defaultForm = 'tags-form';
-    const sliderContainer = document.querySelector('.slider-container');
-    if (sliderContainer) {
-      sliderContainer.style.display = 'flex';
-    };
-  };
-  formContainer.id = defaultForm;
-  console.log(formContainer.id);
-  frequentElements.playButton.value = 'GUESS ALBUMS';
-  if (frequentElements.playButton.classList.contains('on')) {
-    frequentElements.playButton.classList.remove('on');
-  };
-  const okButton = document.querySelector(".ok-btn");
-  okButton.style.display = "block";
-  setPlaceholder(frequentElements.activeButtonID());
-};
-
-function resetGame() {
-  // resets game state
-  // reset a number of guessed albums
-  albumGame.albumsCount = 0;
-  const successIconList = document.querySelectorAll('.success-icon');
-  // remove 'check mark' icons
-  successIconList.forEach(icon => icon.classList.remove('visible'));
-  // remove a description of the album
-  const coverArtList = document.querySelectorAll('.cover-art');
-  coverArtList.forEach(image => {
-    image.alt = "";
-  });
-};
-
-function loadFailureArt(node, failData) {
-  frequentElements.gameFrame.classList.add("shadow-main");
-  const failureArt = document.createElement("img");
-  const failureArtURL = failData['failure_art'];
-  failureArt.src = failureArtURL;
-  failureArt.classList.add("failure-art");
-
-  const failureArtBlock = document.createElement("div");
-  failureArtBlock.classList.add("failure-art-block", "shadow-main");
-
-  const failureArtText = document.createElement("h1");
-  failureArtText.classList.add("text-light");
-  failureArtText.textContent = "someone made an oopsie!";
-
-  failureArtBlock.appendChild(failureArtText);
-
-  node.appendChild(failureArt);
-  node.appendChild(failureArtBlock);
-};
-
-function loadSpinner(node) {
-  const spinner = document.createElement("img");
-  const url = "static/images/loading/spinner-vinyl-64.gif";
-  spinner.classList.add('spinner');
-  spinner.src = url;
-  node.appendChild(spinner);
-};
-
-function removeAllChildNodes(parent) {
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-};
-
-/* tooltips */
-// find all elements that need tooltips
-const tooltipElements = document.querySelectorAll('.info-tooltip');
-// loop through every such element
-tooltipElements.forEach(function(el) {
-  // add 'label' element
-  const tooltip = document.createElement('label');
-  // add class to it
-  tooltip.classList.add('tooltipText');
-  // change text of that element to the text from 'data-tooltip' of the element
-  tooltip.textContent = el.dataset.tooltip;
-  el.appendChild(tooltip);
-});
-
-
-
-
-
-
-function hideOptions() {
-  frequentElements.selectOptions.style.display = 'none';
-
-  const sliderContainer = document.querySelector('.slider-container');
-  if (sliderContainer) {
-    sliderContainer.style.display = 'none';
-  };
-
-  const scoreContainer = document.querySelector('.score-container');
-  if (scoreContainer) {
-    scoreContainer.style.display = "none";
-  };
-};
-
-function configureOptionsStyle(targetButtonID) {
-  // if a button pressed is a new button/new destination
-  if (targetButtonID !== frequentElements.activeButtonID()) {
-    // change the placeholder to the correct one
-    // cancel the game
-    cancelGame();
-    if (targetButtonID === "explore") {
-      prepareToExplore();
-    } else if (frequentElements.activeButtonID() === "explore") {
-      cleanAfterExplore();
-    }
-    setPlaceholder(targetButtonID);
-    setWavesColors(targetButtonID);
-    frequentElements.textField.value = '';
-  }
-};
-
-
-function cleanAfterExplore() {
-  const sliderContainer = document.querySelector('.slider-container');
-  const musicGenresContainer = document.querySelector('.music-genres-container');
-  [sliderContainer, musicGenresContainer].forEach(container => {
-    if (container) {
-      container.remove();
-    };
-  });
-  const okButton = document.querySelector(".ok-btn");
-  okButton.value = 'OK';
-  okButton.disabled = false;
-  const formField = document.querySelector('.form-field');
-  formField.id = "text-field";
-  formField.oninput = '';
-};
+// initialize/create the tooltips
+addTooltips();

@@ -4,7 +4,7 @@ import {setPlaceholder} from './uiconfig.js'
 import {handleTags} from './explore.js'
 import {hideOptions, resetPlayButtons} from './uiconfig.js'
 import {winningMessage} from './info.js'
-import {animateHighlightGuessedAlbum, animateBlockOff, animateWinningMessage} from './animation.js'
+import {animateHighlightGuessedAlbum, animateWinningMessage} from './animation.js'
 import {hideUncoverModeForGame, backToRealityFromTheGame} from './albuminfobox.js'
 
 
@@ -201,7 +201,6 @@ function createWinningContainer() {
   winningContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
   frequentElements.gameFrame.appendChild(winningContainer);
   winningContainer.addEventListener('click', (e) => {
-    animateBlockOff(winningContainer);
     setTimeout(() => {
         e.target.remove();
       }, 100);

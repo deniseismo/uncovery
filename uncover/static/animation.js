@@ -105,8 +105,13 @@ export function animateMusicGenresContainer(container) {
 
 // animates a random winning message
 export function animateWinningMessage() {
-  anime({
-    targets: '.winning-text',
+  let tl = anime.timeline({
+  easing: 'easeOutExpo',
+  duration: 750,
+  });
+  tl
+  .add({
+      targets: '.winning-text',
     opacity: [
       {value: 0, easing: 'easeOutExpo'},
       {value: 1, easing: 'easeOutExpo'},
@@ -124,6 +129,37 @@ export function animateWinningMessage() {
     easing: 'easeOutExpo',
     duration: 500
   })
+  .add({
+    targets: '.winning-text',
+    backgroundColor: [
+      {value: '#67b26f'},
+      {value: '#56ab2f'},
+      {value: '#59c173'},
+      {value: '#fff'},
+      {value: '#11998e'}
+    ],
+    duration: 750,
+    easing: 'easeInOutSine'
+  })
+//  anime({
+//    targets: '.winning-text',
+//    opacity: [
+//      {value: 0, easing: 'easeOutExpo'},
+//      {value: 1, easing: 'easeOutExpo'},
+//      {value: 0, easing: 'easeOutElastic(5, 0.3)'},
+//      {value: 1, easing: 'linear'}
+//    ],
+//    scale: [
+//      {value: 0.8, easing: 'easeOutExpo'},
+//      {value: 1.5, delay: 500},
+//      {value: 1, duration: 500}
+//    ],
+//    fontSize: ['0.1rem', '2rem'],
+//    padding: ['0rem', '1rem'],
+//    backgroundColor: ['#911a1a', '#243d00'],
+//    easing: 'easeOutExpo',
+//    duration: 500
+//  })
 };
 
 // animates  appearance of 'blobs' inside of a music genres container

@@ -7,7 +7,7 @@ from uncover.config import Config
 
 sess = Session()
 db = SQLAlchemy()
-cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': '/tmp'})
 
 
 def create_app(config_class=Config):
@@ -20,7 +20,6 @@ def create_app(config_class=Config):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     app = Flask(__name__)
 
-    # CORS(app)
     app.config.from_object(Config)
     cache.init_app(app)
     # pass the app to the database (initialize the app)

@@ -62,10 +62,15 @@ def save_image(image_url):
         return None
     random_hex = secrets.token_hex(8)
     image_filename = random_hex
-    image_path = os.path.join(current_app.root_path, 'static/cover_art_images', image_filename)
-
+    image_path = os.path.join(current_app.root_path, 'static/optimized_cover_art_images', image_filename)
     try:
-        an_image.convert('RGB').save(f'{image_path}.png', "PNG", optimize=True)
+        an_image.convert('RGB').save(f'{image_path}.jpg', quality=95)
+
+        resized_200 = an_image.convert('RGB').resize((200, 200), Image.LANCZOS)
+        resized_300 = an_image.convert('RGB').resize((300, 300), Image.LANCZOS)
+
+        resized_200.save(f'{image_path}-size200.jpg', quality=95)
+        resized_300.save(f'{image_path}-size300.jpg', quality=95)
     except (OSError, ValueError):
         return None
     return image_filename
@@ -102,7 +107,7 @@ def database_populate():
             for album in tqdm(artist_albums):
                 title = album['title']
                 rating = album['rating']
-                spotify_id = spotify_get_album_id(title, artist_name)
+                # spotify_id = spotify_get_album_id(title, artist_name)
                 try:
                     mb_id = album['mbid']
                 except (KeyError, TypeError):
@@ -127,8 +132,8 @@ def database_populate():
                                         rating=rating,
                                         mb_id=mb_id,
                                         cover_art=cover_art)
-                    if spotify_id:
-                        album_entry.spotify_id = spotify_id
+                    # if spotify_id:
+                    #     album_entry.spotify_id = spotify_id
                     if mb_id:
                         album_entry.mb_id = mb_id
                     if alternative_title:
@@ -272,6 +277,6 @@ def populate_spotify_album_ids():
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
-# database_populate()
+database_populate()
 
-populate_spotify_album_ids()
+# populate_spotify_album_ids()

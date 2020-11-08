@@ -39,11 +39,11 @@
         <link rel="stylesheet"
               href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@7.2.0/dist/css/autoComplete.min.css">
         <link href="{{ url_for('static', filename='auto-complete.css') }}" rel="stylesheet">
-        <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='styles-mini.css') }}" rel="stylesheet">
         {% if title %}
-        <title>uncovery — {{ title }}</title>
+        <title>uncovery.fm — {{ title }}</title>
         {% else %}
-        <title>uncovery — your next best collage</title>
+        <title>uncovery.fm — uncover your next favorite album</title>
         {% endif %}
     </head>
 
@@ -53,8 +53,8 @@
     </main>
     <script src="{{ url_for('static', filename='nouislider/nouislider.min.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery.autocomplete.js') }}"></script>
-    <script src="{{ url_for('static', filename='anime.min.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='main.js') }}">
+    <!--    <script src="{{ url_for('static', filename='anime.min.js') }}"></script>-->
+    <script type="module" src="{{ url_for('static', filename='bundle.9e67286b6bff3100c36c.js') }}">
 
     </script>
 

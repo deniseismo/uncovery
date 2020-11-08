@@ -12,6 +12,8 @@ async def lastfm_fetch_response(payload: dict, session):
     payload['api_key'] = current_app.config['API_KEY']
     payload['format'] = 'json'
     async with session.get(url, headers=headers, params=payload) as response:
+        if response.status != 200:
+            return None
         if not getattr(response, 'from_cache', False):
             await asyncio.sleep(0.2)
         return await response.json()
@@ -31,6 +33,8 @@ async def lastfm_fetch_album_listeners(album: str, artist: str, session):
         'artist': artist
     }, session)
     # in case of an error, return None
+    if not response:
+        return None
     try:
         album_listeners = response['album']['listeners']
     except KeyError:
