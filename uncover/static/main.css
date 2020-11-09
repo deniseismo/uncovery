@@ -1492,3 +1492,24 @@ label.tooltipText:after {
     opacity: 0 !important;
     transition: all 0.3s ease-out;
 }
+
+#consent-popup {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    opacity: 1;
+    background: white;
+    z-index: 10;
+    transition: opacity .8s ease;
+}
+#consent-popup.hidden {
+  opacity: 0;
+}
+
+#accept {
+  padding: 0.5rem;
+  background: var(--dark-color);
+  color: white;
+}
