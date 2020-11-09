@@ -39,6 +39,7 @@ body {
 
 .wrapper {
   overflow-x: hidden;
+  overflow-y: hidden;
   position: relative;
   width: 100%;
   height: 100%;
@@ -181,6 +182,13 @@ header {
   transform: rotate(-45deg) translate(5px, -6px);
 }
 
+
+@media screen and (max-height: 899px) {
+  .wrapper {
+    overflow-y: auto;
+  }
+}
+
 @media screen and (max-width: 850px) {
   body {
     overflow-x: hidden;
@@ -262,6 +270,8 @@ header {
   padding: 0;
   border: 0;
   font-size: 1.2rem;
+  width: 200px;
+  min-width: 200px;
 }
 
 .method:hover {
@@ -469,7 +479,8 @@ it encapsulates all the content with the navigation except 'waves'
 .text-field {
   width: 75%;
   display: flex;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  min-width: 400px;
 }
 
 .text-field::placeholder {
@@ -478,7 +489,7 @@ it encapsulates all the content with the navigation except 'waves'
 
 /* options */
 .select-options {
-  width: 25%;
+  width: 33%;
   display: none;
   flex: 1 1 auto;
   border-radius: 0;
@@ -803,7 +814,7 @@ label.tooltipText:after {
   left: 0;
   bottom: 0;
   opacity: 0.75;
-  z-index: -99;
+  z-index: 1;
 }
 
 .copyright > p {
@@ -1128,6 +1139,10 @@ label.tooltipText:after {
 	font-weight: 500;
 	background: #FFDB57;
 	padding: 0.25rem 0.75rem;
+	overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 .info-box-description {
@@ -1150,7 +1165,7 @@ label.tooltipText:after {
 .tools-and-menu-hidden-elements {
 	display: flex;
 	align-items: center;
-	margin-right: 0.5rem;
+	padding-right: 0.5rem;
 	justify-content: flex-end;
 	width: 25%;
 }
@@ -1159,7 +1174,14 @@ label.tooltipText:after {
   display: none;
   cursor: pointer;
   width: 35px;
+  transition: transform 0.35s ease;
 }
+
+.tools-active {
+  transform: rotate(45deg);
+  transition: transform 0.35s ease;
+}
+
 
 .spotify-login {
   white-space: nowrap;
@@ -1243,6 +1265,9 @@ label.tooltipText:after {
     margin-left: 0%;
 
   }
+  .method {
+    min-width: auto;
+  }
 }
 
 @media screen and (max-width: 1200px) {
@@ -1310,9 +1335,9 @@ label.tooltipText:after {
   .search-and-options-container {
     width: 100%;
   }
-  .tools-icon {
+/*  .tools-icon {
     display: block;
-  }
+  }*/
   .tools-and-menu-hidden-elements {
     margin-left: 0 !important;
     width: 50% !important;
@@ -1320,11 +1345,8 @@ label.tooltipText:after {
   .splash {
     align-items: center;
   }
-  .music-info-box, .music-genres-container {
-    width: 35%;
-    transform: translateX(-100%) !important;
-    opacity: 0 !important;
-    transition: all 0.3s ease-out;
+  .music-genres-container {
+    width: 50%;
   }
   .music-info-box {
     width: 100%;
@@ -1344,11 +1366,6 @@ label.tooltipText:after {
   }
   .music-info-box, .music-genres-container {
     background: var(--bg-color);
-  }
-  .avatar-container {
-    transform: translateX(-100%) !important;
-    opacity: 0 !important;
-    transition: all 0.3s ease-out;
   }
   .lcd-i-heard {
     font-size: 2.5rem !important;
@@ -1468,4 +1485,10 @@ label.tooltipText:after {
     width: calc(150px * 0.75);
     height: calc(150px * 0.75);
   }
+}
+
+.info-block-hidden {
+    transform: translateX(-100%) !important;
+    opacity: 0 !important;
+    transition: all 0.3s ease-out;
 }

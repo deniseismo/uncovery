@@ -1,4 +1,4 @@
-import {theGame, albumGame} from "./main.js"
+import {theGame, albumGame, mediaQuery, handleToolsIconChange} from "./main.js"
 import {animateMusicGenresContainer, animatePlayButtons, animateSpotifyWidget} from './animation.js'
 import {handleTags} from "./explore.js"
 import {loadSpinner, insertAfter} from "./utils.js"
@@ -6,7 +6,7 @@ import {loadSpinner, insertAfter} from "./utils.js"
 
 export function createMusicInfoBox() {
   const musicInfoBox = document.createElement('div');
-  musicInfoBox.classList.add('music-info-box', 'shadow-main', 'info-block-active');
+  musicInfoBox.classList.add('music-info-box', 'shadow-main');
   const infoText = document.createElement('h1');
   infoText.textContent = "ALBUM INFO";
   infoText.classList.add('album-info-header');
@@ -29,6 +29,8 @@ export function createMusicInfoBox() {
   document.querySelector('.wrapper').appendChild(musicInfoBox);
   animateMusicGenresContainer(musicInfoBox);
   animatePlayButtons(uncover, 1);
+  const toolsIcon = document.querySelector('.tools-icon')
+  toolsIcon.style.display = 'block';
 }
 
 function uncoverModeOn() {

@@ -180,6 +180,8 @@ export function createAvatarBox(avatarURL, username) {
   avatarContainer.appendChild(userName);
   avatarContainer.appendChild(avatarImage);
   document.querySelector('.wrapper').appendChild(avatarContainer);
+  const toolsIcon = document.querySelector('.tools-icon')
+  toolsIcon.style.display = 'block';
 }
 
 export function removeAvatarContainer() {

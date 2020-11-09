@@ -83,7 +83,7 @@ export async function handleTags(e) {
 // a container with music tags/genres filters chosen
 function createMusicGenresContainer() {
   const musicGenresContainer = document.createElement('div');
-  musicGenresContainer.classList.add('music-genres-container', 'shadow-main', 'info-block-active');
+  musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
   selectedFilters.textContent = "FILTERS";
   selectedFilters.classList.add('filters-header');
@@ -115,6 +115,8 @@ function createMusicGenresContainer() {
   musicFilters.tagsPickedInfo.forEach(tag => {
     createMusicGenreElement(tag);
   });
+  const toolsIcon = document.querySelector('.tools-icon')
+  toolsIcon.style.display = 'block';
 };
 
 // creates container for music tags

@@ -239,13 +239,15 @@ const infoBlocksSlideHandler = () => {
     if (toolIcon.classList.contains('tools-active')) {
         [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
       if (item) {
-        item.classList.add('info-block-active');
+        item.classList.add('info-block-hidden');
+        item.classList.remove('info-block-active');
       }
     });
     } else {
       [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
       if (item) {
-        item.classList.remove('info-block-active');
+        item.classList.remove('info-block-hidden');
+        item.classList.add('info-block-active');
       }
     });
     };
@@ -311,3 +313,36 @@ let timerID;
 
 // initialize/create the tooltips
 addTooltips();
+
+
+export const mediaQuery = window.matchMedia('(min-width: 800px)')
+ 
+export function handleToolsIconChange(e) {
+  // Check if the media query is true
+  if (e.matches) {
+    // Then log the following message to the console
+    console.log('bigger')
+    const toolsIcon = document.querySelector('.tools-icon')
+    toolsIcon.style.display = 'none';
+
+  } else {
+   console.log('smaller')
+    const toolsIcon = document.querySelector('.tools-icon')
+    const musicInfoBox = document.querySelector('.music-info-box');
+    const musicGenresContainer = document.querySelector('.music-genres-container');
+    const avatar = document.querySelector('.avatar-container');
+    const exist = (element) => element;
+    [musicInfoBox, musicGenresContainer, avatar].some(exist);
+    console.log([musicInfoBox, musicGenresContainer, avatar].some(exist));
+    if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
+        toolsIcon.style.display = 'block';
+    }
+  }
+}
+ 
+// Register event listener
+mediaQuery.addListener(handleToolsIconChange);
+
+// Initial check
+// handleTabletChange(mediaQuery)
+handleToolsIconChange(mediaQuery);
