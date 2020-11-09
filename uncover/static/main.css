@@ -1150,7 +1150,7 @@ label.tooltipText:after {
 .tools-and-menu-hidden-elements {
 	display: flex;
 	align-items: center;
-	margin-right: 1rem;
+	margin-right: 0.5rem;
 	justify-content: flex-end;
 	width: 25%;
 }
@@ -1158,6 +1158,7 @@ label.tooltipText:after {
 .tools-icon {
   display: none;
   cursor: pointer;
+  width: 35px;
 }
 
 .spotify-login {

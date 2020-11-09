@@ -84,7 +84,15 @@ def get_spotify_user_info(token):
             print('getting here')
             current_user = spotify_tekore_client.current_user()
             username = current_user.display_name
-            user_image = current_user.images[0].url
+            current_user_image_list = current_user.images
+            if current_user_image_list:
+                try:
+                    user_image = current_user.images[0].url
+                except (KeyError, IndexError, TypeError):
+                    user_image = None
+            else:
+                user_image = None
+
     except tk.HTTPError:
         return None
     user_info = {

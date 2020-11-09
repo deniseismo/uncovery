@@ -6,7 +6,7 @@ import {loadSpinner, insertAfter} from "./utils.js"
 
 export function createMusicInfoBox() {
   const musicInfoBox = document.createElement('div');
-  musicInfoBox.classList.add('music-info-box', 'shadow-main');
+  musicInfoBox.classList.add('music-info-box', 'shadow-main', 'info-block-active');
   const infoText = document.createElement('h1');
   infoText.textContent = "ALBUM INFO";
   infoText.classList.add('album-info-header');
@@ -125,45 +125,6 @@ function uncoverAlbumInfo(album) {
     musicInfoBox.classList.remove('no-bottom-padding');
     }
   })
-//  if (album.spotify_id) {
-//    console.log('spotify! ura!')
-//    spotifyLoadingSpinner();
-//    const spotifyWidget = document.querySelector('.spotify-widget');
-//    spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
-//    spotifyWidget.onload = showSpotifyOnLoad;
-//    spotifyWidget.onerror = function() {
-//      console.log("something's wrong with the iframe");
-//    };
-//    const musicInfoBox = document.querySelector('.music-info-box');
-//    musicInfoBox.classList.add('no-bottom-padding');
-//  } else {
-//    const spotifyWidget = document.querySelector('.spotify-widget');
-//    spotifyWidget.classList.remove('spotify-active');
-//    const widgetWrapper = document.querySelector('.widget-wrapper');
-//    widgetWrapper.style.display = 'none';
-//    const musicInfoBox = document.querySelector('.music-info-box');
-//    musicInfoBox.classList.remove('no-bottom-padding');
-//  }
-//    if (album.spotify_id) {
-//    console.log('spotify! ura!')
-//    spotifyLoadingSpinner();
-//    const spotifyWidget = document.querySelector('.spotify-widget');
-//    spotifyWidget.src = `https://open.spotify.com/embed/album/${album.spotify_id}`;
-//    spotifyWidget.onload = showSpotifyOnLoad;
-//    spotifyWidget.onerror = function() {
-//      console.log("something's wrong with the iframe");
-//    };
-//    const musicInfoBox = document.querySelector('.music-info-box');
-//    musicInfoBox.classList.add('no-bottom-padding');
-//  } else {
-//    const spotifyWidget = document.querySelector('.spotify-widget');
-//    spotifyWidget.classList.remove('spotify-active');
-//    const widgetWrapper = document.querySelector('.widget-wrapper');
-//    widgetWrapper.style.display = 'none';
-//    const musicInfoBox = document.querySelector('.music-info-box');
-//    musicInfoBox.classList.remove('no-bottom-padding');
-//  }
-
 }
 
 function createSpotifyWidget() {

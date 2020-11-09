@@ -63,6 +63,7 @@ def spotify_callback():
             session['user'] = user_id
             user_entry = User.query.filter_by(spotify_id=user_id).first()
             if not user_entry:
+                print(f'new user! id: {user_id}')
                 # if the user is not yet registered in db
                 # save user to the db with the refresh token
                 refresh_token = token.refresh_token

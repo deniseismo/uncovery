@@ -132,13 +132,10 @@ export function animateWinningMessage() {
   .add({
     targets: '.winning-text',
     backgroundColor: [
-      {value: '#67b26f'},
-      {value: '#56ab2f'},
-      {value: '#59c173'},
       {value: '#fff'},
-      {value: '#11998e'}
+      {value: '#7a911a'}
     ],
-    duration: 750,
+    duration: 250,
     easing: 'easeInOutSine'
   })
 //  anime({

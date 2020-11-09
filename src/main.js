@@ -7,7 +7,7 @@ import {configureOptionsStyle, removePlayButtons, createPlayButtons,
 import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar, animateNavigationBar} from './animation.js'
 import {loadCoverArt, loadFailureArt} from "./coverart.js";
 import {createMusicInfoBox, removeMusicInfoBox} from "./albuminfobox.js";
-import './styles/main.css';
+
 
 let controller = null;
 
