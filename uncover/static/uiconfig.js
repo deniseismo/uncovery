@@ -180,8 +180,7 @@ export function createAvatarBox(avatarURL, username) {
   avatarContainer.appendChild(userName);
   avatarContainer.appendChild(avatarImage);
   document.querySelector('.wrapper').appendChild(avatarContainer);
-  const toolsIcon = document.querySelector('.tools-icon')
-  toolsIcon.style.display = 'block';
+  showToolsIcon();
 }
 
 export function removeAvatarContainer() {
@@ -191,10 +190,14 @@ export function removeAvatarContainer() {
   }
 }
 
-//export showToolsIcon() {
-//  const avatarContainer = document.querySelector('.avatar-container');
-//  const musicGenresContainer = document.querySelector('.music-genres-container');
-//  const musicInfoBox = document.querySelector('.music-info-box');
-//  [avatarContainer, musicGenresContainer
-//}
-//
+export function showToolsIcon() {
+const mediaQuery = window.matchMedia('(min-width: 800px)')
+ 
+// Check if the media query is true
+    if (!mediaQuery.matches) {
+      // Then trigger an alert
+      alert('Media Query Matched!')
+      const toolsIcon = document.querySelector('.tools-icon')
+      toolsIcon.style.display = 'block';
+    }
+}

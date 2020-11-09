@@ -2,6 +2,7 @@ import {theGame, albumGame, mediaQuery, handleToolsIconChange} from "./main.js"
 import {animateMusicGenresContainer, animatePlayButtons, animateSpotifyWidget} from './animation.js'
 import {handleTags} from "./explore.js"
 import {loadSpinner, insertAfter} from "./utils.js"
+import {showToolsIcon} from "./uiconfig.js"
 
 
 export function createMusicInfoBox() {
@@ -29,9 +30,10 @@ export function createMusicInfoBox() {
   document.querySelector('.wrapper').appendChild(musicInfoBox);
   animateMusicGenresContainer(musicInfoBox);
   animatePlayButtons(uncover, 1);
-  const toolsIcon = document.querySelector('.tools-icon')
-  toolsIcon.style.display = 'block';
+  showToolsIcon();
 }
+
+
 
 function uncoverModeOn() {
   theGame.uncoveryStatus = true;

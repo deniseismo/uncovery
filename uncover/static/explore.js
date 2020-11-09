@@ -1,7 +1,7 @@
 import {Blob} from "./shapes.js"
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters, albumGame} from "./main.js"
-import {removeAvatarContainer} from "./uiconfig.js"
+import {removeAvatarContainer, showToolsIcon} from "./uiconfig.js"
 import {animateTimeSpan, animateMusicGenreOn, animateBlockOff,
         animateMusicGenresContainer, animateMorphBlob, animateBlob, animatePlayButtons} from './animation.js'
 
@@ -115,8 +115,7 @@ function createMusicGenresContainer() {
   musicFilters.tagsPickedInfo.forEach(tag => {
     createMusicGenreElement(tag);
   });
-  const toolsIcon = document.querySelector('.tools-icon')
-  toolsIcon.style.display = 'block';
+  showToolsIcon();
 };
 
 // creates container for music tags
