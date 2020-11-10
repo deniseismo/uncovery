@@ -16,12 +16,15 @@ from uncover.models import Artist, Album
 async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=False, ultrafast=False):
     """
     try finding an album image through Spotify → MusicBrainz → Discogs
+    :param ultrafast: a lightning fast approach to finding images
     :param fast: a faster way to get the image (through Spotify first)
     :param mbid: MusicBrainz id of an album
     :param album_title: album's title
     :param artist: artist's name
     :return:
     """
+    if not album_title or not artist:
+        return None
     album_image = None
     # -- MusicBrainz
     if fast:
@@ -60,9 +63,14 @@ async def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, 
 def fetch_artists_top_albums_images(artist: str, sorting):
     """
     get artist's top album images (default way), no database
+    :param sorting: earliest/latest/popular/shuffle
     :param artist: artist's name
     :return: a dict of all the album images found
     """
+    if not artist or not sorting:
+        return None
+    if sorting not in ["popular", "latest", "earliest", "shuffle"]:
+        return None
     # try correcting some typos in artist's name
     correct_name = lastfm.lastfm_get_artist_correct_name(artist)
     if correct_name:
@@ -136,6 +144,10 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
     :param artist_name: artist's name
     :return: album info dict with all the info about albums
     """
+    if not artist_name or not sorting:
+        return None
+    if sorting not in ["popular", "latest", "earliest", "shuffle"]:
+        return None
     ORDER = {
         "popular": Album.rating.desc(),
         "shuffle": func.random(),
@@ -154,7 +166,10 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
         return None
 
     # album entries, each of 'Album' SQL class
-    album_entries = Album.query.filter_by(artist=artist).order_by(ORDER[sorting]).limit(ALBUM_LIMIT).all()
+    try:
+        album_entries = Album.query.filter_by(artist=artist).order_by(ORDER[sorting]).limit(ALBUM_LIMIT).all()
+    except (KeyError, IndexError, TypeError):
+        return None
 
     # initialize the album info dict
     album_info = {
@@ -187,7 +202,7 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
     return album_info
 
 
-@cache.memoize(timeout=360)
+@cache.memoize(timeout=3600)
 def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     """
     finds a specific album image via database
@@ -195,6 +210,8 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     :param an_album_to_find: album's title
     :return:
     """
+    if not artist_name or not an_album_to_find:
+        return None
     artist = Artist.query.filter_by(name=artist_name).first()
     print(f'artist found in sql: {artist}')
     if not artist:

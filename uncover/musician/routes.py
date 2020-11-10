@@ -21,11 +21,27 @@ def get_albums_by_artist():
     sorting = content["option"]
     print(f'getting {artist}')
     print(f'sorting: {sorting}')
-    if not artist:
+    if not artist or not sorting:
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
             {'message': 'an artist has no name, huh?',
+             'failure_art': url_for('static',
+                                    filename=failure_art_filename)}
+        ),
+            404)
+    if not isinstance(artist, str):
+        failure_art_filename = display_failure_art(get_failure_images())
+        return make_response(jsonify(
+            {'message': 'an artist has no name, huh?',
+             'failure_art': url_for('static',
+                                    filename=failure_art_filename)}
+        ),
+            404)
+    if len(artist) > 98:
+        failure_art_filename = display_failure_art(get_failure_images())
+        return make_response(jsonify(
+            {'message': "you ain't foolin' no one",
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),

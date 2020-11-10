@@ -31,7 +31,7 @@ def get_albums_by_username():
         ),
             404)
     username = username.strip()
-    if len(username) > 15 or len(username) < 2:
+    if not (1 < len(username) < 16):
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = display_failure_art(get_failure_images())
         return make_response(jsonify(
@@ -95,10 +95,16 @@ def get_avatar_image():
     gets user's avatar image
     :return: a jsonified dict with user avatar image url in it
     """
-    content = request.get_json()
+    try:
+        content = request.get_json()
+    except TypeError:
+        return None
     if not content:
         return None
-    username = content['qualifier']
+    try:
+        username = content['qualifier']
+    except (KeyError, IndexError, TypeError):
+        return None
     if not username:
         return None
     user_avatar = lastfm_get_user_avatar(username)

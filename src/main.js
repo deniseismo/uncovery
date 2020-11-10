@@ -7,7 +7,7 @@ import {configureOptionsStyle, removePlayButtons, createPlayButtons,
 import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar, animateNavigationBar} from './animation.js'
 import {loadCoverArt, loadFailureArt} from "./coverart.js";
 import {createMusicInfoBox, removeMusicInfoBox} from "./albuminfobox.js";
-
+import {handleCookieConsent} from "./cookieconsent.js";
 
 let controller = null;
 
@@ -346,3 +346,42 @@ mediaQuery.addListener(handleToolsIconChange);
 // Initial check
 // handleTabletChange(mediaQuery)
 handleToolsIconChange(mediaQuery);
+
+
+//const cookieStorage = {
+//    getItem: (item) => {
+//        const cookies = document.cookie
+//            .split(';')
+//            .map(cookie => cookie.split('='))
+//            .reduce((acc, [key, value]) => ({ ...acc, [key.trim()]: value }), {});
+//        return cookies[item];
+//    },
+//    setItem: (item, value) => {
+//        document.cookie = `${item}=${value};`
+//    }
+//}
+//
+//const storageType = cookieStorage;
+//const consentPropertyName = 'uncovery_cookie_consent';
+//const shouldShowPopup = () => !storageType.getItem(consentPropertyName);
+//const saveToStorage = () => storageType.setItem(consentPropertyName, true);
+//
+//window.onload = () => {
+//
+//    const acceptFn = event => {
+//        saveToStorage(storageType);
+//        consentPopup.classList.add('hidden');
+//    }
+//    const consentPopup = document.getElementById('consent-popup');
+//    const acceptBtn = document.getElementById('accept');
+//    acceptBtn.addEventListener('click', acceptFn);
+//
+//    if (shouldShowPopup(storageType)) {
+//        console.log('this triggered!')
+//        setTimeout(() => {
+//            consentPopup.classList.remove('hidden');
+//        }, 2000);
+//    }
+//};
+
+window.onload = handleCookieConsent;

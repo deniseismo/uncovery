@@ -32,6 +32,8 @@ def lastfm_get_album_listeners(album: str, artist: str):
     :param artist: artist's name
     :return:
     """
+    if not album or not artist:
+        return None
     response = lastfm_get_response({
         'method': ' album.getInfo',
         'album': album,

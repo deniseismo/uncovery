@@ -13,10 +13,6 @@ import uncover.helpers.musicbrainz_api as musicbrainz
 import uncover.helpers.utilities as utils
 from uncover import cache
 
-# scope = "user-top-read"
-# sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
-
-# auth_manager = SpotifyClientCredentials()
 requests_cache.install_cache()
 
 
@@ -305,5 +301,3 @@ def spotify_get_album_id(album: str, artist: str):
     if not getattr(album_info, 'from_cache', False):
         time.sleep(1)
     return None
-
-# print(spotify_get_album_id('ЛЕГЕНДАРНАЯ ПЫЛЬ', 'MORGENSHTERN'))

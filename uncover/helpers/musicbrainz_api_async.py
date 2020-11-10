@@ -15,8 +15,10 @@ from uncover import cache
 musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
 
 
-@cache.memoize(timeout=3600)
+@cache.memoize(timeout=36000)
 def mb_get_artist_mbid(artist_name: str):
+    if not artist_name:
+        return None
     artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
     artists_found = musicbrainzngs.search_artists(artist_name, limit=4)
     mbid = None
@@ -38,6 +40,8 @@ async def mb_fetch_album_release_date(album_id: str, session):
     :param album_id: album_id from MusicBrainz
     :return: album release date
     """
+    if not album_id or not session:
+        return None
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"fmt": "json"}
@@ -64,6 +68,8 @@ async def mb_fetch_album_alternative_name(album_id: str, session):
     :param album_id: album_id from MusicBrainz
     :return: alternative name for an album
     """
+    if not album_id or not session:
+        return None
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_id
     params = {"inc": "ratings", "fmt": "json"}
@@ -85,9 +91,13 @@ async def mb_fetch_artists_albums(artist: str, sorting="popular", limit=9):
     :param artist: artist's name
     :return:
     """
+    if not artist or not sorting:
+        return None
     print('async!')
     print('async!')
     print('async!')
+    if sorting not in ["popular", "latest", "earliest", "shuffle"]:
+        return None
     ORDER = {
         "popular": ("rating", True),
         "latest": ("release_date", True),
@@ -137,6 +147,17 @@ async def mb_fetch_artists_albums(artist: str, sorting="popular", limit=9):
 
 
 async def add_album(album, set_of_titles, session, albums_list, artist, sorting):
+    """
+    :param album: an album to add
+    :param set_of_titles: a set of titles used to filter out duplicates
+    :param session: aiohttp object
+    :param albums_list: destination album list
+    :param artist: artist's name
+    :param sorting: shuffle, popular, earliest, latest, etc
+    :return:
+    """
+    if not album or not artist:
+        return None
     alternative_name = await mb_fetch_album_alternative_name(album['id'], session)
     print(alternative_name)
     full_title = album['title'].replace("’", "'")
@@ -171,14 +192,3 @@ async def add_album(album, set_of_titles, session, albums_list, artist, sorting)
     if filtered_name not in set_of_titles:
         set_of_titles.add(filtered_name)
         albums_list.append(an_album_dict)
-
-# async def main():
-#     albums_list = await mb_fetch_artists_albums(artist="Exhumed")
-#     return albums_list
-
-# if __name__ == '__main__':
-#     t0 = time.time()
-#
-#     albumsjke = asyncio.run(mb_fetch_artists_albums(artist="Exhumed"))
-#     print(time.time() - t0)
-#     print(albumsjke)

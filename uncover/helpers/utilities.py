@@ -118,6 +118,8 @@ def get_filtered_names_list(album_name: str):
     :param album_name: album's title
     :return: a list of filtered names
     """
+    if not album_name:
+        return None
     filtered_names = set()
     a_correct_title = album_name.lower().replace("“", "").replace("”", "").replace(":", "").replace("’", "'")
     no_articles = a_correct_title.replace("the ", "")
@@ -135,12 +137,15 @@ def log_artist_missing_from_db(artist_name: str):
     logs artist's name to the csv file of all the artists not yet found in db
     :param artist_name: artist's name
     """
-    with open('uncover/logging/artists_missing_from_db.csv', 'r', newline='', encoding='utf-8') as file:
-        contents = file.read()
+    try:
+        with open('uncover/logging/artists_missing_from_db.csv', 'r', newline='', encoding='utf-8') as file:
+            contents = file.read()
+    except (IOError, OSError):
+        return False
     if artist_name in contents:
         print(f"{artist_name}'s already there")
         # no need to add the artist
-        return None
+        return False
     with open('uncover/logging/artists_missing_from_db.csv', 'a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow([artist_name])

@@ -196,7 +196,6 @@ const mediaQuery = window.matchMedia('(min-width: 800px)')
 // Check if the media query is true
     if (!mediaQuery.matches) {
       // Then trigger an alert
-      alert('Media Query Matched!')
       const toolsIcon = document.querySelector('.tools-icon')
       toolsIcon.style.display = 'block';
     }

@@ -21,6 +21,8 @@ def ultimate_album_image_finder(album_title: str, artist: str, mbid=None, fast=F
     :param artist: artist's name
     :return:
     """
+    if not album_title or not artist:
+        return None
     album_image = None
     # -- MusicBrainz
     if fast:
@@ -62,6 +64,8 @@ def get_artists_top_albums_images(artist: str, sorting):
     :param artist: artist's name
     :return: a dict of all the album images found
     """
+    if not artist:
+        return None
     # try correcting some typos in artist's name
     correct_name = lastfm.lastfm_get_artist_correct_name(artist)
     if correct_name:
@@ -123,6 +127,8 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
     :param artist_name: artist's name
     :return: album info dict with all the info about albums
     """
+    if not artist_name:
+        return None
     ORDER = {
         "popular": Album.rating.desc(),
         "shuffle": func.random(),
@@ -141,8 +147,10 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
         return None
 
     # album entries, each of 'Album' SQL class
-    album_entries = Album.query.filter_by(artist=artist).order_by(ORDER[sorting]).limit(ALBUM_LIMIT).all()
-
+    try:
+        album_entries = Album.query.filter_by(artist=artist).order_by(ORDER[sorting]).limit(ALBUM_LIMIT).all()
+    except (TypeError, KeyError, IndexError):
+        return None
     # initialize the album info dict
     album_info = {
         "info":

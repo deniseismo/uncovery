@@ -27,6 +27,8 @@ async def lastfm_fetch_album_listeners(album: str, artist: str, session):
     :param artist: artist's name
     :return:
     """
+    if not album or not artist:
+        return None
     response = await lastfm_fetch_response({
         'method': ' album.getInfo',
         'album': album,
@@ -42,12 +44,3 @@ async def lastfm_fetch_album_listeners(album: str, artist: str, session):
         return None
     return int(album_listeners)
 
-# async def main():
-#     async with aiohttp.ClientSession() as session:
-#         listeners = await lastfm_fetch_album_listeners("Hunky Dory", "David Bowie", session=session)
-#         return listeners
-#
-# if __name__ == '__main__':
-#     loop = asyncio.get_event_loop()
-#     listeners = loop.run_until_complete(main())
-#     print(listeners)

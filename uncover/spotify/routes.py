@@ -47,7 +47,7 @@ def spotify_callback():
     user_state = session.get('state', None)
     # check if it's there and equals to the state from the callback (against cross-site forgery)
     if user_state is None or user_state != state:
-        return 'Invalid state!', 400
+        return 'Invalid state!', 400  # TODO: some error handling / custom error page
 
     auth = get_spotify_auth()
     # get token object (Tekore token with access and refresh token inside)
