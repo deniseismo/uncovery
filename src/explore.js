@@ -27,17 +27,26 @@ export async function prepareToExplore() {
 function autocompleteTags() {
   if (!(theGame.status)) {
     $('#tag-field').autocomplete({
-    serviceUrl: '/get_tags',
-    type: "GET",
-    minChars: 2,
-    maxHeight: 114,
-    onSelect: function () {
-      const tagsSearchInput = document.querySelector('.form-field');
-      tagsSearchInput.dispatchEvent(new Event('input'));
-    },
-    showNoSuggestionNotice: true,
-      noSuggestionNotice: 'No such tag found.'
-    });
+        serviceUrl: '/get_tags',
+        type: "POST",
+        minChars: 2,
+        maxHeight: 114,
+        onSelect: function () {
+          const tagsSearchInput = document.querySelector('.form-field');
+          tagsSearchInput.dispatchEvent(new Event('input'));
+        },
+        showNoSuggestionNotice: true,
+        noSuggestionNotice: 'No such tag found.',
+        ajaxSettings: {
+            type: "POST",
+            processData: false,
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function (jqXHR, settings)
+            {
+                settings.data = JSON.stringify(settings.data);
+            }
+        },
+        });
   }
 };
 
@@ -264,6 +273,7 @@ async function fetchTags(value) {
     body: JSON.stringify({"query": value})
   });
   const tags = await response.json();
+  console.log(`tags: ${tags}`)
   return tags;
 };
 

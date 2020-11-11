@@ -111,7 +111,7 @@ def remove_punctuation(name: str):
     return re.sub(pattern, '', name, flags=re.IGNORECASE)
 
 
-@cache.memoize(timeout=36000)
+@cache.memoize(timeout=3600)
 def get_filtered_names_list(album_name: str):
     """
     filters out some articles, incorrect symbols & redundant words (e.g. Deluxe Edition)
@@ -123,12 +123,22 @@ def get_filtered_names_list(album_name: str):
     filtered_names = set()
     a_correct_title = album_name.lower().replace("“", "").replace("”", "").replace(":", "").replace("’", "'")
     no_articles = a_correct_title.replace("the ", "")
+    with_and = a_correct_title.replace(" and ", " & ")
+    with_ampersand = a_correct_title.replace(" & ", " and ")
+
+    with_and_no_articles = no_articles.replace("  and", " & ")
+    with_with_ampersand_no_articles = no_articles.replace(" & ", " and ")
     after_regex = get_filtered_name(album_name)
     after_regex_no_articles = after_regex.replace('the ', '')
     filtered_names.add(a_correct_title)
     filtered_names.add(no_articles)
     filtered_names.add(after_regex)
     filtered_names.add(after_regex_no_articles)
+    filtered_names.add(with_and)
+    filtered_names.add(with_ampersand)
+    filtered_names.add(with_and_no_articles)
+    filtered_names.add(with_with_ampersand_no_articles)
+    print(list(filtered_names))
     return list(filtered_names)
 
 

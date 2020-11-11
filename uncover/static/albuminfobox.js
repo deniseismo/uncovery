@@ -5,6 +5,8 @@ import {loadSpinner, insertAfter} from "./utils.js"
 import {showToolsIcon} from "./uiconfig.js"
 
 
+
+// creates an info box with all the info about album clicked
 export function createMusicInfoBox() {
   const musicInfoBox = document.createElement('div');
   musicInfoBox.classList.add('music-info-box', 'shadow-main');
@@ -20,7 +22,9 @@ export function createMusicInfoBox() {
   const description = document.createElement("p");
   description.classList.add('info-box-description', 'no-margin');
   description.textContent = "I ain't playing, I really need to know what these albums are!";
+  // get album info card
   const albumInfoCard = createAlbumInfoCard();
+  // get spotify widget
   const spotifyWidget = createSpotifyWidget();
   musicInfoBox.appendChild(infoText);
   musicInfoBox.appendChild(description);
@@ -30,14 +34,16 @@ export function createMusicInfoBox() {
   document.querySelector('.wrapper').appendChild(musicInfoBox);
   animateMusicGenresContainer(musicInfoBox);
   animatePlayButtons(uncover, 1);
+  // triggers a function that may or may not (depends on view-size) display a tools icon
   showToolsIcon();
 }
 
 
-
+// a function that makes all cover art images clickable and uncoverable
 function uncoverModeOn() {
   theGame.uncoveryStatus = true;
   const uncoverButton = document.getElementById("uncover-info");
+  // remove 'uncover' button
   uncoverButton.style.display = 'none';
   updateInfoBoxDescription("Now all cover arts are ready for uncovery. Click'em away!");
   const albumItems = document.querySelectorAll('.flex-item');
@@ -53,6 +59,7 @@ function uncoverModeOn() {
   })
 }
 
+// removes an 'instruction' for the info box
 function removeInfoBoxDescription() {
   const infoBoxDescription = document.querySelector('.info-box-description');
   if (infoBoxDescription) {
@@ -60,7 +67,9 @@ function removeInfoBoxDescription() {
   }
 }
 
+// updates an 'instruction' for the info box
 function updateInfoBoxDescription(text) {
+  // change instruction text to the text provided
   const infoBoxDescription = document.querySelector('.info-box-description');
   if (infoBoxDescription) {
     infoBoxDescription.style.display = 'block';
@@ -68,6 +77,7 @@ function updateInfoBoxDescription(text) {
   }
 }
 
+// fetch album's spotify ID
 async function fetchAlbumID(albumName, artistName) {
   // fetches current tags list
   const response = await fetch('fetch_album_id', {
@@ -88,6 +98,7 @@ async function fetchAlbumID(albumName, artistName) {
 };
 
 
+// show current album (on click) info in the album info box
 function uncoverAlbumInfo(album) {
   const artistJke = album.artist_name
   const albumJke = album.title
@@ -97,6 +108,7 @@ function uncoverAlbumInfo(album) {
   albumName.textContent = album.title;
   albumName.classList.add('shadow-main');
   if (!(albumGame.currentType === 'artist')) {
+    // show artist's name (by 'artist_name') if it not artist's mode ('cause it's redundant)
     const by = document.querySelector('.by');
     by.textContent = 'by';
     const artistName = document.querySelector('.artist-name-info');
@@ -104,33 +116,44 @@ function uncoverAlbumInfo(album) {
   }
   const year = document.querySelector('.year');
   if (album.year) {
+    // show album's release date
     year.textContent = `(${album.year})`;
   };
+  // get album's spotify id
   fetchAlbumID(album.title, artistJke).then(data => {
     if (data) {
-    const albumID = data['album_id']
-    console.log('spotify! ura!')
-    spotifyLoadingSpinner();
-    const spotifyWidget = document.querySelector('.spotify-widget');
-    spotifyWidget.src = `https://open.spotify.com/embed/album/${albumID}`;
-    spotifyWidget.onload = showSpotifyOnLoad;
-    spotifyWidget.onerror = function() {
-      console.log("something's wrong with the iframe");
-    };
-    const musicInfoBox = document.querySelector('.music-info-box');
-    musicInfoBox.classList.add('no-bottom-padding');
+        const albumID = data['album_id']
+        console.log('spotify! ura!')
+        spotifyLoadingSpinner();
+        const spotifyWidget = document.querySelector('.spotify-widget');
+        spotifyWidget.src = `https://open.spotify.com/embed/album/${albumID}`;
+        // register onload spotify handler
+        spotifyWidget.onload = showSpotifyOnLoad;
+        // register onerror spotify handler
+        spotifyWidget.onerror = function() {
+          hideSpotifyWidget();
+          console.log("something's wrong with the iframe");
+        };
+        const musicInfoBox = document.querySelector('.music-info-box');
+        musicInfoBox.classList.add('no-bottom-padding');
     }
     else {
+        hideSpotifyWidget();
+    }
+  })
+}
+
+// hides spotify widget in case of errors or if no album id was found
+function hideSpotifyWidget() {
     const spotifyWidget = document.querySelector('.spotify-widget');
     spotifyWidget.classList.remove('spotify-active');
     const widgetWrapper = document.querySelector('.widget-wrapper');
     widgetWrapper.style.display = 'none';
     const musicInfoBox = document.querySelector('.music-info-box');
     musicInfoBox.classList.remove('no-bottom-padding');
-    }
-  })
 }
 
+// creates an appropriate iframe for the spotify widget
 function createSpotifyWidget() {
   const iFrame = document.createElement('iframe');
   iFrame.classList.add('spotify-widget');
@@ -147,6 +170,7 @@ function createSpotifyWidget() {
   return widgetWrapper;
 }
 
+// show loading spinner while getting spotify info
 function spotifyLoadingSpinner() {
   const spinnerExists = document.querySelector('.spotify-spinner-container');
   if (spinnerExists) {
@@ -163,7 +187,7 @@ function spotifyLoadingSpinner() {
   insertAfter(spotifySpinnerContainer, albumInfoCard);
 }
 
-
+// show spotify widget/container when widget successfully fetched all the necessary data
 function showSpotifyOnLoad() {
   const spotifySpinnerContainer = document.querySelector('.spotify-spinner-container');
   if (spotifySpinnerContainer) {
@@ -181,7 +205,7 @@ function showSpotifyOnLoad() {
   widgetWrapper.style.display = 'flex';
 }
 
-
+// create a container for album info (title, artist, year)
 function createAlbumInfoCard() {
   const albumName = document.createElement('p');
   albumName.classList.add('album-name-info');
@@ -197,7 +221,7 @@ function createAlbumInfoCard() {
   return albumInfoCard;
 }
 
-
+// removes album info box altogether
 export function removeMusicInfoBox() {
   const musicInfoBox = document.querySelector('.music-info-box');
   if (musicInfoBox) {
@@ -205,6 +229,7 @@ export function removeMusicInfoBox() {
   }
 }
 
+// hide album info when the game is on (without deleting the music info box container)
 export function hideUncoverModeForGame() {
   const albumInfoCard = document.querySelector('.album-info-card');
   albumInfoCard.style.display = 'none';
@@ -221,12 +246,14 @@ export function hideUncoverModeForGame() {
   });
 }
 
+// gets all the necessary info containers back
 export function backToRealityFromTheGame() {
   console.log('canceled but explore')
   const formField = document.querySelector('.form-field');
   const activeButton = document.querySelector('.method.active');
   if (activeButton.id === 'explore') {
     console.log('yeah boy!');
+    // makes tags uncoverable again
     formField.addEventListener("input", handleTags);
     formField.id = "tag-field";
     $('.form-field').autocomplete('enable');
@@ -234,17 +261,20 @@ export function backToRealityFromTheGame() {
   const sliderContainer = document.querySelector('.slider-container');
   const albumItems = document.querySelectorAll('.flex-item');
   if (theGame.uncoveryStatus) {
+    // makes albums uncoverable
     updateInfoBoxDescription("Snap back to reality! You can now safely peek at cover arts.");
     albumItems.forEach(item => {
     item.classList.add('uncoverable');
   });
   } else {
+    // returns the initial instruction message for the user
     updateInfoBoxDescription("I ain't playing, I really need to know what these albums are!");
     const uncoverButton = document.getElementById("uncover-info");
     uncoverButton.style.display = 'block';
   }
 
   if (sliderContainer) {
+    // returns the slider container (time span)
     sliderContainer.style.display = 'flex';
   };
 }

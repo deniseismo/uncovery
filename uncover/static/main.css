@@ -56,6 +56,12 @@ body {
   z-index: -500;
 }
 
+.tour-icon {
+  width: 1.5rem;
+}
+
+
+
 .blob-container {
   position: absolute;
   top: 5%;
@@ -1436,6 +1442,9 @@ label.tooltipText:after {
   }
   .for-what {
     top: 30% !important;
+  }
+  .text-field {
+    min-width: auto;
   }
 }
 
