@@ -4,7 +4,9 @@ import os
 import random
 import re
 import time
-import unicodedata
+
+import cyrtranslit
+import unidecode
 
 from uncover import cache
 
@@ -56,6 +58,18 @@ def timeit(method):
         return result
 
     return timed
+
+
+def has_cyrillic(name):
+    return bool(re.search('[\u0400-\u04FF]', name))
+
+
+def transliterate(name):
+    if not name:
+        return None
+    translit = cyrtranslit.to_latin(name, 'ru')
+    translit = translit.replace("'", "")
+    return translit
 
 
 @cache.memoize(timeout=3600)
@@ -119,10 +133,12 @@ def get_filtered_names_list(a_name: str):
     eszett = a_correct_title.replace("ß", 'ss')
     ae = a_correct_title.replace("æ", 'ae')
     oe = a_correct_title.replace("œ", "oe")
-    no_accents = unicodedata.normalize('NFD', a_correct_title)
-
-    no_accents = no_accents.encode('ascii', 'ignore')
-    no_accents = no_accents.decode("utf-8")
+    # no_accents = unicodedata.normalize('NFD', a_correct_title)
+    # no_accents = no_accents.encode('ascii', 'ignore')
+    # no_accents = no_accents.decode("utf-8")
+    no_accents = unidecode.unidecode(a_correct_title)
+    no_punctuation = remove_punctuation(a_correct_title)
+    print(f'no accents: {no_accents}')
     filtered_names.add(a_correct_title)
     filtered_names.add(no_articles)
     filtered_names.add(after_regex)
@@ -136,6 +152,7 @@ def get_filtered_names_list(a_name: str):
     filtered_names.add(oe)
     filtered_names.add(ae)
     filtered_names.add(eszett)
+    filtered_names.add(no_punctuation)
     print(list(filtered_names))
     return list(filtered_names)
 

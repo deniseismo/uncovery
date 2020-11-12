@@ -169,6 +169,7 @@ def spotify_get_album_id(album_name, artist_name):
     :return: Spotify album id
     """
     # TODO: cache the function taking into account country restrictions
+    transliterated = False
     artist_name = artist_name.lower().replace('the ', '')
     query = "album:" + album_name + " artist:" + artist_name
     user, token = check_spotify()
@@ -181,17 +182,32 @@ def spotify_get_album_id(album_name, artist_name):
                     market='from_token',
                     limit=5
                 )
+                if album_info:
+                    if not album_info[0].items:
+                        if utils.has_cyrillic(artist_name):
+                            artist_name = utils.transliterate(artist_name)
+                            query = "album:" + album_name + " artist:" + artist_name
+                            album_info = spotify_tekore_client.search(
+                                query=query,
+                                types=('album',),
+                                market='from_token',
+                                limit=5
+                            )
+                            print(artist_name)
         except tk.HTTPError:
             return None
         if not album_info:
             return None
         print(len(album_info[0].items))
         album_items = album_info[0].items
+        if not album_items:
+            return None
         artist_name = artist_name.lower().replace(' & ', ' and ')
         album_name = utils.get_filtered_name(album_name)
         ratio_threshold = 94
         album_id_found = None
         for album in album_items:
+            print(album.name)
             try:
                 current_artist = album.artists[0].name. \
                     lower().replace(' & ', ' and ').replace('the ', '')
