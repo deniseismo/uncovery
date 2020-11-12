@@ -140,7 +140,7 @@ def spotify_get_users_albums(token):
             artist_name = track.artists[0].name
             an_album_dict = {
                 "artist_name": artist_name,
-                "artist_names": [artist_name] + utils.get_filtered_artist_names(artist_name),
+                "artist_names": [artist_name] + utils.get_filtered_names_list(artist_name),
                 "title": name,
                 "names": [name.lower()] + utils.get_filtered_names_list(name),
                 "image": track.album.images[0].url,

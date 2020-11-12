@@ -8,6 +8,7 @@ import {animateCoverArt, animateWaves, animatePlayButtons, animateAvatar, animat
 import {loadCoverArt, loadFailureArt} from "./coverart.js";
 import {createMusicInfoBox, removeMusicInfoBox} from "./albuminfobox.js";
 import {handleCookieConsent} from "./cookieconsent.js";
+import {handleWelcomeTour} from "./tour.js"
 
 let controller = null;
 
@@ -385,3 +386,5 @@ handleToolsIconChange(mediaQuery);
 //};
 
 window.onload = handleCookieConsent;
+
+window.onload = handleWelcomeTour;

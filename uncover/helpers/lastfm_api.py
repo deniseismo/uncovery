@@ -192,7 +192,7 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
                     "title": album_name,
                     "names": [album_name.lower()] + utils.get_filtered_names_list(album_name),
                     "artist_name": artist_name,
-                    "artist_names": [artist_name] + utils.get_filtered_artist_names(artist_name)
+                    "artist_names": [artist_name] + utils.get_filtered_names_list(artist_name)
                 }
                 if resizable:
                     an_album_dict['image_small'] = 'static/optimized_cover_art_images/' + album_image + "-size200.jpg"

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import func
 
-from uncover.helpers.utilities import get_filtered_names_list, get_filtered_artist_names
+from uncover.helpers.utilities import get_filtered_names_list
 from uncover.models import Album, Artist, Tag, tags
 
 
@@ -54,7 +54,7 @@ def explore_filtered_albums(genres: list, time_span: list):
             "image_small": 'static/optimized_cover_art_images/' + album_entry.cover_art + "-size200.jpg",
             "image_medium": 'static/optimized_cover_art_images/' + album_entry.cover_art + "-size300.jpg",
             "artist_name": album_entry.artist.name,
-            "artist_names": [album_entry.artist.name] + get_filtered_artist_names(album_entry.artist.name),
+            "artist_names": [album_entry.artist.name] + get_filtered_names_list(album_entry.artist.name),
         }
         if album_entry.spotify_id:
             an_album_dict['spotify_id'] = album_entry.spotify_id

@@ -74,7 +74,7 @@ Create an awesome collage out of your Last.fm charts. Guess the albums by their 
 tour.addStep({
   title: 'artist',
   text: `${noteIcon}
-Are you into <span class='italic'>Arcade Fire</span> or <span class='italic'>Kendrick Lamar?</span> Or are you <span class='italic'>dancer?</span> Here is the place where you'll find all their studio albums. Clean cover arts. No duplicates (we'd hope).`,
+Are you into <span class='italic'>Arcade Fire</span> or <span class='italic'>Kendrick Lamar?</span> Or are you <span class='italic'>dancer?</span> Here is the place where you'll find their studio albums. Clean cover arts. No duplicates (we'd hope).`,
   attachTo: {
     element: '#by_artist',
     on: 'bottom'
@@ -161,10 +161,12 @@ export function handleWelcomeTour() {
         saveToStorage(storageType);
     }
     if (shouldShowPopup(storageType)) {
+        // show only if not shown before
         setTimeout(() => {
             tour.start();
         }, 2000);
-        //tourShown();
+        // make sure it's only shown the first time
+        tourShown();
     }
 };
 

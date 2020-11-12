@@ -4,6 +4,7 @@ import os
 import random
 import re
 import time
+import unicodedata
 
 from uncover import cache
 
@@ -58,22 +59,6 @@ def timeit(method):
 
 
 @cache.memoize(timeout=3600)
-def get_filtered_artist_names(artist_name: str):
-    if not artist_name:
-        return None
-    filtered_names = set()
-    correct_name = artist_name.lower().replace("“", "").replace("”", "").replace("’", "'")
-    no_article = correct_name.lower().replace('the ', '')
-    with_and = correct_name.replace(" and ", " & ")
-    with_ampersand = correct_name.replace(" & ", " and ")
-    filtered_names.add(correct_name)
-    filtered_names.add(with_and)
-    filtered_names.add(with_ampersand)
-    filtered_names.add(no_article)
-    return list(filtered_names)
-
-
-@cache.memoize(timeout=3600)
 def get_filtered_name(album_name: str):
     """
     :param album_name: an album name to filter
@@ -112,24 +97,32 @@ def remove_punctuation(name: str):
 
 
 @cache.memoize(timeout=3600)
-def get_filtered_names_list(album_name: str):
+def get_filtered_names_list(a_name: str):
     """
     filters out some articles, incorrect symbols & redundant words (e.g. Deluxe Edition)
-    :param album_name: album's title
+    :param a_name: album's title
     :return: a list of filtered names
     """
-    if not album_name:
+    if not a_name:
         return None
     filtered_names = set()
-    a_correct_title = album_name.lower().replace("“", "").replace("”", "").replace(":", "").replace("’", "'")
+    a_correct_title = a_name.lower().replace("“", "").replace("”", "").replace(":", "").replace("’", "'")
     no_articles = a_correct_title.replace("the ", "")
     with_and = a_correct_title.replace(" and ", " & ")
     with_ampersand = a_correct_title.replace(" & ", " and ")
 
     with_and_no_articles = no_articles.replace("  and", " & ")
     with_with_ampersand_no_articles = no_articles.replace(" & ", " and ")
-    after_regex = get_filtered_name(album_name)
+    after_regex = get_filtered_name(a_name)
     after_regex_no_articles = after_regex.replace('the ', '')
+    no_yo = a_correct_title.replace("ё", 'е')
+    eszett = a_correct_title.replace("ß", 'ss')
+    ae = a_correct_title.replace("æ", 'ae')
+    oe = a_correct_title.replace("œ", "oe")
+    no_accents = unicodedata.normalize('NFD', a_correct_title)
+
+    no_accents = no_accents.encode('ascii', 'ignore')
+    no_accents = no_accents.decode("utf-8")
     filtered_names.add(a_correct_title)
     filtered_names.add(no_articles)
     filtered_names.add(after_regex)
@@ -138,6 +131,11 @@ def get_filtered_names_list(album_name: str):
     filtered_names.add(with_ampersand)
     filtered_names.add(with_and_no_articles)
     filtered_names.add(with_with_ampersand_no_articles)
+    filtered_names.add(no_yo)
+    filtered_names.add(no_accents)
+    filtered_names.add(oe)
+    filtered_names.add(ae)
+    filtered_names.add(eszett)
     print(list(filtered_names))
     return list(filtered_names)
 

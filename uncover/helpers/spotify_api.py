@@ -60,7 +60,7 @@ def spotify_get_users_playlist_albums(playlist_id: str):
             artist_name = track['track']['album']['artists'][0]['name']
             an_album_dict = {
                 "artist_name": artist_name,
-                "artist_names": [artist_name] + utils.get_filtered_artist_names(artist_name),
+                "artist_names": [artist_name] + utils.get_filtered_names_list(artist_name),
                 "title": track['track']['album']['name'],
                 "names": [name.lower()] + utils.get_filtered_names_list(name),
                 "image": track["track"]["album"]["images"][0]["url"],
