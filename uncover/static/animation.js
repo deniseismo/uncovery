@@ -55,7 +55,7 @@ export function animateTimeSpan(timeBefore, timeAfter) {
   };
 };
 
-// animates music genre appearance TODO: fix animation. doesn't really show
+// animates music genre appearance
 export function animateMusicGenreOn(musicGenreElement) {
   console.log('genre show up!', musicGenreElement)
   anime({
@@ -138,25 +138,6 @@ export function animateWinningMessage() {
     duration: 250,
     easing: 'easeInOutSine'
   })
-//  anime({
-//    targets: '.winning-text',
-//    opacity: [
-//      {value: 0, easing: 'easeOutExpo'},
-//      {value: 1, easing: 'easeOutExpo'},
-//      {value: 0, easing: 'easeOutElastic(5, 0.3)'},
-//      {value: 1, easing: 'linear'}
-//    ],
-//    scale: [
-//      {value: 0.8, easing: 'easeOutExpo'},
-//      {value: 1.5, delay: 500},
-//      {value: 1, duration: 500}
-//    ],
-//    fontSize: ['0.1rem', '2rem'],
-//    padding: ['0rem', '1rem'],
-//    backgroundColor: ['#911a1a', '#243d00'],
-//    easing: 'easeOutExpo',
-//    duration: 500
-//  })
 };
 
 // animates  appearance of 'blobs' inside of a music genres container

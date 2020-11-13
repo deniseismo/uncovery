@@ -31,7 +31,7 @@ tour.addStep({
   title: `explore`,
   text: `${exploreIcon}
 Dive into exploration by picking your favorite <span class='italic'>genres</span> or <span class='italic'>era of music.</span>
-Find your next favorite album by its cover art.`,
+Mix and match whatever you want. Find your next favorite album by its cover art.`,
   attachTo: {
     element: '#explore',
     on: 'bottom'
@@ -74,7 +74,7 @@ Create an awesome collage out of your Last.fm charts. Guess the albums by their 
 tour.addStep({
   title: 'artist',
   text: `${noteIcon}
-Are you into <span class='italic'>Arcade Fire</span> or <span class='italic'>Kendrick Lamar?</span> Or are you <span class='italic'>dancer?</span> Here is the place where you'll find their studio albums. Clean cover arts. No duplicates (we'd hope).`,
+Are you into <span class='italic'>Arcade Fire</span> or <span class='italic'>Kendrick Lamar?</span> Search for your favorite artists and uncover their albums. Treat yourself with a good old collage! Check how well do you know the discography.`,
   attachTo: {
     element: '#by_artist',
     on: 'bottom'
@@ -123,7 +123,7 @@ Have fun with your top records. Might have to log in for this one!`,
 });
 tour.addStep({
   title: 'log in',
-  text: `${smileyFaceIcon}Chances are you're probably using Spotify. So why not log in with it to boost your experience? Albums <span class='italic'>uncovered</span> become <span class='italic'>spotifyable.</span>`,
+  text: `${smileyFaceIcon}Chances are you're probably using Spotify. So why not log in with it to boost your experience? All site's features get enhanced! Albums <span class='italic'>uncovered</span> become <span class='italic'>spotifyable.</span>`,
   attachTo: {
     element: '.spotify-login-container',
     on: 'bottom'
@@ -153,6 +153,22 @@ const tourName = 'uncovery_welcome_tour';
 const shouldShowPopup = () => !storageType.getItem(tourName);
 const saveToStorage = () => storageType.setItem(tourName, true);
 
+
+
+export function prepareAndStartTour() {
+  const mediaQuery = window.matchMedia('(min-width: 851px)')
+    if (!mediaQuery.matches) {
+      // change tour's 'attach' behaviour for smaller devices, make the tour appear in the middle
+      tour.steps.forEach(step => {
+              step.updateStepOptions({
+              "attachTo": ""
+              })
+            })
+    }
+    tour.start();
+}
+
+
 // display cookie consent message if the user's hasn't pressed 'accept' yet
 export function handleWelcomeTour() {
 
@@ -163,10 +179,18 @@ export function handleWelcomeTour() {
     if (shouldShowPopup(storageType)) {
         // show only if not shown before
         setTimeout(() => {
-            tour.start();
+            prepareAndStartTour();
         }, 2000);
         // make sure it's only shown the first time
         tourShown();
+    } else {
+       const helpTourIcon = document.querySelector('.help-tour-icon');
+       helpTourIcon.classList.add('on');
+       helpTourIcon.addEventListener('click', () => {
+         if (!Shepherd.activeTour) {
+           prepareAndStartTour();
+         }
+       });
     }
 };
 

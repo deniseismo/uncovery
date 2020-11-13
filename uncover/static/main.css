@@ -60,7 +60,19 @@ body {
   width: 1.5rem;
 }
 
+.help-tour-icon {
+  width: 2rem;
+  position: fixed;
+  right: 5%;
+  bottom: 5%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
 
+.help-tour-icon.on {
+  opacity: 1;
+}
 
 .blob-container {
   position: absolute;
