@@ -114,7 +114,7 @@ def spotify_get_users_albums(token):
     try:
         with spotify_tekore_client.token_as(token):
             # get user's top 50 tracks
-            top_tracks = spotify_tekore_client.current_user_top_tracks(limit=50)
+            top_tracks = spotify_tekore_client.current_user_top_tracks(limit=50, time_range='short_term')
     except tk.HTTPError:
         return None
 
@@ -132,6 +132,7 @@ def spotify_get_users_albums(token):
     # initialize a set of titles used to filter duplicate titles
     list_of_titles = set()
     # iterate through tracks
+    print(len(top_tracks.items))
     for track in top_tracks.items:
         if track.album.album_type == 'album':
             name = track.album.name
