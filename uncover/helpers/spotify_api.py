@@ -238,7 +238,9 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
                         a_set_of_titles.add(filtered_name)
                         correct_title = album_title.lower()
                         rating = lastfm_api.lastfm_get_album_listeners(correct_title, artist)
+                        print(f'rating: {rating}')
                         print(f'filtered_name: {filtered_name}')
+                        print('test!jke')
                         release_date = datetime.strptime(an_album["release_date"][:4], '%Y')
                         an_album_dict = {
                             "artist_name": artist,

@@ -272,11 +272,11 @@ def populate_spotify_album_ids():
     db.session.commit()
 
 
-# get_all_tags()
+get_all_tags()
 
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
-database_populate()
+# database_populate()
 
 # populate_spotify_album_ids()
