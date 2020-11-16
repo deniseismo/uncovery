@@ -35,6 +35,7 @@ export function configureOptionsStyle(targetButtonID) {
       const searchBar = document.querySelector(".search-and-options-container");
       searchBar.style.display = 'block';
       removeAllChildNodes(frequentElements.gameFrame);
+      removePlayButtons();
     }
     if (targetButtonID === "by_spotify") {
       prepareSpotify();

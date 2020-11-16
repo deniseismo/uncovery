@@ -68,11 +68,25 @@ body {
   opacity: 0;
   transition: opacity 0.3s ease;
   cursor: pointer;
+  z-index: 6;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15))
+          drop-shadow(0 8px 8px rgba(0,0,0,0.25));
 }
 
 .help-tour-icon.on {
   opacity: 1;
 }
+
+.help-tour-icon:hover .q-mark, .help-tour-icon:hover .q-mark-outer-circle {
+  transition: stroke 0.3s ease;
+  stroke: #ed6663;
+}
+
+.help-tour-icon:hover .q-mark-circle {
+  transition: fill 0.3s ease;
+  fill: #ed6663;
+}
+
 
 .blob-container {
   position: absolute;
@@ -681,6 +695,8 @@ it encapsulates all the content with the navigation except 'waves'
 
 .logo {
   margin-top: 0.45rem;
+  width: 47px;
+  height: 47px;
 }
 
 .loading *,
@@ -736,6 +752,7 @@ it encapsulates all the content with the navigation except 'waves'
 
 .play-button:hover {
   background-color: #7A911A;
+  color: #ebecf1;
 }
 
 .play-button.on {
@@ -1192,6 +1209,7 @@ label.tooltipText:after {
   display: none;
   cursor: pointer;
   width: 35px;
+  height: 35px;
   transition: transform 0.35s ease;
 }
 
@@ -1457,6 +1475,9 @@ label.tooltipText:after {
   }
   .text-field {
     min-width: auto;
+  }
+  .play-button {
+    font-size: 0.75rem;
   }
 }
 

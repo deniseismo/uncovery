@@ -22,7 +22,7 @@ export const tour = new Shepherd.Tour({
     cancelIcon: {
       enabled: true
     },
-    classes: 'class-1 class-2',
+    classes: 'shadow-main',
     scrollTo: { behavior: 'smooth', block: 'center' }
   }
 });

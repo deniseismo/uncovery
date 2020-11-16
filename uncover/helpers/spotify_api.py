@@ -231,12 +231,14 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
             try:
                 album_image = an_album['images'][0]['url']
                 if album_image:
+                    print('adding some album')
                     album_title = an_album['name']
                     correct_title = album_title.lower()
                     rating = lastfm_api.lastfm_get_album_listeners(correct_title, artist)
                     filtered_name = utils.get_filtered_name(album_title)
                     release_date = datetime.strptime(an_album["release_date"][:4], '%Y')
                     an_album_dict = {
+                        "artist_name": artist,
                         "title": album_title,
                         "image": album_image,
                         "names": [correct_title] + utils.get_filtered_names_list(album_title),
@@ -244,17 +246,22 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
                         "release_date": release_date
                     }
                     # remove duplicates
-                    an_album['names'] = list(set(an_album['names']))
+                    an_album_dict['names'] = list(set(an_album_dict['names']))
+                    print(an_album_dict)
                     albums_list.append(an_album_dict)
 
-            except (KeyError, IndexError):
+            except (KeyError, IndexError) as e:
+                print(e)
+                print('some key or index error exception occurred')
                 continue
 
     except (KeyError, TypeError, IndexError) as e:
+        print('some spotify error occurred!')
         print(e)
         return None
 
     if not albums_list:
+        print('no album list')
         return None
     if sorting == "shuffle":
         random.seed(datetime.now())

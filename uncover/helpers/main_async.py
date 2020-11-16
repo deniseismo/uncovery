@@ -84,6 +84,7 @@ def fetch_artists_top_albums_images(artist: str, sorting):
         try:
             print('trying spotifyjke')
             albums = spotify.spotify_get_artists_albums_images(artist, sorting)
+            print(f'albums with spotify: {albums}')
             if albums:
                 utils.log_artist_missing_from_db(artist_name=artist)
                 return albums

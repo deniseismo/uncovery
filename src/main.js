@@ -362,5 +362,5 @@ window.onload = handleWelcomeTour;
      if (!Shepherd.activeTour) {
        prepareAndStartTour();
      }
-   })
+   });
 }));

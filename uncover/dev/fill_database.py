@@ -62,7 +62,7 @@ def save_image(image_url):
         return None
     random_hex = secrets.token_hex(8)
     image_filename = random_hex
-    image_path = os.path.join(current_app.root_path, 'static/optimized_cover_art_images', image_filename)
+    image_path = os.path.join(current_app.root_path, 'static/cover_art_new_batch', image_filename)
     try:
         an_image.convert('RGB').save(f'{image_path}.jpg', quality=95)
 
@@ -240,11 +240,11 @@ def populate_music_genres():
     db.session.commit()
 
 
-def delete_all_tags():
-    tag_entries = Tag.query.all()
-    for tag in tag_entries:
-        db.session.delete(tag)
-    db.session.commit()
+# def delete_all_tags():
+#     tag_entries = Tag.query.all()
+#     for tag in tag_entries:
+#         db.session.delete(tag)
+#     db.session.commit()
 
 
 def get_all_tags():
