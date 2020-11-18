@@ -78,7 +78,7 @@ function updateInfoBoxDescription(text) {
 }
 
 // fetch album's spotify ID
-async function fetchAlbumID(albumName, artistName) {
+async function fetchAlbumID(albumName, artistName, spotifyArtistName) {
   // fetches current tags list
   const response = await fetch('fetch_album_id', {
     method: "POST",
@@ -87,7 +87,8 @@ async function fetchAlbumID(albumName, artistName) {
     },
     body: JSON.stringify({
       "album_name": albumName,
-      "artist_name": artistName
+      "artist_name": artistName,
+      "spotify_artist_name": spotifyArtistName
     })
   });
   if (!response.ok) {
@@ -120,7 +121,8 @@ function uncoverAlbumInfo(album) {
     year.textContent = `(${album.year})`;
   };
   // get album's spotify id
-  fetchAlbumID(album.title, artistJke).then(data => {
+  const spotifyArtistName = album.artist_spotify_name ? album.artist_spotify_name : null;
+  fetchAlbumID(album.title, artistJke, spotifyArtistName).then(data => {
     if (data) {
         const albumID = data['album_id']
         console.log('spotify! ura!')

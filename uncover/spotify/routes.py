@@ -5,7 +5,8 @@ from flask import request, url_for, Blueprint, redirect, session, jsonify, make_
 
 from uncover import db
 from uncover.models import User
-from uncover.spotify.spotify_user_oauth import get_spotify_auth, spotify_get_album_id
+from uncover.spotify.spotify_user_oauth import get_spotify_auth, spotify_get_album_id, check_spotify, \
+    get_spotify_user_info
 
 spotify = Blueprint('spotify', __name__)
 
@@ -81,15 +82,25 @@ def spotify_fetch_album_id():
     content = request.get_json()
     if not content:
         return None
-    album_name = content['album_name']
-    artist_name = content['artist_name']
-    album_id = spotify_get_album_id(album_name, artist_name)
-    print(album_id)
-    if not album_id:
-        return make_response(jsonify(
-            {'message': f"album id could not be found"}
-        ),
-            404)
+    album_id = None
+    user, token = check_spotify()
+
+    if user and token:
+        user_info = get_spotify_user_info(token)
+        try:
+            country = user_info['country']
+        except KeyError:
+            country = None
+        album_name = content['album_name']
+        artist_name = content['artist_name']
+        spotify_artist_name = content['spotify_artist_name']
+        album_id = spotify_get_album_id(album_name, artist_name, spotify_artist_name, country)
+        print(album_id)
+        if not album_id:
+            return make_response(jsonify(
+                {'message': f"album id could not be found"}
+            ),
+                404)
     return jsonify({
         "album_id": album_id
     })

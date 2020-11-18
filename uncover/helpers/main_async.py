@@ -171,7 +171,7 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
         album_entries = Album.query.filter_by(artist=artist).order_by(ORDER[sorting]).limit(ALBUM_LIMIT).all()
     except (KeyError, IndexError, TypeError):
         return None
-
+    print('sql selecting an artist!')
     # initialize the album info dict
     album_info = {
         "info": {
@@ -191,8 +191,9 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
             "image_small": 'static/optimized_cover_art_images/' + album.cover_art + "-size200.jpg",
             "image_medium": 'static/optimized_cover_art_images/' + album.cover_art + "-size300.jpg"
         }
-        if album.spotify_id:
-            an_album_dict['spotify_id'] = album.spotify_id
+        if artist.spotify_name:
+            print('artist spotify name found!')
+            an_album_dict['artist_spotify_name'] = artist.spotify_name
         if album.release_date:
             an_album_dict['year'] = album.release_date.strftime("%Y")
         if album.alternative_title:

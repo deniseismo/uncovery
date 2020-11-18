@@ -99,6 +99,10 @@ def database_populate():
                     continue
             artist_entry = Artist(name=artist_name)
             add_artist_music_genres(artist_entry)
+            artist_spotify_name = get_spotify_artist_name(artist_name)
+            if artist_spotify_name:
+                if artist_spotify_name != artist_name:
+                    artist_entry.spotify_name = artist_spotify_name
 
             db.session.add(artist_entry)
             db.session.commit()
@@ -198,6 +202,8 @@ def add_artist_music_genres(artist):
         tags = lookup_tags(artist.name)
     if tags:
         for tag in tags:
+            if tag == 'hip hop':
+                tag = 'hip-hop'
             tag_entry = Tag.query.filter_by(tag_name=tag).first()
             if not tag_entry:
                 # add the tag if not exists
@@ -255,6 +261,14 @@ def get_all_tags():
         json.dump(tags_list, f, ensure_ascii=False, indent=4)
 
 
+def get_artist_spotify_names():
+    all_artists = Artist.query.all()
+    artist_dict = {artist.name: artist.spotify_name for artist in all_artists if artist.spotify_name}
+    import json
+    with open('arist_spotify_names.json', 'w', encoding='utf-8') as f:
+        json.dump(artist_dict, f, ensure_ascii=False, indent=4)
+
+
 def populate_spotify_album_ids():
     all_albums = Album.query.filter(Album.id > 16131).all()
     for album in tqdm(all_albums):
@@ -272,7 +286,47 @@ def populate_spotify_album_ids():
     db.session.commit()
 
 
-get_all_tags()
+def get_spotify_artist_name(artist_name):
+    import tekore as tk
+
+    client_id = current_app.config['SPOTIPY_CLIENT_ID']
+    client_secret = current_app.config['SPOTIPY_CLIENT_SECRET']
+
+    app_token = tk.request_client_token(client_id, client_secret)
+    spotify = tk.Spotify(app_token)
+
+    artist_object = spotify.search(
+        query=artist_name,
+        types=('artist',),
+        limit=5
+    )
+    if not artist_object:
+        return None
+    if not artist_object[0].items:
+        return None
+    try:
+        artist_name_on_spotify = artist_object[0].items[0].name
+    except (TypeError, IndexError):
+        return None
+    if not getattr(artist_object, 'from_cache', False):
+        time.sleep(0.4)
+    return artist_name_on_spotify
+
+
+def populate_spotify_artist_names():
+    all_artists = Artist.query.all()
+    for artist in tqdm(all_artists):
+        if not artist.spotify_name:
+            artist_name = artist.name
+            spotify_artist_name = get_spotify_artist_name(artist_name)
+            if spotify_artist_name:
+                if spotify_artist_name != artist_name:
+                    print(f'original name: {artist_name}, spotify name: {spotify_artist_name}')
+                    artist.spotify_name = spotify_artist_name
+                    db.session.commit()
+
+
+# get_all_tags()
 
 # populate_release_dates()
 # populate_music_genres()
@@ -280,3 +334,6 @@ get_all_tags()
 # database_populate()
 
 # populate_spotify_album_ids()
+
+# populate_spotify_artist_names()
+get_artist_spotify_names()

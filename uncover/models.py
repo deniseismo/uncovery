@@ -1,10 +1,15 @@
 from uncover import db
 
-
 tags = db.Table(
     'tags',
     db.Column('artist_id', db.Integer, db.ForeignKey('artist.id')),
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
+)
+
+colors = db.Table(
+    'colors',
+    db.Column('album_id', db.Integer, db.ForeignKey('album.id')),
+    db.Column('color_id', db.Integer, db.ForeignKey('color.id'))
 )
 
 
@@ -12,6 +17,7 @@ class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), unique=True, index=True, nullable=False)
     albums = db.relationship('Album', backref='artist', lazy=True)
+    spotify_name = db.Column(db.String(), nullable=True)
     music_genres = db.relationship('Tag', secondary=tags,
                                    backref=db.backref('artists', lazy='dynamic'))
 
@@ -29,7 +35,8 @@ class Album(db.Model):
     mb_id = db.Column(db.Integer)
     discogs_id = db.Column(db.Integer)
     release_date = db.Column(db.DateTime)
-    spotify_id = db.Column(db.String())
+    color_names = db.relationship('Color', secondary=colors,
+                                  backref=db.backref('albums', lazy='dynamic'))
 
     def __repr__(self):
         return f"Album('{self.title}', '{self.cover_art}')"

@@ -85,6 +85,7 @@ def get_spotify_user_info(token):
             current_user = spotify_tekore_client.current_user()
             username = current_user.display_name
             current_user_image_list = current_user.images
+            country = current_user.country
             if current_user_image_list:
                 try:
                     user_image = current_user.images[0].url
@@ -97,7 +98,8 @@ def get_spotify_user_info(token):
         return None
     user_info = {
         "username": username,
-        "user_image": user_image
+        "user_image": user_image,
+        "country": country
     }
     return user_info
 
@@ -162,39 +164,93 @@ def spotify_get_users_albums(token):
     return album_info
 
 
-def spotify_get_album_id(album_name, artist_name):
+@cache.memoize(timeout=3600)
+def spotify_get_artist_name(artist_name):
+    """
+    gets Spotify's version of a given artist name
+    :param artist_name: original/given artist name
+    :return: Spotify version of artist's name (e.g. Chinese names → English names, transliterated Russian, etc)
+    """
+    if not artist_name:
+        return None
+    client_id = current_app.config['SPOTIPY_CLIENT_ID']
+    client_secret = current_app.config['SPOTIPY_CLIENT_SECRET']
+
+    app_token = tk.request_client_token(client_id, client_secret)
+    try:
+        with spotify_tekore_client.token_as(app_token):
+            artist_object = spotify_tekore_client.search(
+                query=artist_name,
+                types=('artist',),
+                limit=5
+            )
+            if not artist_object:
+                return None
+            if not artist_object[0].items:
+                return None
+            try:
+                artist_name_on_spotify = artist_object[0].items[0].name
+            except (TypeError, IndexError):
+                return None
+    except tk.HTTPError:
+        return None
+    print(f'found spotify artist name: {artist_name_on_spotify}')
+    return artist_name_on_spotify
+
+
+@cache.memoize(timeout=3600)
+def spotify_get_album_id(album_name, artist_name, spotify_artist_name, country):
     """
     gets Spotify album id with through Tekore
+    :param country: current user's market/country for spotify
     :param album_name: album's title
     :param artist_name: artist's title
     :return: Spotify album id
     """
-    # TODO: cache the function taking into account country restrictions
-    transliterated = False
+    print(f'country: {country}')
     artist_name = artist_name.lower().replace('the ', '')
     query = "album:" + album_name + " artist:" + artist_name
     user, token = check_spotify()
     if user and token:
         try:
             with spotify_tekore_client.token_as(token):
+                # try getting the album in one go: album and artist provided
                 album_info = spotify_tekore_client.search(
                     query=query,
                     types=('album',),
-                    market='from_token',
+                    market=country if country else 'from_token',
                     limit=5
                 )
                 if album_info:
                     if not album_info[0].items:
-                        if utils.has_cyrillic(artist_name):
-                            artist_name = utils.transliterate(artist_name)
-                            query = "album:" + album_name + " artist:" + artist_name
-                            album_info = spotify_tekore_client.search(
-                                query=query,
-                                types=('album',),
-                                market='from_token',
-                                limit=5
-                            )
-                            print(artist_name)
+                        if not spotify_artist_name:
+                            print('try finding with spotify artist name')
+                            # try finding an album with a different (Spotify's version) artist name
+                            spotify_artist_name = spotify_get_artist_name(artist_name)
+                            if not spotify_artist_name:
+                                # no artist name found
+                                return None
+                        if spotify_artist_name.lower() == artist_name.lower():
+                            # spotify's version is the same — no need to try again
+                            return None
+                        artist_name = spotify_artist_name
+                        query = "album:" + album_name + " artist:" + artist_name
+                        album_info = spotify_tekore_client.search(
+                            query=query,
+                            types=('album',),
+                            market=country if country else 'from_token',
+                            limit=5
+                        )
+                        # if utils.has_cyrillic(artist_name):
+                        #     artist_name = utils.transliterate(artist_name)
+                        #     query = "album:" + album_name + " artist:" + artist_name
+                        #     album_info = spotify_tekore_client.search(
+                        #         query=query,
+                        #         types=('album',),
+                        #         market='from_token',
+                        #         limit=5
+                        #     )
+                        #     print(artist_name)
         except tk.HTTPError:
             return None
         if not album_info:
@@ -213,13 +269,16 @@ def spotify_get_album_id(album_name, artist_name):
                 current_artist = album.artists[0].name. \
                     lower().replace(' & ', ' and ').replace('the ', '')
                 current_album = utils.get_filtered_name(album.name)
-
+                print(current_artist)
+                print(current_album)
+                print(artist_name)
                 current_artist_ratio = fuzz.ratio(artist_name, current_artist)
+                print(current_artist_ratio)
                 current_album_ratio = fuzz.ratio(album_name, current_album)
-                if current_album_ratio > 98 and current_artist_ratio > 90:
+                if current_album_ratio > 98 and current_artist_ratio > 85:
                     # found perfect match, return immediately
                     return album.id
-                elif current_album_ratio > ratio_threshold and current_artist_ratio > 90:
+                elif current_album_ratio > ratio_threshold and current_artist_ratio > 85:
                     ratio_threshold = current_album_ratio
                     album_id_found = album.id
             except (KeyError, TypeError, IndexError):
