@@ -34,7 +34,7 @@ export function removeAllChildNodes(parent) {
 export function loadSpinner(node) {
   const spinner = document.createElement("img");
   const url = "static/images/loading/spinner-vinyl-64.gif";
-  spinner.classList.add('spinner');
+  spinner.classList.add('spinner', 'mt-2');
   spinner.src = url;
   node.appendChild(spinner);
 };

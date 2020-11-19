@@ -101,6 +101,11 @@ def spotify_fetch_album_id():
                 {'message': f"album id could not be found"}
             ),
                 404)
+    else:
+        return make_response(jsonify(
+            {'message': f"no token or user provided"}
+        ),
+            403)
     return jsonify({
         "album_id": album_id
     })

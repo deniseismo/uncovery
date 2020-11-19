@@ -55,7 +55,7 @@ def save_image(image_url):
     if not image_url:
         return None
     try:
-        an_image = Image.open(urllib.request.urlopen(image_url))
+        an_image = Image.open(urllib.request.urlopen(image_url)).convert('RGB')
         if an_image.width >= 900:
             an_image.thumbnail((900, 900), Image.ANTIALIAS)
     except Exception:
@@ -64,11 +64,17 @@ def save_image(image_url):
     image_filename = random_hex
     image_path = os.path.join(current_app.root_path, 'static/cover_art_new_batch', image_filename)
     try:
-        an_image.convert('RGB').save(f'{image_path}.jpg', quality=95)
+        # save in original size
+        an_image.save(f'{image_path}.jpg', quality=95)
 
-        resized_200 = an_image.convert('RGB').resize((200, 200), Image.LANCZOS)
-        resized_300 = an_image.convert('RGB').resize((300, 300), Image.LANCZOS)
+        resized_200 = an_image
+        resized_300 = an_image
+        if an_image.width > 300:
+            # make pictures smaller if the original is bigger than 300 pixels wide
+            resized_200 = an_image.resize((200, 200), Image.LANCZOS)
+            resized_300 = an_image.resize((300, 300), Image.LANCZOS)
 
+        # save (smaller) copies
         resized_200.save(f'{image_path}-size200.jpg', quality=95)
         resized_300.save(f'{image_path}-size300.jpg', quality=95)
     except (OSError, ValueError):
