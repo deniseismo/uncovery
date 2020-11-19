@@ -8,6 +8,10 @@ import {showToolsIcon} from "./uiconfig.js"
 
 // creates an info box with all the info about album clicked
 export function createMusicInfoBox() {
+  const alreadyExists = document.querySelector('.music-info-box');
+  if (alreadyExists) {
+    return;
+  }
   const musicInfoBox = document.createElement('div');
   musicInfoBox.classList.add('music-info-box', 'shadow-main');
   const infoText = document.createElement('h1');
@@ -136,8 +140,6 @@ function uncoverAlbumInfo(album) {
           hideSpotifyWidget();
           console.log("something's wrong with the iframe");
         };
-        const musicInfoBox = document.querySelector('.music-info-box');
-        musicInfoBox.classList.add('no-bottom-padding');
     }
     else {
         hideSpotifyWidget();
@@ -205,6 +207,8 @@ function showSpotifyOnLoad() {
   const widgetWrapper = document.querySelector('.widget-wrapper');
   // TODO: show animation only no iframe was present
   widgetWrapper.style.display = 'flex';
+  const musicInfoBox = document.querySelector('.music-info-box');
+  musicInfoBox.classList.add('no-bottom-padding');
 }
 
 // create a container for album info (title, artist, year)

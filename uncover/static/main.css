@@ -656,6 +656,10 @@ it encapsulates all the content with the navigation except 'waves'
   animation: filter-animation 5s infinite;
 }
 
+.failure-art-text {
+  color: var(--bg-color);
+}
+
 /* failure art psychedelic animation */
 @keyframes filter-animation {
   0% {
@@ -1443,7 +1447,7 @@ label.tooltipText:after {
     height: calc(200px * 0.75);
     width: calc(200px * 0.75);
   }
-  .cover-big {
+  .cover-big, .failure-art {
     height: calc(600px * 0.75);
     width: calc(600px * 0.75);
   }
@@ -1479,6 +1483,9 @@ label.tooltipText:after {
   .play-button {
     font-size: 0.75rem;
   }
+  .failure-art-text {
+    font-size: 1.5rem;
+  }
 }
 
 @media screen and (max-width: 449px) {
@@ -1486,7 +1493,7 @@ label.tooltipText:after {
     height: calc(200px * 0.5625);
     width: calc(200px * 0.5625);
   }
-  .cover-big {
+  .cover-big, .failure-art {
     height: calc(600px * 0.5625);
     width: calc(600px * 0.5625);
   }

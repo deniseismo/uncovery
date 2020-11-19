@@ -84,7 +84,7 @@ def get_filtered_name(album_name: str):
     a_correct_title = album_name.lower().replace("’", "'")
     patterns = [
         # no special words in brackets
-        r"\(.*((\bremaster)|(\banniversary)|(\bEdition)|(\bmix)|(\bdeluxe)|(\bCD)|(\bsoundtrack)).*\)|\[.*\]",
+        r"\(.*((\bremaster)|(\banniversary)|(\bEdition)|(\bmix)|(\bdeluxe)|(\bCD)|(\bsoundtrack)|(\bComplete)).*\)|\[.*\]",
         # no super deluxe
         r"((super)?\s?(deluxe)\s?).*",
         r"((\d+)?\s?(Remaster)\s?).*",

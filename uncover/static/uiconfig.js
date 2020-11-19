@@ -117,6 +117,10 @@ export function setPlaceholder(targetButtonID) {
 };
 
 export function createPlayButtons(method) {
+  const alreadyExists = document.querySelector('.play-buttons-container');
+  if (alreadyExists) {
+    return;
+  }
   const flexContainer = document.createElement('div');
   flexContainer.classList.add('flex-container', 'play-buttons-container');
   // button generator

@@ -3,9 +3,11 @@ from datetime import datetime
 from sqlalchemy import func
 
 from uncover.helpers.utilities import get_filtered_names_list
+from uncover.helpers.utilities import timeit
 from uncover.models import Album, Artist, Tag, tags
 
 
+@timeit
 def explore_filtered_albums(genres: list, time_span: list):
     """
     :param genres: a list of music tags/genres
