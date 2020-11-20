@@ -47,6 +47,7 @@ export function configureOptionsStyle(targetButtonID) {
     setPlaceholder(targetButtonID);
     setCurrentPageTitle(targetButtonID);
     frequentElements.textField.value = '';
+    showOrHideToolsIcon();
   }
 };
 
@@ -195,8 +196,28 @@ export function removeAvatarContainer() {
   }
 }
 
+
+function showOrHideToolsIcon() {
+    const musicInfoBox = document.querySelector('.music-info-box');
+    const musicGenresContainer = document.querySelector('.music-genres-container');
+    const avatar = document.querySelector('.avatar-container');
+
+    const exist = (element) => element;
+    if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
+        console.log('some exist')
+        showToolsIcon();
+    }
+    else {
+      console.log('some do not exist')
+      const toolsIcon = document.querySelector('.tools-icon')
+      toolsIcon.style.display = 'none';
+    }
+}
+
+
+
 export function showToolsIcon() {
-const mediaQuery = window.matchMedia('(min-width: 800px)')
+    const mediaQuery = window.matchMedia('(min-width: 800px)')
  
 // Check if the media query is true
     if (!mediaQuery.matches) {
