@@ -803,6 +803,8 @@ label.tooltipText {
   line-height: 1em;
   pointer-events: none;
   z-index: 999;
+  white-space: nowrap;
+  margin-left: 5%;
 }
 
 label.tooltipText:after {
@@ -830,8 +832,14 @@ label.tooltipText:after {
 .info-tooltip:focus>label,
 .info-tooltip:hover>label {
   opacity: 1;
-  margin: 0;
+  /*margin-top: 60px;*/
+  margin-left: 5%;
+  margin-top: 0;
 }
+
+
+
+
 
 .success-icon {
   position: absolute;
@@ -1055,15 +1063,24 @@ label.tooltipText:after {
 }
 
 .winning-text {
-  position: absolute;
+/*  position: absolute;
   top: 33%;
-  left: 33%;
+  left: 33%;*/
   background: #3b444b;
   padding: 1rem;
   color: white;
   font-size: 2rem;
   filter: drop-shadow(0.35rem 0.35rem 0.4rem rgba(255, 92, 54, 0.84));
 }
+
+#winning-container {
+	z-index: 99;
+	position: fixed;
+	top: 33%;
+	left: 50%;
+	margin-left: -200px;
+}
+
 
 .blob {
   position: absolute;

@@ -199,7 +199,8 @@ function createWinningContainer() {
   winningText.textContent = winningMessage[randomIndex]["quote"];
   winningContainer.appendChild(winningText);
   winningContainer.setAttribute("data-tooltip", winningMessage[randomIndex]["credits"]);
-  frequentElements.gameFrame.appendChild(winningContainer);
+  //frequentElements.gameFrame.appendChild(winningContainer);
+  document.querySelector('.wrapper').appendChild(winningContainer);
   winningContainer.addEventListener('click', (e) => {
     setTimeout(() => {
         e.target.remove();

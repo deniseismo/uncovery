@@ -1,5 +1,5 @@
 const path = require('path');
-const HTMLPlugin = require('html-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
   entry: './src/main.js',
@@ -10,9 +10,21 @@ module.exports = {
   devServer: {
     port: 3000
   },
-  plugins: [
-    new HTMLPlugin({
-      template: "./src/layout.html"
-    })
-  ]
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+          compress: {
+               drop_console: true,
+           },
+        },
+        extractComments: false,
+      }),
+    ],
+  },
 }
+
