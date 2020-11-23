@@ -952,6 +952,8 @@ p.tooltipText:after {
   padding: 0.25rem;
   border: 2px solid #3B444B;
   transition: all .3s ease-in-out;
+  background: none;
+  margin: 0.5rem 0;
 }
 
 .music-genre-element:hover {
