@@ -129,7 +129,7 @@ function createMusicGenresContainer() {
 
 // creates container for music tags
 function createMusicGenreElement(musicGenre) {
-  const musicGenreElement = document.createElement('p');
+  const musicGenreElement = document.createElement('button');
   musicGenreElement.classList.add('music-genre-element', 'shadow-main');
   // remove spaces to create an appropriate id
   musicGenreElement.id = `tag-${musicGenre.replace(/\s/g, '')}`;
