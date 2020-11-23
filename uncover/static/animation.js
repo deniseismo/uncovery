@@ -20,7 +20,7 @@ export function animateWaves(method) {
   const theWave = new Wave(method);
 
   anime({
-    targets: '#wave-path-3',
+    targets: '.wave-path-3',
     d: [
       {
         // get random shape

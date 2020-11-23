@@ -260,7 +260,7 @@ const infoBlocksSlideHandler = () => {
 infoBlocksSlideHandler();
 
 // activate buttons
-const buttonsContainer = document.querySelector('#buttons-container');
+const buttonsContainer = document.querySelector('.buttons-container');
 // add an event listener to a buttons wrapper (event bubbling)
 buttonsContainer.addEventListener('click', (event) => {
   const isButton = event.target.nodeName === 'INPUT';

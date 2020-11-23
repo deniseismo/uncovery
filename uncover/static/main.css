@@ -277,7 +277,7 @@ header {
   border: 1px solid #ced4da;
 }
 
-#submit-container {
+.submit-container {
   width: 100%;
 /*  position: sticky;
   top: 60px;

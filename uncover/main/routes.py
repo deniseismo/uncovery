@@ -6,8 +6,8 @@ from uncover.spotify.spotify_user_oauth import check_spotify, get_spotify_user_i
 main = Blueprint('main', __name__)
 
 
-@main.route("/")
-@main.route("/home")
+@main.route("/", methods=["GET", "POST"])
+@main.route("/home", methods=["GET", "POST"])
 def home():
     """
     renders home page

@@ -25,7 +25,7 @@ def spotify_login():
     return redirect(auth.url, 307)
 
 
-@spotify.route('/spotify_logout', methods=['GET'])
+@spotify.route('/spotify_logout', methods=['POST'])
 def spotify_logout():
     """
     logs user out
