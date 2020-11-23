@@ -87,6 +87,10 @@ body {
   fill: #ed6663;
 }
 
+.help-tour-button {
+	background: none;
+	border: none;
+}
 
 .blob-container {
   position: absolute;
@@ -790,7 +794,7 @@ it encapsulates all the content with the navigation except 'waves'
   }
 }
 
-label.tooltipText {
+p.tooltipText {
   position: absolute;
   left: 50%;
   transform: translate(-50%);
@@ -806,7 +810,7 @@ label.tooltipText {
   margin-left: 5%;
 }
 
-label.tooltipText:after {
+p.tooltipText:after {
   content: '';
   display: block;
   height: 0;
@@ -826,10 +830,10 @@ label.tooltipText:after {
   margin-top: -.5em;
   transition: .1s all linear;
   opacity: 0;
+  visibility: visible !important;
 }
 
-.info-tooltip:focus>label,
-.info-tooltip:hover>label {
+.info-tooltip:focus>.tooltipText, .info-tooltip:hover>.tooltipText {
   opacity: 1;
   /*margin-top: 60px;*/
   margin-left: 5%;

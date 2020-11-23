@@ -18,7 +18,7 @@ export function insertAfter(newNode, referenceNode) {
 export function addTooltips() {
   const tooltippedElements = document.querySelectorAll('.info-tooltip')
   tooltippedElements.forEach((element) => {
-    const tooltip = document.createElement('label');
+    const tooltip = document.createElement('p');
     tooltip.classList.add('tooltipText');
     tooltip.textContent = element.dataset.tooltip;
     element.appendChild(tooltip);
