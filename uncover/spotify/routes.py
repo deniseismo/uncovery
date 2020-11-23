@@ -41,14 +41,18 @@ def spotify_callback():
     a function that gets triggered after the user successfully granted the permission
     :return:
     """
+    print('spotify callback worked!')
+    error = request.args.get('error', None)
     code = request.args.get('code', None)
     state = request.args.get('state', None)
+    if error:
+        return redirect(url_for('main.home'), 307)
 
     # get current user's state
     user_state = session.get('state', None)
     # check if it's there and equals to the state from the callback (against cross-site forgery)
     if user_state is None or user_state != state:
-        return 'Invalid state!', 400  # TODO: some error handling / custom error page
+        return redirect(url_for('main.home'), 307)
 
     auth = get_spotify_auth()
     # get token object (Tekore token with access and refresh token inside)
@@ -73,6 +77,7 @@ def spotify_callback():
                 db.session.commit()
 
     except tk.HTTPError:
+        print('http error')
         return None
     return redirect(url_for('main.home'), 307)
 
