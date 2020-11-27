@@ -1590,3 +1590,56 @@ p.tooltipText:after {
   background: var(--dark-color);
   color: white;
 }
+
+.color-box {
+  display: flex;
+  flex-flow: row wrap;
+  padding: 0.5rem;
+  justify-content: space-between;
+}
+.square {
+  width: 45px;
+  height: 45px;
+  margin: 0.2rem;
+}
+.square.active {
+  outline: 2px solid red;
+}
+
+.square.white {
+  background: white;
+}
+.square.black {
+  background: black;
+}
+.square.gray {
+  background: #CED4DA;
+}
+.square.black_and_white {
+  border-top:45px solid white;
+  border-right:45px solid black;
+}
+.square.red {
+  background: #D62828;
+}
+.square.green {
+  background: #55A630;
+}
+.square.blue {
+  background: #118AB2;
+}
+.square.magenta {
+  background: #F20089;
+}
+.square.purple {
+  background: #7209B7;
+}
+.square.yellow {
+  background: #FFBA08;
+}
+.square.orange {
+  background: #FB5607;
+}
+.square.brown {
+  background: #5B3000;
+}

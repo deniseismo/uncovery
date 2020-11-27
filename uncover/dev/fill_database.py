@@ -218,7 +218,7 @@ def add_artist_music_genres(artist):
                 db.session.commit()
             # append artist to the tag, thus creating the many-to-many association between tags & artists
             tag_entry.artists.append(artist)
-    db.session.commit()
+        db.session.commit()
 
 
 @timeit

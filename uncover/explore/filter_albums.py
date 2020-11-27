@@ -4,12 +4,13 @@ from sqlalchemy import func
 
 from uncover.helpers.utilities import get_filtered_names_list
 from uncover.helpers.utilities import timeit
-from uncover.models import Album, Artist, Tag, tags
+from uncover.models import Album, Artist, Tag, tags, Color, colors
 
 
 @timeit
-def explore_filtered_albums(genres: list, time_span: list):
+def explore_filtered_albums(genres: list, time_span: list, colors_list: list):
     """
+    :param colors_list: album colors picked
     :param genres: a list of music tags/genres
     :param time_span: a list of a time span range [start_year, end_year]
     :return:
@@ -22,16 +23,19 @@ def explore_filtered_albums(genres: list, time_span: list):
         start_year = datetime.strptime(str(time_span[0]), '%Y')
         end_year = datetime.strptime(str(time_span[1]), '%Y')
 
-    print(f'time_span: {time_span}, genres: {genres}')
+    print(f'time_span: {time_span}, genres: {genres}, colors: {colors_list}')
     print(start_year, end_year)
 
     filter_query = Album.query.join(Artist, Artist.id == Album.artist_id) \
         .join(tags, (tags.c.artist_id == Artist.id)).join(Tag, (Tag.id == tags.c.tag_id)) \
+        .join(colors, (colors.c.album_id == Album.id)).join(Color, (Color.id == colors.c.color_id)) \
         .filter(Album.release_date >= start_year).filter(Album.release_date <= end_year)
 
     if genres:
         filter_query = filter_query.filter(Tag.tag_name.in_(genres))
 
+    if colors_list:
+        filter_query = filter_query.filter(Color.color_name.in_(colors_list))
     # randomize sample
     filter_query = filter_query.order_by(func.random()).limit(9)
 

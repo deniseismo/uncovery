@@ -20,7 +20,8 @@ export const albumGame = new AlbumGameInfo();
 
 export const musicFilters = new MusicFilter({
   tags: ['hip-hop', 'jazz'],
-  timeSpan: [1967, 2015]
+  timeSpan: [1967, 2015],
+  colors: []
 })
 
 
@@ -164,7 +165,8 @@ function prepareJSONBody(method){
     qualifier = '';
     option = {
       "genres": musicFilters.tagsPickedInfo,
-      "time_span": musicFilters.timeSpanInfo
+      "time_span": musicFilters.timeSpanInfo,
+      "colors": musicFilters.colorsPickedInfo
     };
   } else {
     // get the input value

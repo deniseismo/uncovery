@@ -230,7 +230,7 @@ def lastfm_get_user_avatar(username: str):
     :param username: user's name
     :return:
     """
-    print('getting avatar')
+    print(f'getting avatar for {username}')
     response = lastfm_get_response({
         'method': 'user.getInfo',
         'user': username
@@ -241,12 +241,12 @@ def lastfm_get_user_avatar(username: str):
         return None
     try:
         user_avatars = response.json()['user']['image']
-    except KeyError:
+    except (KeyError, IndexError, TypeError, ValueError):
         print(f"there is no avatar for {username}")
         return None
     try:
         avatar = user_avatars[-1]["#text"]
-    except (KeyError, IndexError):
+    except (KeyError, IndexError, TypeError):
         return None
     return avatar
 

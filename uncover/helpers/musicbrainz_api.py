@@ -210,9 +210,10 @@ def mb_get_artists_albums(artist: str, sorting="popular", limit=9):
         # filters duplicate album names
         an_album_dict['names'] = list(set(an_album_dict['names']))
         # add an album to the albums list only if it's a new one
-        if filtered_name not in a_set_of_titles:
-            a_set_of_titles.add(filtered_name)
-            albums.append(an_album_dict)
+        # if filtered_name not in a_set_of_titles:
+        #     a_set_of_titles.add(filtered_name)
+        #     albums.append(an_album_dict)
+        albums.append(an_album_dict)
     if sorting == "shuffle":
         random.seed(datetime.now())
         random.shuffle(albums)

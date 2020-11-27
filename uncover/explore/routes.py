@@ -18,12 +18,17 @@ def get_albums_by_filter():
     print(content)
     genres = None
     time_span = None
+    colors = None
     try:
         genres = content['option']['genres']
     except KeyError:
         pass
     try:
         time_span = content['option']['time_span']
+    except KeyError:
+        pass
+    try:
+        colors = content['option']['colors']
     except KeyError:
         pass
     # gets albums
@@ -36,7 +41,7 @@ def get_albums_by_filter():
                                     filename=failure_art_filename)}
         ),
             404)
-    albums = explore_filtered_albums(genres=genres, time_span=time_span)
+    albums = explore_filtered_albums(genres=genres, time_span=time_span, colors_list=colors)
     if not albums:
         # if no albums found, make a failure response
         failure_art_filename = display_failure_art(get_failure_images())

@@ -124,6 +124,7 @@ function createMusicGenresContainer() {
   musicFilters.tagsPickedInfo.forEach(tag => {
     createMusicGenreElement(tag);
   });
+  createColorBox();
   showToolsIcon();
 };
 
@@ -295,5 +296,46 @@ export function cleanAfterExplore() {
   formField.removeEventListener("input", handleTags);
   $('.form-field').autocomplete('dispose');
 };
+
+
+function createColorBox() {
+  const colorBox = document.createElement('div');
+  colorBox.classList.add('flex-container', 'color-box');
+  const colorList = [
+    "white",
+    "black",
+    "black_and_white",
+    "gray",
+    "red",
+    "green",
+    "blue",
+    "magenta",
+    "purple",
+    "yellow",
+    "orange",
+    "brown"
+  ]
+  function createColorSquare(colorName) {
+    const colorSquare = document.createElement('div');
+    colorSquare.classList.add('square', 'shadow-main', colorName);
+    colorSquare.dataset.colorName = colorName;
+    colorSquare.addEventListener('click', (e) => {
+      colorSquare.classList.toggle('active');
+      if (colorSquare.classList.contains('active')) {
+        console.log(musicFilters.colorsPickedInfo);
+        musicFilters.addColor(e.target.dataset.colorName);
+      } else {
+        musicFilters.removeColor(e.target.dataset.colorName);
+      };
+    });
+    return colorSquare;
+  };
+  colorList.forEach(colorName =>  {
+    const colorSquare = createColorSquare(colorName);
+    colorBox.appendChild(colorSquare);
+  });
+  const musicGenresContainer = document.querySelector('.music-genres-container');
+  musicGenresContainer.appendChild(colorBox);
+}
 
 

@@ -189,6 +189,9 @@ async def add_album(album, set_of_titles, session, albums_list, artist, sorting)
     # filters duplicate album names
     an_album_dict['names'] = list(set(an_album_dict['names']))
     # add an album to the albums list only if it's a new one
-    if filtered_name not in set_of_titles:
-        set_of_titles.add(filtered_name)
+    # if filtered_name not in set_of_titles:
+    #     set_of_titles.add(filtered_name)
+    #     albums_list.append(an_album_dict)
+    if album['id'] not in set_of_titles:
+        set_of_titles.add(album['id'])
         albums_list.append(an_album_dict)
