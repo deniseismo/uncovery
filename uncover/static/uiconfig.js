@@ -199,11 +199,11 @@ export function removeAvatarContainer() {
 
 function showOrHideToolsIcon() {
     const musicInfoBox = document.querySelector('.music-info-box');
-    const musicGenresContainer = document.querySelector('.music-genres-container');
+    const musicFiltersContainer = document.querySelector('.music-filters-container');
     const avatar = document.querySelector('.avatar-container');
 
     const exist = (element) => element;
-    if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
+    if ([musicInfoBox, musicFiltersContainer, avatar].some(exist)) {
         console.log('some exist')
         showToolsIcon();
     }

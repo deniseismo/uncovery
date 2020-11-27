@@ -213,7 +213,7 @@ def is_image_black_or_white(color_list, is_black_and_white=False):
         if mean_lightness <= 33:
             # black
             return 'black'
-        elif 34 <= mean_lightness <= 66:
+        elif 33 < mean_lightness <= 66:
             # white
             return 'gray'
         else:

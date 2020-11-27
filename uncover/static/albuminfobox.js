@@ -1,5 +1,5 @@
 import {theGame, albumGame, mediaQuery, handleToolsIconChange} from "./main.js"
-import {animateMusicGenresContainer, animatePlayButtons, animateSpotifyWidget} from './animation.js'
+import {animateMusicFiltersContainer, animatePlayButtons, animateSpotifyWidget} from './animation.js'
 import {handleTags} from "./explore.js"
 import {loadSpinner, insertAfter} from "./utils.js"
 import {showToolsIcon} from "./uiconfig.js"
@@ -36,7 +36,7 @@ export function createMusicInfoBox() {
   musicInfoBox.appendChild(albumInfoCard);
   musicInfoBox.appendChild(spotifyWidget);
   document.querySelector('.wrapper').appendChild(musicInfoBox);
-  animateMusicGenresContainer(musicInfoBox);
+  animateMusicFiltersContainer(musicInfoBox);
   animatePlayButtons(uncover, 1);
   // triggers a function that may or may not (depends on view-size) display a tools icon
   showToolsIcon();

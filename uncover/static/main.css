@@ -909,7 +909,7 @@ p.tooltipText:after {
   background: #911A1A;
 }
 
-.music-genres-container {
+.music-filters-container {
   display: flex;
   flex-flow: column nowrap;
   position: absolute;
@@ -924,6 +924,11 @@ p.tooltipText:after {
   width: 20%;
   transition: margin-left 0.3s ease-out;
   z-index: 3;
+}
+
+.music-genres-container {
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .avatar-container {
@@ -1316,7 +1321,7 @@ p.tooltipText:after {
 
   }
 
-  .music-genres-container, .avatar-container  {
+  .music-filters-container, .avatar-container  {
     margin-left: 5%;
 
   }
@@ -1328,7 +1333,7 @@ p.tooltipText:after {
 
   }
 
-  .music-genres-container, .avatar-container {
+  .music-filters-container, .avatar-container {
     margin-left: 0%;
 
   }
@@ -1339,7 +1344,7 @@ p.tooltipText:after {
 
 @media screen and (max-width: 1200px) {
 
-  .music-info-box h1, .music-genres-container h1 {
+  .music-info-box h1, .music-filters-container h1 {
     font-size: 1.5rem;
   }
   .info-box-description, .time-span,
@@ -1368,7 +1373,7 @@ p.tooltipText:after {
     width: 75%;
     max-width: 600px;
   }
-  .music-genres-container {
+  .music-filters-container {
     top: 20%;
     width: 25%;
   }
@@ -1412,7 +1417,7 @@ p.tooltipText:after {
   .splash {
     align-items: center;
   }
-  .music-genres-container {
+  .music-filters-container {
     width: 50%;
   }
   .music-info-box {
@@ -1431,7 +1436,7 @@ p.tooltipText:after {
   .spotify-widget {
     height: 80px !important;
   }
-  .music-info-box, .music-genres-container {
+  .music-info-box, .music-filters-container {
     background: var(--bg-color);
   }
   .lcd-i-heard {
@@ -1532,7 +1537,7 @@ p.tooltipText:after {
     height: calc(150px * 0.5625);
     width: calc(150px * 0.5625);
   }
-  .music-info-box h1, .music-genres-container h1 {
+  .music-info-box h1, .music-filters-container h1 {
     font-size: 1rem;
   }
   .info-box-description, .time-span,

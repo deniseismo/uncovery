@@ -3,7 +3,7 @@ import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters, albumGame} from "./main.js"
 import {removeAvatarContainer, showToolsIcon} from "./uiconfig.js"
 import {animateTimeSpan, animateMusicGenreOn, animateBlockOff,
-        animateMusicGenresContainer, animateMorphBlob, animateBlob, animatePlayButtons} from './animation.js'
+        animateMusicFiltersContainer, animateMorphBlob, animateBlob, animatePlayButtons} from './animation.js'
 
 // prepares all the sliders and options for the EXPLORE mode
 export async function prepareToExplore() {
@@ -12,7 +12,7 @@ export async function prepareToExplore() {
   // create slider, filter, etc. containers
   createSliderContainer();
   createSlider();
-  createMusicGenresContainer();
+  createMusicFiltersContainer();
   frequentElements.textField.id = "tag-field";
   const formContainer = document.getElementById("submit-form");
   formContainer.id = "tags-form";
@@ -90,9 +90,9 @@ export async function handleTags(e) {
 };
 
 // a container with music tags/genres filters chosen
-function createMusicGenresContainer() {
-  const musicGenresContainer = document.createElement('div');
-  musicGenresContainer.classList.add('music-genres-container', 'shadow-main');
+function createMusicFiltersContainer() {
+  const musicFiltersContainer = document.createElement('div');
+  musicFiltersContainer.classList.add('music-filters-container', 'shadow-main');
   const selectedFilters = document.createElement('h1');
   selectedFilters.textContent = "FILTERS";
   selectedFilters.classList.add('filters-header');
@@ -114,13 +114,16 @@ function createMusicGenresContainer() {
   timeSpanBegin.textContent = musicFilters.timeSpanInfo[0];
   timeSpanDelimit.textContent = "—";
   timeSpanEnd.textContent = musicFilters.timeSpanInfo[1];
-  addBlob(musicGenresContainer, 3);
-  musicGenresContainer.appendChild(selectedFilters);
-  musicGenresContainer.appendChild(timeSpanElement);
-  document.querySelector('.wrapper').appendChild(musicGenresContainer);
+  addBlob(musicFiltersContainer, 3);
+  musicFiltersContainer.appendChild(selectedFilters);
+  musicFiltersContainer.appendChild(timeSpanElement);
+  document.querySelector('.wrapper').appendChild(musicFiltersContainer);
   animateBlob();
-  animateMusicGenresContainer(musicGenresContainer);
+  animateMusicFiltersContainer(musicFiltersContainer);
   // display all the tags already chosen/left from before
+  const musicGenresContainer = document.createElement('div');
+  musicGenresContainer.classList.add('music-genres-container');
+  musicFiltersContainer.appendChild(musicGenresContainer);
   musicFilters.tagsPickedInfo.forEach(tag => {
     createMusicGenreElement(tag);
   });
@@ -282,8 +285,8 @@ async function fetchTags(value) {
 export function cleanAfterExplore() {
   console.log('cleaning up after explore')
   const sliderContainer = document.querySelector('.slider-container');
-  const musicGenresContainer = document.querySelector('.music-genres-container');
-  [sliderContainer, musicGenresContainer].forEach(container => {
+  const musicFiltersContainer = document.querySelector('.music-filters-container');
+  [sliderContainer, musicFiltersContainer].forEach(container => {
     if (container) {
       container.remove();
     };
@@ -322,20 +325,25 @@ function createColorBox() {
     colorSquare.addEventListener('click', (e) => {
       colorSquare.classList.toggle('active');
       if (colorSquare.classList.contains('active')) {
-        console.log(musicFilters.colorsPickedInfo);
         musicFilters.addColor(e.target.dataset.colorName);
+        console.log(musicFilters.colorsPickedInfo);
       } else {
         musicFilters.removeColor(e.target.dataset.colorName);
+        console.log(musicFilters.colorsPickedInfo);
       };
     });
     return colorSquare;
   };
+  const colorsAlreadyPicked = musicFilters.colorsPickedInfo;
   colorList.forEach(colorName =>  {
     const colorSquare = createColorSquare(colorName);
+    if (colorsAlreadyPicked.includes(colorName)) {
+      colorSquare.classList.add('active');
+    }
     colorBox.appendChild(colorSquare);
   });
-  const musicGenresContainer = document.querySelector('.music-genres-container');
-  musicGenresContainer.appendChild(colorBox);
+  const musicFiltersContainer = document.querySelector('.music-filters-container');
+  musicFiltersContainer.appendChild(colorBox);
 }
 
 

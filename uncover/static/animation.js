@@ -92,7 +92,7 @@ export function animateHighlightGuessedAlbum(album) {
 };
 
 // animates appearance of a music genres container
-export function animateMusicGenresContainer(container) {
+export function animateMusicFiltersContainer(container) {
   anime({
     targets: container,
     scale: [0.5, 1],
