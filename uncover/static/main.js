@@ -112,6 +112,16 @@ export const submitInput = function(desiredMethod) {
       downloadInit();
       playInit();
       createMusicInfoBox();
+      if (desiredMethod === 'explore' && total == 8) {
+        const wrapper = document.querySelector('.wrapper');
+        wrapper.classList.add('overflow-positive');
+        document.querySelector('header').classList.add('z-index-high');
+      }
+      else {
+        const wrapper = document.querySelector('.wrapper');
+        wrapper.classList.remove('overflow-positive');
+        document.querySelector('header').classList.remove('z-index-high');
+      }
       if (desiredMethod === "by_lastfm_username") {
         // shows avatar if it's username method
         const username = data['info']['query'];

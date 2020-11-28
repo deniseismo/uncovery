@@ -219,6 +219,13 @@ header {
   transform: rotate(-45deg) translate(5px, -6px);
 }
 
+.overflow-positive {
+  overflow-y: auto;
+}
+
+.z-index-high {
+  z-index: 5;
+}
 
 @media screen and (max-height: 899px) {
   .wrapper {
@@ -1651,8 +1658,9 @@ p.tooltipText:after {
 
 
 .square.black_and_white {
-  border-top: 44px solid black;
-  border-right: 44px solid white;
+/*  border-top: 44px solid black;
+  border-right: 44px solid white;*/
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(0,0,0,1) 68%, rgba(0,0,0,1) 100%);
 }
 
 
@@ -1661,10 +1669,10 @@ p.tooltipText:after {
   background: #CF2626;
 }
 
-.square.black_and_white.active::before {
+/*.square.black_and_white.active::before {
  transform: translateY(-85%);
  color: #A5E349;
-}
+}*/
 .square.green {
   background: #55A630;
 }

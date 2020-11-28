@@ -336,4 +336,4 @@ def add_album_color(album_entry: Album):
 #         db.session.delete(color)
 #         db.session.commit()
 # #delete_colors()
-populate_album_colors()
+# populate_album_colors()

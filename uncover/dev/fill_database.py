@@ -337,9 +337,11 @@ def populate_spotify_artist_names():
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
-database_populate()
+# database_populate()
 
 # populate_spotify_album_ids()
 
 # populate_spotify_artist_names()
 # get_artist_spotify_names()
+
+print(lookup_tags('Neurosis'))
