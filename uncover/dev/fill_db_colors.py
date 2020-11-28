@@ -31,6 +31,7 @@ SHADES = {
     # (0, 128, 128, 'teal'),  # blue?
     (0, 0, 128, 'navyblue'),  # blue
     (0, 191, 255, 'capri'),  # blue
+    (0, 123, 167, 'cerulean'),  # blue
 
     (139, 69, 19, 'brown'),  # brown
     (123, 63, 0, 'chocolate'),  # chocolate
@@ -164,6 +165,7 @@ def get_basic_color(complex_color):
         'platinum': 'gray',
         'bluegray': 'blue',
         'navyblue': 'blue',
+        'cerulean': 'blue',
         'mahogany': 'brown',
         'peach': 'yellow',
         'tomato': 'red',
@@ -246,6 +248,7 @@ def analyze_image_colors(image_file):
     if not image_file:
         return None
     print(image_file)
+    image_colors = None
     color_thief = ColorThief(image_file)
     # gets the most dominant color
     dominant_color = color_thief.get_color(quality=1)
@@ -253,14 +256,34 @@ def analyze_image_colors(image_file):
     full_palette = color_thief.get_palette(color_count=10, quality=1)
     # main_palette = color_thief.get_palette(color_count=3, quality=1)
     # determines if it's b&w using full palette
+    main_palette = color_thief.get_palette(color_count=5, quality=1)
+    main_nearest_colors_shades = [nearest_color_delta(SHADES, palette_color)[-1] for palette_color in main_palette]
+    print(main_nearest_colors_shades)
+    nearest_dominant_shade = nearest_color_delta(SHADES, dominant_color)[-1]
     is_black_or_white = is_image_black_or_white(full_palette)
     if is_black_or_white:
+        # if IMAGE is black & white
         image_colors = ['black_and_white'] + [is_black_or_white]
-        print(image_colors)
+    elif nearest_dominant_shade == 'black':
+        # if image is NOT black & white, but DOMINANT color is BLACK
+        black_count = main_nearest_colors_shades.count('black')
+        gray_count = main_nearest_colors_shades.count('gray')
+        if black_count > 2 or (black_count > 1 and gray_count > 1):
+            image_colors = ['black']
+    elif nearest_dominant_shade == 'white':
+        white_count = main_nearest_colors_shades.count('white')
+        gray_count = main_nearest_colors_shades.count('gray')
+        if white_count > 2 or (white_count > 1 and gray_count > 1):
+            image_colors = ['white']
+    elif nearest_dominant_shade == 'gray':
+        gray_count = main_nearest_colors_shades.count('gray')
+        black_count = main_nearest_colors_shades.count('black')
+        white_count = main_nearest_colors_shades.count('white')
+        if gray_count > 2 or (gray_count > 1 and (black_count > 0 or white_count > 0)):
+            image_colors = ['gray']
     else:
         # color image
         # gets the nearest shade color from (r, g, b)
-        nearest_dominant_shade = nearest_color_delta(SHADES, dominant_color)[-1]
         # gets a simplified version of a color name (shade/tone → simple color) for the database
         simplified_dominant_shade = get_basic_color(nearest_dominant_shade)
         image_colors = [simplified_dominant_shade]
@@ -303,7 +326,8 @@ def add_album_color(album_entry: Album):
                 db.session.commit()
             # append artist to the tag, thus creating the many-to-many association between tags & artists
             color_entry.albums.append(album_entry)
-    db.session.commit()
+        db.session.commit()
+
 
 # def delete_colors():
 #     colors = Color.query.all()
@@ -312,5 +336,4 @@ def add_album_color(album_entry: Album):
 #         db.session.delete(color)
 #         db.session.commit()
 # #delete_colors()
-
-# populate_album_colors()
+populate_album_colors()

@@ -66,6 +66,9 @@ def explore_filtered_albums(genres: list, time_span: list, colors_list: list):
             an_album_dict['spotify_name'] = album_entry.artist.spotify_name
         if album_entry.release_date:
             an_album_dict['year'] = album_entry.release_date.strftime("%Y")
+        if album_entry.alternative_title:
+            an_album_dict['names'] += [album_entry.alternative_title]
+            an_album_dict["names"] += get_filtered_names_list(album_entry.alternative_title)
         # remove duplicates
         an_album_dict['artist_names'] = list(set(an_album_dict["artist_names"]))
         an_album_dict['names'] = list(set(an_album_dict['names']))

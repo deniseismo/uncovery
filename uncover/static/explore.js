@@ -307,13 +307,13 @@ function createColorBox() {
   const colorList = [
     "white",
     "black",
-    "black_and_white",
-    "gray",
     "red",
     "green",
     "blue",
-    "magenta",
     "purple",
+    "gray",
+    "black_and_white",
+    "magenta",
     "yellow",
     "orange",
     "brown"

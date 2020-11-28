@@ -1600,41 +1600,79 @@ p.tooltipText:after {
   display: flex;
   flex-flow: row wrap;
   padding: 0.5rem;
-  justify-content: space-between;
+  justify-content: center;
 }
 .square {
-  width: 45px;
-  height: 45px;
+  width: 44px;
+  height: 44px;
   margin: 0.2rem;
+  transition: transform 0.1s ease-in;
 }
+
 .square.active {
-  outline: 2px solid red;
+  transform: scale(1.2);
+  transition: transform 0.1s ease-in;
+}
+
+/*.square:hover {
+  transform: scale(1.2);
+  transition: transform 0.1s ease-out;
+}*/
+
+
+
+
+
+.square.active::before {
+	content: '✔';
+	width: 44px;
+	height: 44px;
+	position: absolute;
+	background-color: #774b4b00;
+	transform: translateY(15%) translateX(-50%);
+	z-index: 5;
+	border-radius: 0;
+	color: white;
 }
 
 .square.white {
   background: white;
 }
+.square.white.active::before, .square.gray.active::before {
+  color: black;
+}
+
 .square.black {
   background: black;
 }
 .square.gray {
   background: #CED4DA;
 }
+
+
 .square.black_and_white {
-  border-top:45px solid white;
-  border-right:45px solid black;
+  border-top: 44px solid black;
+  border-right: 44px solid white;
 }
+
+
+
 .square.red {
-  background: #D62828;
+  background: #CF2626;
+}
+
+.square.black_and_white.active::before {
+ transform: translateY(-85%);
+ color: #A5E349;
 }
 .square.green {
   background: #55A630;
 }
 .square.blue {
-  background: #118AB2;
+  background: #1FB7EA;
 }
 .square.magenta {
-  background: #F20089;
+  background: #FF70C1;
 }
 .square.purple {
   background: #7209B7;
@@ -1646,5 +1684,5 @@ p.tooltipText:after {
   background: #FB5607;
 }
 .square.brown {
-  background: #5B3000;
+  background: #522C00;
 }
