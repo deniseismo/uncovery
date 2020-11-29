@@ -296,9 +296,10 @@ def populate_album_colors():
         add_album_color(album_entry)
 
 
-def add_album_color(album_entry: Album):
+def add_album_color(album_entry: Album, folder='static/optimized_cover_art_images'):
     """
 
+    :param folder: the path to the album images
     :param album_entry: album of Album class
     :return:
     """
@@ -306,7 +307,7 @@ def add_album_color(album_entry: Album):
         return None
     print(f'... analyzing {album_entry.title} ...')
     image_filename = album_entry.cover_art
-    image_path = os.path.join(current_app.root_path, 'static/optimized_cover_art_images',
+    image_path = os.path.join(current_app.root_path, folder,
                               image_filename) + '-size200.jpg'
     try:
         color_names = analyze_image_colors(image_path)

@@ -7,6 +7,7 @@ from datetime import datetime
 
 import requests_cache
 from PIL import Image
+from fill_db_colors import add_album_color
 from flask import current_app
 from tqdm import tqdm
 
@@ -158,7 +159,9 @@ def database_populate():
                         album_entry.release_date = release_date
                     else:
                         add_album_release_date(album_entry)
+                    add_album_color(album_entry, 'static/cover_art_new_batch')
                     db.session.add(album_entry)
+
 
         db.session.commit()
 
@@ -337,11 +340,9 @@ def populate_spotify_artist_names():
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
-# database_populate()
+database_populate()
 
 # populate_spotify_album_ids()
 
 # populate_spotify_artist_names()
 # get_artist_spotify_names()
-
-print(lookup_tags('Neurosis'))

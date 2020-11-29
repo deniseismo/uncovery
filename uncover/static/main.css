@@ -1414,9 +1414,6 @@ p.tooltipText:after {
   .search-and-options-container {
     width: 100%;
   }
-/*  .tools-icon {
-    display: block;
-  }*/
   .tools-and-menu-hidden-elements {
     margin-left: 0 !important;
     width: 50% !important;
@@ -1425,7 +1422,7 @@ p.tooltipText:after {
     align-items: center;
   }
   .music-filters-container {
-    width: 50%;
+    width: 75%;
   }
   .music-info-box {
     width: 100%;
@@ -1567,11 +1564,29 @@ p.tooltipText:after {
     font-size: 2rem;
   }
   .logo-title-container {
-    align-items: flex-end;
+    align-items: center;
+  }
+  .title-link {
+    font-size: 1.5rem;
+  }
+  .current-page-title {
+    font-size: 1rem;
   }
   .about-item {
     width: calc(150px * 0.75);
     height: calc(150px * 0.75);
+  }
+  .my-name {
+    display: none;
+  }
+  .copyright > p {
+    letter-spacing: normal;
+  }
+  .tools-icon {
+    margin-left: 0.25rem;
+  }
+  .tools-and-menu-hidden-elements {
+    width: 60% !important;
   }
 }
 
@@ -1612,23 +1627,15 @@ p.tooltipText:after {
 .square {
   width: 44px;
   height: 44px;
-  margin: 0.2rem;
+  margin: 0.25rem;
   transition: transform 0.1s ease-in;
+  border-radius: 50%;
 }
 
 .square.active {
   transform: scale(1.2);
   transition: transform 0.1s ease-in;
 }
-
-/*.square:hover {
-  transform: scale(1.2);
-  transition: transform 0.1s ease-out;
-}*/
-
-
-
-
 
 .square.active::before {
 	content: '✔';

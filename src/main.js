@@ -20,7 +20,8 @@ export const albumGame = new AlbumGameInfo();
 
 export const musicFilters = new MusicFilter({
   tags: ['hip-hop', 'jazz'],
-  timeSpan: [1967, 2015]
+  timeSpan: [1967, 2015],
+  colors: []
 })
 
 
@@ -111,6 +112,16 @@ export const submitInput = function(desiredMethod) {
       downloadInit();
       playInit();
       createMusicInfoBox();
+      if (desiredMethod === 'explore' && total == 8) {
+        const wrapper = document.querySelector('.wrapper');
+        wrapper.classList.add('overflow-positive');
+        document.querySelector('header').classList.add('z-index-high');
+      }
+      else {
+        const wrapper = document.querySelector('.wrapper');
+        wrapper.classList.remove('overflow-positive');
+        document.querySelector('header').classList.remove('z-index-high');
+      }
       if (desiredMethod === "by_lastfm_username") {
         // shows avatar if it's username method
         const username = data['info']['query'];
@@ -164,7 +175,8 @@ function prepareJSONBody(method){
     qualifier = '';
     option = {
       "genres": musicFilters.tagsPickedInfo,
-      "time_span": musicFilters.timeSpanInfo
+      "time_span": musicFilters.timeSpanInfo,
+      "colors": musicFilters.colorsPickedInfo
     };
   } else {
     // get the input value
@@ -228,26 +240,26 @@ const infoBlocksSlideHandler = () => {
   toolIcon.addEventListener("click", () => {
     console.log('clicked!');
     const musicInfoBox = document.querySelector('.music-info-box');
-    const musicGenresContainer = document.querySelector('.music-genres-container');
+    const musicFiltersContainer = document.querySelector('.music-filters-container');
     const avatar = document.querySelector('.avatar-container');
 
     const exist = (element) => element;
-    [musicInfoBox, musicGenresContainer, avatar].some(exist);
-    console.log([musicInfoBox, musicGenresContainer, avatar].some(exist));
-    if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
+    [musicInfoBox, musicFiltersContainer, avatar].some(exist);
+    console.log([musicInfoBox, musicFiltersContainer, avatar].some(exist));
+    if ([musicInfoBox, musicFiltersContainer, avatar].some(exist)) {
       toolIcon.classList.toggle('tools-active');
     } else {
 //      toolIcon.classList.add('tools-active');
     }
     if (toolIcon.classList.contains('tools-active')) {
-        [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
+        [musicInfoBox, musicFiltersContainer, avatar].forEach(item => {
       if (item) {
         item.classList.add('info-block-hidden');
         item.classList.remove('info-block-active');
       }
     });
     } else {
-      [musicInfoBox, musicGenresContainer, avatar].forEach(item => {
+      [musicInfoBox, musicFiltersContainer, avatar].forEach(item => {
       if (item) {
         item.classList.remove('info-block-hidden');
         item.classList.add('info-block-active');
@@ -276,11 +288,11 @@ buttonsContainer.addEventListener('click', (event) => {
   methodButtonsList.forEach(button => button.classList.remove('active'));
   event.target.classList.add('active');
   const sliderContainer = document.querySelector('.slider-container');
-  const musicGenresContainer = document.querySelector('.music-genres-container');
+  const musicFiltersContainer = document.querySelector('.music-filters-container');
   if (!(event.target.id === "explore")) {
     if (sliderContainer) {
       sliderContainer.remove();
-      musicGenresContainer.remove();
+      musicFiltersContainer.remove();
     };
     const tagsForm = document.querySelector('#tags-form');
     if (tagsForm) {
@@ -332,12 +344,12 @@ export function handleToolsIconChange(e) {
    console.log('smaller')
     const toolsIcon = document.querySelector('.tools-icon')
     const musicInfoBox = document.querySelector('.music-info-box');
-    const musicGenresContainer = document.querySelector('.music-genres-container');
+    const musicFiltersContainer = document.querySelector('.music-filters-container');
     const avatar = document.querySelector('.avatar-container');
     const exist = (element) => element;
-    [musicInfoBox, musicGenresContainer, avatar].some(exist);
-    console.log([musicInfoBox, musicGenresContainer, avatar].some(exist));
-    if ([musicInfoBox, musicGenresContainer, avatar].some(exist)) {
+    [musicInfoBox, musicFiltersContainer, avatar].some(exist);
+    console.log([musicInfoBox, musicFiltersContainer, avatar].some(exist));
+    if ([musicInfoBox, musicFiltersContainer, avatar].some(exist)) {
         toolsIcon.style.display = 'block';
     }
   }
