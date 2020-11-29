@@ -2,8 +2,7 @@ import {theGame, albumGame, mediaQuery, handleToolsIconChange} from "./main.js"
 import {animateMusicFiltersContainer, animatePlayButtons, animateSpotifyWidget} from './animation.js'
 import {handleTags} from "./explore.js"
 import {loadSpinner, insertAfter} from "./utils.js"
-import {showToolsIcon} from "./uiconfig.js"
-
+import {showToolsIcon, getCancelIconSvg} from "./uiconfig.js"
 
 
 // creates an info box with all the info about album clicked
@@ -30,17 +29,40 @@ export function createMusicInfoBox() {
   const albumInfoCard = createAlbumInfoCard();
   // get spotify widget
   const spotifyWidget = createSpotifyWidget();
+  const cancelIcon = getCancelIconSvg('.music-info-box');
+  const mediaQuery = window.matchMedia('(min-width: 800px)')
+  if (!mediaQuery.matches) {
+      musicInfoBox.classList.remove('info-block-active');
+      musicInfoBox.classList.add('info-block-hidden');
+  }
+  musicInfoBox.appendChild(cancelIcon);
   musicInfoBox.appendChild(infoText);
   musicInfoBox.appendChild(description);
   musicInfoBox.appendChild(uncover);
   musicInfoBox.appendChild(albumInfoCard);
   musicInfoBox.appendChild(spotifyWidget);
+
   document.querySelector('.wrapper').appendChild(musicInfoBox);
+  if (!mediaQuery.matches) {
+      uncoverModeOn();
+      const musicFiltersContainer = document.querySelector('.music-filters-container');
+       if (musicFiltersContainer) {
+         musicFiltersContainer.classList.remove('info-block-active');
+         musicFiltersContainer.classList.add('info-block-hidden');
+         const toolsIcon = document.querySelector('.tools-icon');
+         if (toolsIcon) {
+           if (!toolsIcon.classList.contains('tools-active')) {
+            toolsIcon.classList.add('tools-active');
+            }
+         }
+      }
+  }
   animateMusicFiltersContainer(musicInfoBox);
   animatePlayButtons(uncover, 1);
   // triggers a function that may or may not (depends on view-size) display a tools icon
   showToolsIcon();
 }
+
 
 
 // a function that makes all cover art images clickable and uncoverable
@@ -54,6 +76,11 @@ function uncoverModeOn() {
   albumItems.forEach(item => {
     item.addEventListener('click', () => {
       if (!(theGame.status)) {
+        const musicInfoBox = document.querySelector('.music-info-box');
+        if (musicInfoBox.classList.contains('info-block-hidden')) {
+          musicInfoBox.classList.add('info-block-active');
+          musicInfoBox.classList.remove('info-block-hidden');
+        }
         removeInfoBoxDescription();
         const id = item.id[item.id.length - 1];
         uncoverAlbumInfo(albumGame.albums[id]);

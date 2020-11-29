@@ -215,7 +215,6 @@ function showOrHideToolsIcon() {
 }
 
 
-
 export function showToolsIcon() {
     const mediaQuery = window.matchMedia('(min-width: 800px)')
  
@@ -225,4 +224,36 @@ export function showToolsIcon() {
       const toolsIcon = document.querySelector('.tools-icon')
       toolsIcon.style.display = 'block';
     }
+}
+
+export function getCancelIconSvg(queryElement) {
+  const cancelIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  cancelIcon.xmlns = "http://www.w3.org/2000/svg";
+  cancelIcon.classList.add('album-info-cancel-icon');
+  cancelIcon.setAttribute('viewBox', '0 0 512 512');
+  const title = document.createElement('title');
+  title.textContent = 'Close';
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', 'currentColor');
+  path.setAttribute('stroke-linejoin', 'round');
+  path.setAttribute('stroke-width', '32');
+  path.setAttribute('d', 'M368 368L144 144M368 144L144 368');
+  path.classList.add('cancel-icon-path');
+  cancelIcon.appendChild(title);
+  cancelIcon.appendChild(path);
+  cancelIcon.addEventListener('click', () =>  {
+    const musicInfoBox = document.querySelector(queryElement);
+    musicInfoBox.classList.remove('info-block-active');
+    musicInfoBox.classList.add('info-block-hidden');
+    if (queryElement === '.music-filters-container') {
+      const toolsIcon = document.querySelector('.tools-icon');
+         if (toolsIcon) {
+           if (!toolsIcon.classList.contains('tools-active')) {
+            toolsIcon.classList.add('tools-active');
+            }
+         }
+    }
+  });
+  return cancelIcon;
 }

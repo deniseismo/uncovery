@@ -1198,6 +1198,22 @@ p.tooltipText:after {
   z-index: 3;
 }
 
+.album-info-cancel-icon {
+  width: 20px;
+  height: 20px;
+  position: fixed;
+  top: 10%;
+  right: 3%;
+  display: none;
+}
+.album-info-cancel-icon:hover {
+  cursor: pointer;
+}
+.album-info-cancel-icon:hover .cancel-icon-path {
+  transition: stroke 0.3s ease;
+  stroke: #ed6663;
+}
+
 .no-bottom-padding {
   padding-bottom: 0;
 }
@@ -1413,6 +1429,7 @@ p.tooltipText:after {
   }
   .search-and-options-container {
     width: 100%;
+    max-height: 146px;
   }
   .tools-and-menu-hidden-elements {
     margin-left: 0 !important;
@@ -1422,7 +1439,8 @@ p.tooltipText:after {
     align-items: center;
   }
   .music-filters-container {
-    width: 75%;
+    width: 100%;
+    top: 206px;
   }
   .music-info-box {
     width: 100%;
@@ -1464,6 +1482,9 @@ p.tooltipText:after {
   }
   .lcd-done, .lcd-by-anybody {
     font-size: 2.5rem !important;
+  }
+  .album-info-cancel-icon {
+    display: block;
   }
 }
 

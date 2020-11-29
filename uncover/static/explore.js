@@ -1,7 +1,7 @@
 import {Blob} from "./shapes.js"
 import {frequentElements} from "./utils.js"
 import {theGame, submitInput, musicFilters, albumGame} from "./main.js"
-import {removeAvatarContainer, showToolsIcon} from "./uiconfig.js"
+import {removeAvatarContainer, showToolsIcon, getCancelIconSvg} from "./uiconfig.js"
 import {animateTimeSpan, animateMusicGenreOn, animateBlockOff,
         animateMusicFiltersContainer, animateMorphBlob, animateBlob, animatePlayButtons} from './animation.js'
 
@@ -124,6 +124,8 @@ function createMusicFiltersContainer() {
   const musicGenresContainer = document.createElement('div');
   musicGenresContainer.classList.add('music-genres-container');
   musicFiltersContainer.appendChild(musicGenresContainer);
+  const cancelIcon = getCancelIconSvg('.music-filters-container');
+  musicFiltersContainer.appendChild(cancelIcon);
   musicFilters.tagsPickedInfo.forEach(tag => {
     createMusicGenreElement(tag);
   });
