@@ -124,6 +124,8 @@ export const submitInput = function(desiredMethod) {
       }
       if (desiredMethod === "by_lastfm_username") {
         // shows avatar if it's username method
+        const mediaQuery = window.matchMedia('(min-width: 800px)')
+        if (mediaQuery.matches) {
         const username = data['info']['query'];
         fetchAvatar(username)
         .then(avatar => avatar['avatar'])
@@ -138,6 +140,7 @@ export const submitInput = function(desiredMethod) {
           });
           }
         );
+        }
       };
 
 
@@ -252,14 +255,14 @@ const infoBlocksSlideHandler = () => {
 //      toolIcon.classList.add('tools-active');
     }
     if (toolIcon.classList.contains('tools-active')) {
-        [musicInfoBox, musicFiltersContainer, avatar].forEach(item => {
+        [musicFiltersContainer].forEach(item => {
       if (item) {
         item.classList.add('info-block-hidden');
         item.classList.remove('info-block-active');
       }
     });
     } else {
-      [musicInfoBox, musicFiltersContainer, avatar].forEach(item => {
+      [musicFiltersContainer].forEach(item => {
       if (item) {
         item.classList.remove('info-block-hidden');
         item.classList.add('info-block-active');
