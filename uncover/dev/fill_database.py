@@ -19,7 +19,7 @@ from uncover.helpers.musicbrainz_api import mb_get_artists_albums, mb_get_album_
 from uncover.helpers.spotify_api import spotify_get_artist_id, spotify_get_artists_genres, \
     spotify_get_artists_albums_images, spotify_get_album_id
 from uncover.helpers.utilities import timeit
-from uncover.models import Artist, Album, Tag
+from uncover.models import Artist, Album, Tag, User
 
 app = create_app()
 app.app_context().push()
@@ -335,12 +335,24 @@ def populate_spotify_artist_names():
                     db.session.commit()
 
 
-get_all_tags()
+def add_spotify_user_to_database(user_id, spotify_token):
+    if not user_id or not spotify_token:
+        print("not enough data provided")
+        return False
+    if not isinstance(user_id, str) or not isinstance(spotify_token, str):
+        print("incorrect data type")
+        return False
+    a_user = User(spotify_id=user_id, spotify_token=spotify_token)
+    db.session.add(a_user)
+    db.session.commit()
+
+
+# get_all_tags()
 
 # populate_release_dates()
 # populate_music_genres()
 # delete_all_tags()
-# database_populate()
+database_populate()
 
 # populate_spotify_album_ids()
 
