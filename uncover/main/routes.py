@@ -34,6 +34,11 @@ def get_collage():
     image_file = url_for('static', filename='collage/' + collage_filename)
     return jsonify(image_file)
 
+
+@main.route('/static/')
+def forbid_static():
+    return render_template('404.html', title='Page Not Found'), 404
+
 # @main.after_request
 # def add_header(r):
 #     """
