@@ -179,17 +179,21 @@ def spotify_get_artist_name(artist_name):
     app_token = tk.request_client_token(client_id, client_secret)
     try:
         with spotify_tekore_client.token_as(app_token):
-            artist_object = spotify_tekore_client.search(
+            artists_found, = spotify_tekore_client.search(
                 query=artist_name,
                 types=('artist',),
-                limit=5
+                limit=10
             )
-            if not artist_object:
+            if not artists_found:
                 return None
-            if not artist_object[0].items:
+            if not artists_found.items:
                 return None
             try:
-                artist_name_on_spotify = artist_object[0].items[0].name
+                artist_name_on_spotify = artists_found.items[0].name
+                for artist_found in artists_found.items:
+                    if artist_found.name.lower() == artist_name.lower():
+                        artist_name_on_spotify = artist_found.name
+                        return artist_name_on_spotify
             except (TypeError, IndexError):
                 return None
     except tk.HTTPError:
