@@ -1,23 +1,17 @@
 import random
 import time
 from datetime import datetime
+from pprint import pprint
 
 import musicbrainzngs
 import requests
-from flask import current_app
-
 import uncover.helpers.lastfm_api as lastfm
 import uncover.helpers.utilities as utils
+from flask import current_app
 
-# from uncover import cache
-
-# requests_cache.install_cache()
-
-musicbrainzngs.set_useragent("uncovery", "0.8", "denisseismo@gmail.com")
+musicbrainzngs.set_useragent(*current_app.config['MUSIC_BRAINZ_USER_AGENT'].split(','))
 
 
-@utils.timeit
-# @cache.memoize(timeout=60000)
 def mb_get_album_alternative_name(album_id: str):
     """
     gets the alternative name for the album (e. g. White Album for 'The Beatles')
@@ -37,8 +31,6 @@ def mb_get_album_alternative_name(album_id: str):
     return alternative
 
 
-@utils.timeit
-# @cache.memoize(timeout=60000)
 def mb_get_album_release_date(album_id: str):
     """
     :param album_id: album_id from MusicBrainz
@@ -59,8 +51,6 @@ def mb_get_album_release_date(album_id: str):
     return release_date
 
 
-@utils.timeit
-# @cache.memoize(timeout=60000)
 def mb_get_artist_mbid(artist_name: str):
     artist_fixed = artist_name.lower().replace("’", "'").replace('‐', '-').replace(',', '')
     artists_found = musicbrainzngs.search_artists(artist_name, limit=4)
@@ -262,6 +252,43 @@ def mb_get_album_image(mbid: str, size='large', fast=False):
     return image
 
 
-if __name__ == '__main__':
-    albums = mb_get_artists_albums("Exhumed")
-    print(albums)
+def mb_get_artist_albums_v2(artist: str, album_query_filter=None):
+    """
+    :param album_query_filter: query filter to filter out all unnecessary albums (compilations, remixes, etc)
+    :param artist: artist's name
+    :return:
+    """
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
+    artist_mbid = mb_get_artist_mbid(artist)
+    print(artist_mbid)
+
+    if not artist_mbid:
+        # if nothing found
+        return None
+    if album_query_filter is None:
+        album_query_filter = '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&limit=100&fmt=json'
+    response = requests.get(
+        'https://musicbrainz.org/ws/2/release-group?query=arid:'
+        + artist_mbid
+        + album_query_filter,
+        headers=headers
+    )
+    print(response.url)
+    # in case of an error, return None
+    if response.status_code != 200:
+        return None
+
+    albums = {}
+    pprint(response.json())
+    print(f'albums found: {len(response.json()["release-groups"])}')
+    pprint(response.json()["release-groups"])
+    for release in response.json()["release-groups"]:
+        albums[release['id']] = release['title']
+    return albums
+
+
+def parse_release_date(release_date):
+    if not release_date:
+        return None
+    release_date = datetime.strptime(release_date[:4], '%Y')
+    return release_date

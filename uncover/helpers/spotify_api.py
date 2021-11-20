@@ -4,19 +4,21 @@ from datetime import datetime
 
 import requests_cache
 import spotipy
-from flask import current_app
-from fuzzywuzzy import fuzz
-from spotipy.oauth2 import SpotifyClientCredentials
-
 import uncover.helpers.lastfm_api as lastfm_api
 import uncover.helpers.musicbrainz_api as musicbrainz
 import uncover.helpers.utilities as utils
+from flask import current_app
+from fuzzywuzzy import fuzz
+from spotipy.oauth2 import SpotifyClientCredentials
 from uncover import cache
 
 requests_cache.install_cache()
 
 
 def get_spotify():
+    print(current_app.config['SPOTIPY_CLIENT_ID'])
+    print(current_app.config['SPOTIPY_CLIENT_SECRET'])
+    print(current_app.config['SPOTIPY_REDIRECT_URI'])
     spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
         client_id=current_app.config['SPOTIPY_CLIENT_ID'],
         client_secret=current_app.config['SPOTIPY_CLIENT_SECRET']
