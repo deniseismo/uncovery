@@ -214,7 +214,7 @@ function createSlider() {
         step: 1,
         range: {
             'min': 1946,
-            'max': 2020
+            'max': 2021
         },
         pips: {
             mode: 'values',
