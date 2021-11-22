@@ -1,14 +1,5 @@
-import discogs_client
-from flask import current_app
-
 from uncover import cache
-
-
-def get_discogs():
-    discogs = discogs_client.Client(
-        'uncover',
-        user_token=current_app.config['DISCOGS_USER_TOKEN'])
-    return discogs
+from uncover.music_apis.discogs_api.discogs_client_api import get_discogs
 
 
 @cache.memoize(timeout=3600)
