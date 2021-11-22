@@ -2,16 +2,16 @@ import json
 
 from flask import request, url_for, Blueprint, make_response, jsonify
 
-from uncover.explore.filter_albums import explore_filtered_albums
-from uncover.helpers.utilities import display_failure_art, get_failure_images
+from uncover.explore.filter_albums import get_albums_by_filters
+from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
 
 explore = Blueprint('explore', __name__)
 
 
 @explore.route("/explore", methods=["POST"])
-def get_albums_by_filter():
+def get_album_cover_arts_by_filters():
     """
-    finds albums for specific filters (tags & time span)
+    get cover arts by user-defined filters
     :return: a jsonified dict with all the albums found
     """
     content = request.get_json()
@@ -41,7 +41,7 @@ def get_albums_by_filter():
                                     filename=failure_art_filename)}
         ),
             404)
-    albums = explore_filtered_albums(genres=genres, time_span=time_span, colors_list=colors)
+    albums = get_albums_by_filters(genres=genres, time_span=time_span, colors_list=colors)
     if not albums:
         # if no albums found, make a failure response
         failure_art_filename = display_failure_art(get_failure_images())
