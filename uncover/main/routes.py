@@ -1,7 +1,7 @@
 from flask import render_template, request, Blueprint, url_for, jsonify
 
-from uncover.helpers.collage_creator import save_collage
-from uncover.spotify.spotify_user_oauth import check_spotify, get_spotify_user_info
+from uncover.cover_art_collage.collage_handlers import save_collage
+from uncover.music_apis.spotify_api.spotify_user_handlers import check_spotify, get_spotify_user_info
 
 main = Blueprint('main', __name__)
 
@@ -38,16 +38,3 @@ def get_collage():
 @main.route('/static/')
 def forbid_static():
     return render_template('404.html', title='Page Not Found'), 404
-
-# @main.after_request
-# def add_header(r):
-#     """
-#     Add headers to both force latest IE rendering engine or Chrome Frame,
-#     and also to cache the rendered page for 10 minutes.
-#     """
-#     print('after requestjke')
-#     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-#     r.headers["Pragma"] = "no-cache"
-#     r.headers["Expires"] = "0"
-#     r.headers['Cache-Control'] = 'public, max-age=0'
-#     return r

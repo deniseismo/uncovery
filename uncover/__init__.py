@@ -27,15 +27,15 @@ def create_app(config_class=Config):
     db.init_app(app)
     sess.init_app(app)
 
-    from uncover.personal.routes import personal
+    from uncover.profile.lastfm.routes import lastfm_profile
     from uncover.musician.routes import musician
     from uncover.explore.routes import explore
     from uncover.main.routes import main
     from uncover.errors.handlers import errors
-    from uncover.spotify.routes import spotify
+    from uncover.profile.spotify.routes import spotify
 
     # register all blueprints
-    app.register_blueprint(personal)
+    app.register_blueprint(lastfm_profile)
     app.register_blueprint(explore)
     app.register_blueprint(main)
     app.register_blueprint(musician)

@@ -1,15 +1,12 @@
-import random
+from flask import Blueprint, request, make_response, jsonify, url_for
 
-from flask import request, Blueprint, jsonify, make_response, url_for
+from uncover.music_apis.lastfm_api.lastfm_user_handlers import lastfm_get_users_top_albums, lastfm_get_user_avatar
+from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
 
-from uncover.helpers.lastfm_api import lastfm_get_users_top_albums, lastfm_get_user_avatar
-from uncover.helpers.utilities import display_failure_art, get_failure_images
-from uncover.spotify.spotify_user_oauth import spotify_get_users_albums, check_spotify
-
-personal = Blueprint('personal', __name__)
+lastfm_profile = Blueprint('lastfm_profile', __name__)
 
 
-@personal.route("/by_lastfm_username", methods=["POST"])
+@lastfm_profile.route("/by_lastfm_username", methods=["POST"])
 def get_albums_by_username():
     """
     gets user's top albums based on their last.fm stats
@@ -54,41 +51,7 @@ def get_albums_by_username():
     return jsonify(albums)
 
 
-@personal.route("/by_spotify", methods=["POST"])
-def get_albums_by_spotify():
-    """
-    gets album cover art images based on Spotify's playlist
-    :return: jsonified dictionary {album_name: cover_art}
-    """
-    user, token = check_spotify()
-    if not user or not token:
-        failure_art_filename = display_failure_art(get_failure_images())
-        return make_response(jsonify(
-            {'message': f"you are not logged in!",
-             'failure_art': url_for('static',
-                                    filename=failure_art_filename)}
-        ),
-            401)
-    albums = spotify_get_users_albums(token)
-    if not albums:
-        # if the given username has no albums or the username's incorrect
-        failure_art_filename = display_failure_art(get_failure_images())
-        return make_response(jsonify(
-            {'message': f"some things can't be uncovered",
-             'failure_art': url_for('static',
-                                    filename=failure_art_filename)}
-        ),
-            404)
-    # shuffles a list of albums to get random results
-    random.shuffle(albums["albums"])
-    albums['albums'] = albums['albums'][:9]
-    # adds ids to albums
-    for count, album in enumerate(albums['albums']):
-        album['id'] = count
-    return jsonify(albums)
-
-
-@personal.route("/get_user_avatar", methods=["POST"])
+@lastfm_profile.route("/get_user_avatar", methods=["POST"])
 def get_avatar_image():
     """
     gets user's avatar image

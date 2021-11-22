@@ -1,16 +1,19 @@
 import pickle
+import random
 
 import tekore as tk
-from flask import request, url_for, Blueprint, redirect, session, jsonify, make_response
+from flask import Blueprint, session, url_for, request, make_response, jsonify
+from werkzeug.utils import redirect
 
 from uncover import db
+from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
 from uncover.models import User
-from uncover.spotify.spotify_user_oauth import get_spotify_auth, spotify_get_album_id, check_spotify, \
-    get_spotify_user_info
+from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_album_id
+from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
+from uncover.music_apis.spotify_api.spotify_user_handlers import get_spotify_auth, check_spotify, get_spotify_user_info, \
+    spotify_get_users_albums
 
 spotify = Blueprint('spotify', __name__)
-
-spotify_tekore_client = tk.Spotify()
 
 
 @spotify.route("/spotify_login", methods=['GET'])
@@ -60,6 +63,7 @@ def spotify_callback():
 
     # put serialized token in a session
     session['token'] = pickle.dumps(token)
+    spotify_tekore_client = get_spotify_tekore_client()
     try:
         with spotify_tekore_client.token_as(token):
             current_user = spotify_tekore_client.current_user()
@@ -114,3 +118,37 @@ def spotify_fetch_album_id():
     return jsonify({
         "album_id": album_id
     })
+
+
+@spotify.route("/by_spotify", methods=["POST"])
+def get_albums_by_spotify():
+    """
+    gets album cover art images based on Spotify's playlist
+    :return: jsonified dictionary {album_name: cover_art}
+    """
+    user, token = check_spotify()
+    if not user or not token:
+        failure_art_filename = display_failure_art(get_failure_images())
+        return make_response(jsonify(
+            {'message': f"you are not logged in!",
+             'failure_art': url_for('static',
+                                    filename=failure_art_filename)}
+        ),
+            401)
+    albums = spotify_get_users_albums(token)
+    if not albums:
+        # if the given username has no albums or the username's incorrect
+        failure_art_filename = display_failure_art(get_failure_images())
+        return make_response(jsonify(
+            {'message': f"some things can't be uncovered",
+             'failure_art': url_for('static',
+                                    filename=failure_art_filename)}
+        ),
+            404)
+    # shuffles a list of albums to get random results
+    random.shuffle(albums["albums"])
+    albums['albums'] = albums['albums'][:9]
+    # adds ids to albums
+    for count, album in enumerate(albums['albums']):
+        album['id'] = count
+    return jsonify(albums)
