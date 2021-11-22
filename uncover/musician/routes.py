@@ -1,14 +1,12 @@
 from flask import request, url_for, Blueprint, make_response, jsonify
 
-import uncover.helpers.utilities as utils
 from uncover import cache
-from uncover.helpers.main_async import fetch_artists_top_albums_images, sql_select_artist_albums
-from uncover.helpers.utilities import display_failure_art, get_failure_images
+from uncover.musician.musician_handlers import fetch_artists_top_albums_images, sql_select_artist_albums
+from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
 
 musician = Blueprint('musician', __name__)
 
 
-@utils.timeit
 @musician.route("/by_artist", methods=["POST"])
 def get_albums_by_artist():
     """
