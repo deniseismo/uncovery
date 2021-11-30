@@ -1,8 +1,7 @@
-import json
-
 from flask import request, url_for, Blueprint, make_response, jsonify
 
 from uncover.explore.filter_albums import get_albums_by_filters
+from uncover.explore.filter_tags import get_suggested_tags
 from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
 
 explore = Blueprint('explore', __name__)
@@ -62,23 +61,10 @@ def get_tags_list():
     :return:
     """
     try:
-        with open('uncover/static/data/genres_list.json') as jsonfile:
-            tags_list = json.load(jsonfile)
-    except (IOError, OSError):
-        tags_list = []
-    try:
         search_query = request.get_json()['query']
-    except (KeyError, TypeError, IndexError):
-        search_query = ''
-    filtered_tags_list = []
-    # check if the input's not empty
-    if search_query:
-        if len(search_query) < 98:
-            search_query = search_query.lower()
-            for tag in tags_list:
-                # if a 'tag' consists of the provided input, add it to the final list
-                if search_query in tag:
-                    filtered_tags_list.append(tag)
+    except (KeyError, TypeError):
+        return None
+    filtered_tags_list = get_suggested_tags(search_query)
     suggestions = {"suggestions": filtered_tags_list}
     print(suggestions)
     return jsonify(suggestions)

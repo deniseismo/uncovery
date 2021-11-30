@@ -1,3 +1,5 @@
+from flask import url_for
+
 from uncover.utilities.name_filtering import get_filtered_names_list
 
 
@@ -7,6 +9,9 @@ def process_albums_from_db(album_entries: list):
     :param album_entries: a list of album entries from db
     :return: a list of album info dicts
     """
+    # url_for('static', filename='collage/' + collage_filename)
+    SMALL_SIZE = "size200"
+    MEDIUM_SIZE = "size300"
     processed_albums = []
     for counter, album_entry in enumerate(album_entries):
         album_name = album_entry.title
@@ -14,9 +19,12 @@ def process_albums_from_db(album_entries: list):
             "id": counter,
             "title": album_entry.title,
             "names": [album_entry.title.lower()] + get_filtered_names_list(album_name),
-            "image": f'static/optimized_cover_art_images/{album_entry.cover_art}.jpg',
-            "image_small": f'static/optimized_cover_art_images/{album_entry.cover_art}-size200.jpg',
-            "image_medium": f'static/optimized_cover_art_images/{album_entry.cover_art}-size300.jpg',
+            "image": url_for("static",
+                             filename=f"optimized_cover_art_images/{album_entry.cover_art}.jpg"),
+            "image_small": url_for("static",
+                                   filename=f"optimized_cover_art_images/{album_entry.cover_art}-{SMALL_SIZE}.jpg"),
+            "image_medium": url_for("static",
+                                    filename=f"optimized_cover_art_images/{album_entry.cover_art}-{MEDIUM_SIZE}.jpg"),
             "artist_name": album_entry.artist.name,
             "artist_names": [album_entry.artist.name] + get_filtered_names_list(album_entry.artist.name),
         }

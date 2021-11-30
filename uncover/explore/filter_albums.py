@@ -1,10 +1,9 @@
-from datetime import datetime
-
 from sqlalchemy import func
 
 from uncover.explore.prepare_tracks import process_albums_from_db
-from uncover.utilities.misc import timeit
 from uncover.models import Album, Artist, Tag, tags, Color, colors
+from uncover.utilities.convert_values import convert_time_span_to_dates
+from uncover.utilities.misc import timeit
 
 
 @timeit
@@ -60,18 +59,3 @@ def filter_albums(genres: list, time_span: tuple, colors_list: list):
 
     album_entries = filter_query.all()
     return album_entries
-
-
-def convert_time_span_to_dates(time_span: list):
-    """
-    convert [start_year, end_year] to datetime objects
-    :param time_span: a list of start and end years picked by the user
-    :return: a tuple of (start_date, end_date)
-    """
-    start_year, end_year = time_span
-    end_year += 1
-    start_date = datetime.strptime(str(start_year), '%Y')
-    end_date = datetime.strptime(str(end_year), '%Y')
-    return start_date, end_date
-
-
