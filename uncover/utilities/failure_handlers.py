@@ -4,16 +4,16 @@ import random
 from uncover import cache
 
 
-def display_failure_art(list_of_images: list):
+def pick_failure_art_image():
     """
-    picks a random 'failure' cover art from a list
+    picks a random 'failure' cover art from a list of failure art images
     :return: a 'failure' cover art location
     """
-    return random.choice(list_of_images)
+    return random.choice(_get_failure_art_images())
 
 
 @cache.cached(timeout=3600)
-def get_failure_images():
+def _get_failure_art_images():
     """
     gets the list of all 'failure' art images found in the corresponding folder
     :return:

@@ -2,7 +2,7 @@ from flask import request, url_for, Blueprint, make_response, jsonify
 
 from uncover.explore.filter_albums import get_albums_by_filters
 from uncover.explore.filter_tags import get_suggested_tags
-from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
+from uncover.utilities.failure_handlers import pick_failure_art_image
 
 explore = Blueprint('explore', __name__)
 
@@ -33,7 +33,7 @@ def get_album_cover_arts_by_filters():
     # gets albums
     print(type(genres), type(time_span))
     if not isinstance(genres, list) or not (isinstance(time_span, list)):
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': f"couldn't find any covers",
              'failure_art': url_for('static',
@@ -43,7 +43,7 @@ def get_album_cover_arts_by_filters():
     albums = get_albums_by_filters(genres=genres, time_span=time_span, colors_list=colors)
     if not albums:
         # if no albums found, make a failure response
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': f"couldn't find any covers",
              'failure_art': url_for('static',

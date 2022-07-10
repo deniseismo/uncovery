@@ -6,7 +6,7 @@ from flask import Blueprint, session, url_for, request, make_response, jsonify
 from werkzeug.utils import redirect
 
 from uncover import db
-from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
+from uncover.utilities.failure_handlers import pick_failure_art_image
 from uncover.models import User
 from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_album_id
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
@@ -128,7 +128,7 @@ def get_albums_by_spotify():
     """
     user, token = check_spotify()
     if not user or not token:
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': f"you are not logged in!",
              'failure_art': url_for('static',
@@ -138,7 +138,7 @@ def get_albums_by_spotify():
     albums = spotify_get_users_albums(token)
     if not albums:
         # if the given username has no albums or the username's incorrect
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': f"some things can't be uncovered",
              'failure_art': url_for('static',

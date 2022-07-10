@@ -2,7 +2,7 @@ from flask import request, url_for, Blueprint, make_response, jsonify
 
 from uncover import cache
 from uncover.musician.musician_handlers import fetch_artists_top_albums_images, sql_select_artist_albums
-from uncover.utilities.failure_handlers import display_failure_art, get_failure_images
+from uncover.utilities.failure_handlers import pick_failure_art_image
 
 musician = Blueprint('musician', __name__)
 
@@ -21,7 +21,7 @@ def get_albums_by_artist():
     print(f'sorting: {sorting}')
     if not artist or not sorting:
         # if the input's empty, send an error message and a 'failure' image
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': 'an artist has no name, huh?',
              'failure_art': url_for('static',
@@ -29,7 +29,7 @@ def get_albums_by_artist():
         ),
             404)
     if not isinstance(artist, str):
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': 'an artist has no name, huh?',
              'failure_art': url_for('static',
@@ -37,7 +37,7 @@ def get_albums_by_artist():
         ),
             404)
     if len(artist) > 98:
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': "you ain't foolin' no one",
              'failure_art': url_for('static',
@@ -55,7 +55,7 @@ def get_albums_by_artist():
         # TODO: add saving data to db if it doesn't exist yet
     if not albums:
         # if the given username has no albums or the username's incorrect
-        failure_art_filename = display_failure_art(get_failure_images())
+        failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
             {'message': f"couldn't find any covers",
              'failure_art': url_for('static',
