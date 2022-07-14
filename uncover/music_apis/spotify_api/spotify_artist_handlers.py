@@ -17,8 +17,8 @@ def spotify_get_artist_name(artist_name):
     """
     if not artist_name:
         return None
-    client_id = current_app.config['SPOTIPY_CLIENT_ID']
-    client_secret = current_app.config['SPOTIPY_CLIENT_SECRET']
+    client_id = current_app.config['SPOTIFY_CLIENT_ID']
+    client_secret = current_app.config['SPOTIFY_CLIENT_SECRET']
 
     app_token = tk.request_client_token(client_id, client_secret)
     spotify_tekore_client = get_spotify_tekore_client()
@@ -91,5 +91,3 @@ def spotify_get_artists_genres(artist_id: str):
     if not getattr(artist_info, 'from_cache', False):
         time.sleep(0.2)
     return genres
-
-

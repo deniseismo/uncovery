@@ -20,12 +20,9 @@ def get_spotify_tekore_client(asynchronous=False):
 
 
 def get_spotify():
-    print(current_app.config['SPOTIPY_CLIENT_ID'])
-    print(current_app.config['SPOTIPY_CLIENT_SECRET'])
-    print(current_app.config['SPOTIPY_REDIRECT_URI'])
     spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
-        client_id=current_app.config['SPOTIPY_CLIENT_ID'],
-        client_secret=current_app.config['SPOTIPY_CLIENT_SECRET']
+        client_id=current_app.config['SPOTIFY_CLIENT_ID'],
+        client_secret=current_app.config['SPOTIFY_CLIENT_SECRET']
     ))
     return spotify
 

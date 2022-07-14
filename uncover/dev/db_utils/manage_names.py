@@ -38,8 +38,8 @@ def get_artist_spotify_names():
 def get_spotify_artist_name(artist_name):
     import tekore as tk
 
-    client_id = current_app.config['SPOTIPY_CLIENT_ID']
-    client_secret = current_app.config['SPOTIPY_CLIENT_SECRET']
+    client_id = current_app.config['SPOTIFY_CLIENT_ID']
+    client_secret = current_app.config['SPOTIFY_CLIENT_SECRET']
 
     app_token = tk.request_client_token(client_id, client_secret)
     spotify = tk.Spotify(app_token)

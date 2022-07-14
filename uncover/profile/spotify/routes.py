@@ -6,12 +6,12 @@ from flask import Blueprint, session, url_for, request, make_response, jsonify
 from werkzeug.utils import redirect
 
 from uncover import db
-from uncover.utilities.failure_handlers import pick_failure_art_image
 from uncover.models import User
 from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_album_id
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
 from uncover.music_apis.spotify_api.spotify_user_handlers import get_spotify_auth, check_spotify, get_spotify_user_info, \
     spotify_get_users_albums
+from uncover.utilities.failure_handlers import pick_failure_art_image
 
 spotify = Blueprint('spotify', __name__)
 
@@ -91,7 +91,6 @@ def spotify_fetch_album_id():
     content = request.get_json()
     if not content:
         return None
-    album_id = None
     user, token = check_spotify()
 
     if user and token:
@@ -104,7 +103,6 @@ def spotify_fetch_album_id():
         artist_name = content['artist_name']
         spotify_artist_name = content['spotify_artist_name']
         album_id = spotify_get_album_id(album_name, artist_name, spotify_artist_name, country)
-        print(album_id)
         if not album_id:
             return make_response(jsonify(
                 {'message': f"album id could not be found"}
