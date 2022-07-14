@@ -1,15 +1,14 @@
 import pickle
 import random
+from dataclasses import asdict
 
-import spotipy
 import tekore as tk
 from flask import current_app, session
 
 from uncover import cache
-from uncover.utilities.name_filtering import get_filtered_name, remove_punctuation, get_filtered_names_list
 from uncover.models import User
-from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client, get_spotify
-from uncover.profile.spotify.prepare_tracks import extract_albums_from_user_top_spotify_tracks
+from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
+from uncover.profile.spotify.prepare_tracks import extract_albums_from_spotify_tracks
 
 
 def get_spotify_auth():
@@ -18,9 +17,9 @@ def get_spotify_auth():
     :return: redirect url
     """
     conf = (
-        current_app.config['SPOTIPY_CLIENT_ID'],
-        current_app.config['SPOTIPY_CLIENT_SECRET'],
-        current_app.config['SPOTIPY_REDIRECT_URI']
+        current_app.config['SPOTIFY_CLIENT_ID'],
+        current_app.config['SPOTIFY_CLIENT_SECRET'],
+        current_app.config['SPOTIFY_REDIRECT_URI']
     )
     cred = tk.Credentials(*conf)
     # scopes allow client to read user's name, id, avatar & user's top artists/tracks
@@ -50,9 +49,9 @@ def check_spotify():
         # get new access token
         print('token is expiring')
         conf = (
-            current_app.config['SPOTIPY_CLIENT_ID'],
-            current_app.config['SPOTIPY_CLIENT_SECRET'],
-            current_app.config['SPOTIPY_REDIRECT_URI']
+            current_app.config['SPOTIFY_CLIENT_ID'],
+            current_app.config['SPOTIFY_CLIENT_SECRET'],
+            current_app.config['SPOTIFY_REDIRECT_URI']
         )
         print(user)
         cred = tk.Credentials(*conf)
@@ -111,14 +110,14 @@ def spotify_get_users_albums(token):
     :param token: an access token
     :return: a dict {album_title: album_image_url}
     """
-    print('spotify getting albums')
+    time_periods = ['short_term', 'medium_term', 'long_term']
     if not token:
         return None
     spotify_tekore_client = get_spotify_tekore_client()
     try:
         with spotify_tekore_client.token_as(token):
             # get user's top 50 tracks
-            top_tracks = spotify_tekore_client.current_user_top_tracks(limit=50, time_range='short_term')
+            top_tracks = spotify_tekore_client.current_user_top_tracks(limit=50, time_range=random.choice(time_periods))
     except tk.HTTPError:
         return None
 
@@ -133,61 +132,8 @@ def spotify_get_users_albums(token):
         },
         "albums": []
     }
-    print(len(top_tracks.items))
-    albums = extract_albums_from_user_top_spotify_tracks(top_tracks.items)
+    albums = extract_albums_from_spotify_tracks(top_tracks.items)
     if not albums:
         return None
-    album_info["albums"] = albums
-    return album_info
-
-
-def spotify_get_users_playlist_albums(playlist_id: str):
-    """
-    :param playlist_id: spotify's playlist ID or a playlist's URL
-    :return: a dict {album_title: album_image_url}
-    """
-    spotify = get_spotify()
-    try:
-        playlist_info = spotify.playlist(playlist_id)
-    except spotipy.exceptions.SpotifyException:
-        # Invalid playlist ID
-        return None
-    # initialize a dict to avoid KeyErrors
-    album_info = {
-        "info": {
-            "type": "playlist",
-            "query": f"'{playlist_info['name']}' by {playlist_info['owner']['display_name']}"
-        },
-        "albums": []
-    }
-    # initialize a set of titles used to filter duplicate titles
-    list_of_titles = set()
-    # iterate through tracks
-    for track in playlist_info["tracks"]["items"]:
-        if track['track']['album']['album_type'] == "album":
-            name = track['track']['album']['name']
-            filtered_title = get_filtered_name(name)
-            filtered_title = remove_punctuation(filtered_title)
-            artist_name = track['track']['album']['artists'][0]['name']
-            an_album_dict = {
-                "artist_name": artist_name,
-                "artist_names": [artist_name] + get_filtered_names_list(artist_name),
-                "title": track['track']['album']['name'],
-                "names": [name.lower()] + get_filtered_names_list(name),
-                "image": track["track"]["album"]["images"][0]["url"],
-                "rating": track["track"]['popularity']
-            }
-            an_album_dict["artist_names"] = list(set(an_album_dict["artist_names"]))
-            an_album_dict['names'] = list(set(an_album_dict['names']))
-            # filter duplicates:
-            if filtered_title not in list_of_titles:
-                # append a title to a set of titles
-                list_of_titles.add(filtered_title)
-                # adds an album info only if a title hasn't been seen before
-                album_info["albums"].append(an_album_dict)
-    # shuffles a list of albums to get random results
-    random.shuffle(album_info["albums"])
-    # adds ids to albums
-    for count, album in enumerate(album_info['albums']):
-        album['id'] = count
+    album_info["albums"] = [asdict(album) for album in albums]
     return album_info
