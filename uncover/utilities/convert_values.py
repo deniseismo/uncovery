@@ -1,16 +1,7 @@
 import math
 from datetime import datetime
-from typing import NamedTuple
 
-
-class TimeSpan(NamedTuple):
-    start_date: datetime
-    end_date: datetime
-
-
-class CollageDimensions(NamedTuple):
-    width: int
-    height: int
+from uncover.schemas.characteristics import TimeSpan, CollageDimensions
 
 
 def convert_a_list_of_dates_to_time_span(time_span: list) -> TimeSpan:
