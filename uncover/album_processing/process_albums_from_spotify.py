@@ -1,11 +1,10 @@
 from collections import Counter
 from typing import Optional
 
-from tekore._model import PlaylistTrack
-from tekore.model import FullTrack
+from tekore._model import FullTrack, PlaylistTrack
 
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
-from uncover.schemas.models import AlbumInfo
+from uncover.schemas.album import AlbumInfo
 from uncover.utilities.name_filtering import get_filtered_name, remove_punctuation, get_filtered_names_list
 
 
