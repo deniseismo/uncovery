@@ -1,7 +1,7 @@
 from flask import request, url_for, Blueprint, make_response, jsonify
 
 from uncover import cache
-from uncover.musician.musician_handlers import fetch_artists_top_albums_images, sql_select_artist_albums
+from uncover.client.musician.musician_handlers import fetch_artists_top_albums_images, sql_select_artist_albums
 from uncover.utilities.failure_handlers import pick_failure_art_image
 
 musician = Blueprint('musician', __name__)
@@ -17,8 +17,6 @@ def get_albums_by_artist():
     content = request.get_json()
     artist = content["qualifier"]
     sorting = content["option"]
-    print(f'getting {artist}')
-    print(f'sorting: {sorting}')
     if not artist or not sorting:
         # if the input's empty, send an error message and a 'failure' image
         failure_art_filename = pick_failure_art_image()

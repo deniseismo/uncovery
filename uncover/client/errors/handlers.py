@@ -21,6 +21,6 @@ def error_500(error):
     return render_template('404.html', title="Server's Down or Something"), 500
 
 
-@errors.route('/static')
+@errors.route('/static/')
 def forbid_static():
     return render_template('404.html', title='Page Not Found'), 404

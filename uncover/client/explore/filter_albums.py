@@ -1,8 +1,8 @@
 from sqlalchemy import func
 
-from uncover.explore.prepare_tracks import process_albums_from_db
+from uncover.album_processing.process_albums_from_database import process_albums_from_db
 from uncover.models import Album, Artist, Tag, tags, Color, colors
-from uncover.utilities.convert_values import convert_time_span_to_dates
+from uncover.utilities.convert_values import convert_a_list_of_dates_to_time_span
 from uncover.utilities.misc import timeit
 
 
@@ -15,7 +15,7 @@ def get_albums_by_filters(genres: list, time_span: list, colors_list: list):
     :param time_span: a list of a time span range [start_year, end_year]
     :return:
     """
-    start_date, end_date = convert_time_span_to_dates(time_span)
+    start_date, end_date = convert_a_list_of_dates_to_time_span(time_span)
 
     print(f'time_span: {time_span}, genres: {genres}, colors: {colors_list}')
     print(start_date, end_date)
@@ -30,7 +30,7 @@ def get_albums_by_filters(genres: list, time_span: list, colors_list: list):
             "type": "explore",
             "query": ""
         },
-        "albums": processed_albums
+        "albums": [album.serialized for album in processed_albums]
     }
     return album_info
 

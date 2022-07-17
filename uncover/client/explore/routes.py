@@ -1,7 +1,7 @@
 from flask import request, url_for, Blueprint, make_response, jsonify
 
-from uncover.explore.filter_albums import get_albums_by_filters
-from uncover.explore.filter_tags import get_suggested_tags
+from uncover.client.explore.filter_albums import get_albums_by_filters
+from uncover.client.explore.filter_tags import get_suggested_tags
 from uncover.utilities.failure_handlers import pick_failure_art_image
 
 explore = Blueprint('explore', __name__)
