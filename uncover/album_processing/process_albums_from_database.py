@@ -1,6 +1,6 @@
 from flask import url_for
 
-from uncover.schemas.album import AlbumInfo
+from uncover.schemas.album_schema import AlbumInfo
 from uncover.utilities.name_filtering import get_filtered_names_list
 
 
@@ -32,7 +32,7 @@ def process_albums_from_db(album_entries: list) -> list[AlbumInfo]:
         if album_entry.artist.spotify_name:
             album_info.spotify_name = album_entry.artist.spotify_name
         if album_entry.release_date:
-            album_info.year = album_entry.release_date.strftime("%Y")
+            album_info.release_date = album_entry.release_date.strftime("%Y")
         if album_entry.alternative_title:
             album_info.names += [album_entry.alternative_title]
             album_info.names += get_filtered_names_list(album_entry.alternative_title)

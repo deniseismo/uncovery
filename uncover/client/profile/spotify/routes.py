@@ -95,10 +95,7 @@ def spotify_fetch_album_id():
 
     if user and token:
         user_info = get_spotify_user_info(token)
-        try:
-            country = user_info['country']
-        except KeyError:
-            country = None
+        country = user_info.country
         album_name = content['album_name']
         artist_name = content['artist_name']
         spotify_artist_name = content['spotify_artist_name']
