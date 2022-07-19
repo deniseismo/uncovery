@@ -1,12 +1,13 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from uncover.schemas.info_base import InfoBase
 
 
 @dataclass
 class SpotifyUserAuth(InfoBase):
-    spotify_user_id: str = None
-    token: str = None
+    spotify_user_id: Optional[str] = None
+    token: Optional[str] = None
 
 
 @dataclass

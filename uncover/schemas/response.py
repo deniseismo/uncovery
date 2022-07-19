@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from uncover.schemas.album_schema import AlbumInfo
 from uncover.schemas.info_base import InfoBase
 
 
@@ -12,4 +13,4 @@ class ResponseInfo(InfoBase):
 @dataclass
 class AlbumCoversResponse(InfoBase):
     info: ResponseInfo
-    albums: list[dict]
+    albums: list[AlbumInfo]
