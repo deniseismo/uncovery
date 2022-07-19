@@ -40,7 +40,7 @@ def get_album_cover_arts_by_filters():
                                     filename=failure_art_filename)}
         ),
             404)
-    albums = get_albums_by_filters(genres=genres, time_span=time_span, colors_list=colors)
+    albums = get_albums_by_filters(genres=genres, a_list_of_time_span_dates=time_span, colors_list=colors)
     if not albums:
         # if no albums found, make a failure response
         failure_art_filename = pick_failure_art_image()

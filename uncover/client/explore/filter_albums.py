@@ -2,37 +2,37 @@ from sqlalchemy import func
 
 from uncover.album_processing.process_albums_from_database import process_albums_from_db
 from uncover.models import Album, Artist, Tag, tags, Color, colors
+from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
 from uncover.utilities.convert_values import convert_a_list_of_dates_to_time_span
 from uncover.utilities.misc import timeit
 
 
 @timeit
-def get_albums_by_filters(genres: list, time_span: list, colors_list: list):
+def get_albums_by_filters(genres: list, a_list_of_time_span_dates: list, colors_list: list):
     """
     get albums given user's filters
     :param colors_list: album colors picked
     :param genres: a list of music tags/genres
-    :param time_span: a list of a time span range [start_year, end_year]
+    :param a_list_of_time_span_dates: a list of a time span range [start_year, end_year]
     :return:
     """
-    start_date, end_date = convert_a_list_of_dates_to_time_span(time_span)
+    time_span = convert_a_list_of_dates_to_time_span(a_list_of_time_span_dates)
 
     print(f'time_span: {time_span}, genres: {genres}, colors: {colors_list}')
-    print(start_date, end_date)
 
-    album_entries = filter_albums(genres, (start_date, end_date), colors_list)
+    album_entries = filter_albums(genres, time_span, colors_list)
     # build an album info dict
     if not album_entries:
         return None
     processed_albums = process_albums_from_db(album_entries)
-    album_info = {
-        "info": {
-            "type": "explore",
-            "query": ""
-        },
-        "albums": [album.serialized for album in processed_albums]
-    }
-    return album_info
+    album_covers_response = AlbumCoversResponse(
+        info=ResponseInfo(
+            type="explore",
+            query=f"album covers for {time_span} with colors: {colors_list}"
+        ),
+        albums=processed_albums
+    )
+    return album_covers_response
 
 
 def filter_albums(genres: list, time_span: tuple, colors_list: list):
