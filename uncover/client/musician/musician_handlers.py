@@ -11,6 +11,7 @@ from uncover.models import Album, Artist
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
 from uncover.music_apis.musicbrainz_api.mb_artist_handlers import mb_fetch_artists_albums
 from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_artists_albums_images
+from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
 from uncover.utilities.logging_handlers import log_artist_missing_from_db
 
 
@@ -57,15 +58,14 @@ def sql_select_artist_albums(artist_name: str, sorting: str):
     except (TypeError, KeyError, IndexError):
         return None
     processed_albums = process_albums_from_db(album_entries)
-    album_info = {
-        "info":
-            {
-                "type": "artist",
-                "query": artist_name
-            },
-        "albums": [album.serialized for album in processed_albums]
-    }
-    return album_info
+    album_covers_response = AlbumCoversResponse(
+        info=ResponseInfo(
+            type="artist",
+            query=artist_name
+        ),
+        albums=processed_albums
+    )
+    return album_covers_response
 
 
 @cache.memoize(timeout=360)
@@ -107,54 +107,53 @@ def sql_find_specific_album(artist_name: str, an_album_to_find: str):
     return album_found
 
 
-def fetch_artists_top_albums_images(artist: str, sorting):
+def fetch_artists_top_albums_images(artist_name: str, sorting):
     """
     get artist's top album images (default way), no database
     :param sorting: earliest/latest/popular/shuffle
-    :param artist: artist's name
+    :param artist_name: artist's name
     :return: a dict of all the album images found
     """
-    if not artist or not sorting:
+    if not artist_name or not sorting:
         return None
     if sorting not in ["popular", "latest", "earliest", "shuffle"]:
         return None
     # try correcting some typos in artist's name
-    correct_name = lastfm_get_artist_correct_name(artist)
+    correct_name = lastfm_get_artist_correct_name(artist_name)
     if correct_name:
-        artist = correct_name
+        artist_name = correct_name
 
-    albums = asyncio.run(mb_fetch_artists_albums(artist, sorting))
+    albums = asyncio.run(mb_fetch_artists_albums(artist_name, sorting))
 
     if not albums:
         try:
             print('trying spotifyjke')
-            albums = spotify_get_artists_albums_images(artist, sorting)
+            albums = spotify_get_artists_albums_images(artist_name, sorting)
             print(f'albums with spotify: {albums}')
             if albums:
-                log_artist_missing_from_db(artist_name=artist)
+                log_artist_missing_from_db(artist_name=artist_name)
                 return albums
             else:
                 return None
         except TypeError:
             return None
     # initialize a dict to avoid KeyErrors
-    album_info = {
-        "info": {
-            "type": "artist",
-            "query": artist
-        },
-        "albums": []
-    }
-    asyncio.run(fetch_and_assign_images(albums_list=albums, artist=artist))
-    album_info['albums'] = _filter_albums_without_album_covers(albums)
+    asyncio.run(fetch_and_assign_images(albums_list=albums, artist=artist_name))
+    albums_with_album_covers = _filter_albums_without_album_covers(albums)
 
-    if not album_info['albums']:
+    if not albums_with_album_covers:
         return None
-    print(f'there are {len(album_info["albums"])} album images found with the Ultimate')
-    if album_info['albums']:
-        print(f'search through APIs was successful')
-        log_artist_missing_from_db(artist_name=artist)
-    return album_info
+    album_covers_response = AlbumCoversResponse(
+        info=ResponseInfo(
+            type="artist",
+            query=artist_name
+        ),
+        albums=albums_with_album_covers
+    )
+    print(f'there are {len(albums_with_album_covers)} album images found with the Ultimate')
+    print(f'search through APIs was successful')
+    log_artist_missing_from_db(artist_name=artist_name)
+    return album_covers_response
 
 
 def _filter_albums_without_album_covers(albums: list[dict]) -> list[dict]:
