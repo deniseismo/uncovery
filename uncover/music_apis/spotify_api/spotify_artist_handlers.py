@@ -1,15 +1,16 @@
-import time
+from typing import Optional
 
-import spotipy
 import tekore as tk
 from flask import current_app
+from fuzzywuzzy import fuzz
+from tekore._model import FullArtist, FullArtistOffsetPaging
 
 from uncover import cache
-from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client, get_spotify
+from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
 
 
 @cache.memoize(timeout=3600)
-def spotify_get_artist_name(artist_name):
+def get_artist_spotify_name_by_name(artist_name: str) -> Optional[str]:
     """
     gets Spotify's version of a given artist name
     :param artist_name: original/given artist name
@@ -48,46 +49,95 @@ def spotify_get_artist_name(artist_name):
 
 
 @cache.memoize(timeout=6000)
-def spotify_get_artist_id(artist_name: str):
-    """
-    search for an artist's id
-    :param artist_name: artist's name
-    :return: album_image_url
-    """
-    spotify = get_spotify()
-    try:
-        artist_info = spotify.search(q=artist_name, type="artist", limit=5, market='SE')
-    except spotipy.exceptions.SpotifyException:
-        return None
-    if not artist_info:
-        return None
-    artist_id = None
-    for item in artist_info['artists']['items']:
-        print(item['name'].lower(), artist_name.lower())
-        if item['name'].lower() == artist_name.lower():
-            try:
-                print('artists name are equal!')
-                artist_id = item['id']
-                break
-            except KeyError:
-                return None
-    return artist_id
-
-
-@cache.memoize(timeout=6000)
-def spotify_get_artists_genres(artist_id: str):
+def spotify_get_artists_genres(artist_spotify_entry: FullArtist) -> list[str]:
     """
     gets artist's top music genres
     :return:
     """
-    spotify = get_spotify()
-    artist_info = spotify.artist(artist_id)
-    if not artist_info:
+    return artist_spotify_entry.genres
+
+
+def get_spotify_artist_info(artist_name: str, tekore_client: tk.Spotify = None) -> Optional[FullArtist]:
+    """get spotify ID for an artist (via tekore library)
+
+    Args:
+        artist_name (str): artist's name
+        tekore_client (optional): an instance of a Spotify client. Defaults to None.
+
+    Returns:
+        (tekore.FullArtist): tekore.FullArtist (Artist info object)
+    """
+    if not artist_name:
         return None
-    try:
-        genres = artist_info['genres']
-    except KeyError:
+    # if tekore client is not provided, get a new one
+    if not tekore_client:
+        spotify_tekore_client = get_spotify_tekore_client()
+    else:
+        spotify_tekore_client = tekore_client
+    artists_found = get_artist_id_search_results(
+        artist_name, spotify_tekore_client)
+    if not artists_found:
         return None
-    if not getattr(artist_info, 'from_cache', False):
-        time.sleep(0.2)
-    return genres
+    perfect_match = find_artist_best_match(artist_name, artists_found.items)
+    if not perfect_match:
+        return None
+    return perfect_match
+
+
+def get_artist_id_search_results(artist_name: str, spotify_tekore_client: tk.Spotify) \
+        -> Optional[FullArtistOffsetPaging]:
+    """
+    search for a particular artist on spotify
+    :param artist_name: artist's name
+    :param spotify_tekore_client: an instance of a Spotify client. Defaults to None.
+    :return: artists found (max=50)
+    """
+    artists_found, = spotify_tekore_client.search(
+        query=artist_name, types=('artist',), market="GE", limit=50)
+    # in case of not getting any response
+    if not artists_found:
+        print("search for track failed")
+        return None
+    if artists_found.total == 0:
+        # no tracks found whatsoever
+        return None
+    return artists_found
+
+
+def find_artist_best_match(artist_name: str, search_results: list[FullArtist]) -> Optional[FullArtist]:
+    """find the most appropriate (best) match amongst all the search results for an artist id to find
+
+    :param artist_name: artist's name
+    :param search_results: a list of all the search results
+    :return: perfect match if found
+    """
+    print(
+        f"searching for Artist({artist_name}) among {len(search_results)} results")
+    print([result.name for result in search_results])
+    first_result = search_results[0]
+    print(f"first result: {first_result}")
+    artist_name = artist_name.lower()
+    if not artist_name.isascii():
+        print('non-latin artist name')
+        return first_result
+    matches = []
+    for index, artist in enumerate(search_results):
+        print(index, artist.name)
+        # find the right one
+        if artist.name.lower() == artist_name:
+            return artist
+        ratio = fuzz.ratio(artist.name.lower(), artist_name)
+        print(ratio)
+        if ratio > 95:
+            print(f"pretty close: {artist.name} vs. {artist_name}")
+            return artist
+        if ratio > 90:
+            matches.append((artist, ratio))
+    if matches:
+        try:
+            # pick with the highest ratio
+            return sorted(matches, key=lambda x: x[1], reverse=True)[0][0]
+        except IndexError as e:
+            print(e)
+            return None
+    return first_result
