@@ -1,19 +1,21 @@
 import pickle
 import random
-from dataclasses import asdict
+from typing import Optional
 
 import tekore as tk
 from flask import current_app, session
 
 from uncover import cache
+from uncover.album_processing.process_albums_from_spotify import extract_albums_from_spotify_tracks
 from uncover.models import User
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
-from uncover.profile.spotify.prepare_tracks import extract_albums_from_spotify_tracks
+from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
+from uncover.schemas.spotify_user_info import SpotifyUserAuth, SpotifyUserProfile
 
 
-def get_spotify_auth():
+def get_spotify_auth() -> tk.UserAuth:
     """
-    get a User auth object
+    get a tekore spotify User auth object
     :return: redirect url
     """
     conf = (
@@ -28,7 +30,7 @@ def get_spotify_auth():
     return auth
 
 
-def check_spotify():
+def check_spotify() -> Optional[SpotifyUserAuth]:
     """
     checks if the person's logged in and the token's not expired
     refreshes token if present
@@ -43,7 +45,7 @@ def check_spotify():
         print('something is None')
         session.pop('user', None)
         session.pop('token', None)
-        return None, None
+        return SpotifyUserAuth(None, None)
 
     if token.is_expiring:
         # get new access token
@@ -65,11 +67,11 @@ def check_spotify():
                 token = cred.refresh_user_token(refresh_token)
                 session['token'] = pickle.dumps(token)
 
-    return user, token
+    return SpotifyUserAuth(user, token)
 
 
 @cache.memoize(timeout=60000)
-def get_spotify_user_info(token):
+def get_spotify_user_info(token) -> Optional[SpotifyUserProfile]:
     """
     get information about the current spotify user
     :param token: a Spotify access token
@@ -88,23 +90,18 @@ def get_spotify_user_info(token):
             if current_user_image_list:
                 try:
                     user_image = current_user.images[0].url
-                except (KeyError, IndexError, TypeError):
+                except (IndexError, TypeError):
                     user_image = None
             else:
                 user_image = None
 
     except tk.HTTPError:
         return None
-    user_info = {
-        "username": username,
-        "user_image": user_image,
-        "country": country
-    }
-    return user_info
+    return SpotifyUserProfile(username=username, user_image=user_image, country=country)
 
 
 @cache.memoize(timeout=3600)
-def spotify_get_users_albums(token):
+def spotify_get_users_albums(token) -> Optional[AlbumCoversResponse]:
     """
     get current spotify user top albums
     :param token: an access token
@@ -123,17 +120,14 @@ def spotify_get_users_albums(token):
 
     if not top_tracks:
         return None
-
-    # initialize a dict to avoid KeyErrors
-    album_info = {
-        "info": {
-            "type": "playlist",
-            "query": f"top tracks by some user"  # TODO: get user's name or something
-        },
-        "albums": []
-    }
     albums = extract_albums_from_spotify_tracks(top_tracks.items)
     if not albums:
         return None
-    album_info["albums"] = [asdict(album) for album in albums]
-    return album_info
+    album_covers_response = AlbumCoversResponse(
+        info=ResponseInfo(
+            type="playlist",
+            query="spotify user top tracks albums"
+        ),
+        albums=albums
+    )
+    return album_covers_response

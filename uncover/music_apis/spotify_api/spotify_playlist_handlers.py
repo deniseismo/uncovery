@@ -1,9 +1,9 @@
 from collections import Counter
 
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
-from uncover.profile.spotify.prepare_tracks import extract_albums_from_spotify_tracks, \
+from uncover.album_processing.process_albums_from_spotify import extract_albums_from_spotify_tracks, \
     extract_genres_from_spotify_tracks
-from uncover.schemas.models import AlbumInfo
+from uncover.schemas.album_schema import AlbumInfo
 
 
 def spotify_get_playlist_albums_by_playlist_id(playlist_id: str) -> list[AlbumInfo]:

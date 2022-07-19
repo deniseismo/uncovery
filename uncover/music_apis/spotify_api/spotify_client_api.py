@@ -4,7 +4,7 @@ from flask import current_app
 from spotipy import SpotifyClientCredentials
 
 
-def get_spotify_tekore_client(asynchronous=False):
+def get_spotify_tekore_client(asynchronous: bool = False) -> tk.Spotify:
     """get a spotify client via tekore library
 
     Returns:
@@ -19,14 +19,9 @@ def get_spotify_tekore_client(asynchronous=False):
     return spotify_tekore_client
 
 
-def get_spotify():
+def get_spotify_spotipy_client() -> spotipy.Spotify:
     spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
         client_id=current_app.config['SPOTIFY_CLIENT_ID'],
         client_secret=current_app.config['SPOTIFY_CLIENT_SECRET']
     ))
-    return spotify
-
-
-def get_spotify_v2():
-    spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
     return spotify
