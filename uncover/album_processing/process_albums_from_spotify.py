@@ -1,21 +1,20 @@
 from collections import Counter
+from datetime import datetime
 from typing import Optional
 
-from tekore._model import FullTrack, PlaylistTrack
+from tekore._model import FullTrack, PlaylistTrack, SimpleAlbum
 
+from uncover.music_apis.lastfm_api.lastfm_album_handlers import lastfm_get_album_listeners
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
-from uncover.schemas.album import AlbumInfo
+from uncover.schemas.album_schema import AlbumInfo
 from uncover.utilities.name_filtering import get_filtered_name, remove_punctuation, get_filtered_names_list
 
 
-def extract_albums_from_spotify_tracks(
-        track_items: list[FullTrack],
-        ordered=False
-) -> Optional[list[AlbumInfo]]:
+def extract_albums_from_spotify_tracks(track_items: list[FullTrack], ordered=False) -> Optional[list[AlbumInfo]]:
     """
     :param track_items: a list of FullTrack items (a tekore Track object)
     :param ordered: ordered by the number of occurrences of an album in a playlist
-    :return:
+    :return: list[AlbumInfo]
     """
     albums = []
     list_of_titles = set()
@@ -25,8 +24,8 @@ def extract_albums_from_spotify_tracks(
             track = track.track
         elif track.album.album_type != "album":
             continue
-        name = track.album.name
-        filtered_title = get_filtered_name(name)
+        album_name = track.album.name
+        filtered_title = get_filtered_name(album_name)
         filtered_title = remove_punctuation(filtered_title)
         # filter duplicates:
         if ordered:
@@ -37,12 +36,12 @@ def extract_albums_from_spotify_tracks(
         album_info = AlbumInfo(
             artist_name=artist_name,
             artist_names=[artist_name] + get_filtered_names_list(artist_name),
-            title=name,
-            names=[name.lower()] + get_filtered_names_list(name),
+            title=album_name,
+            names=[album_name.lower()] + get_filtered_names_list(album_name),
             image=track.album.images[0].url,
             rating=track.popularity,
             spotify_id=track.album.id,
-            year=track.album.release_date[:4]
+            release_date=track.album.release_date[:4]
         )
         album_info.artist_names = list(set(album_info.artist_names))
         album_info.names = list(set(album_info.names))
@@ -56,6 +55,39 @@ def extract_albums_from_spotify_tracks(
         print(albums_counter, len(albums_counter))
         return sorted(albums, key=lambda x: albums_counter[x.filtered_title], reverse=True)
     return albums
+
+
+def process_spotify_artist_albums(albums: list[SimpleAlbum]) -> list[AlbumInfo]:
+    """
+    extract all the needed info from artist's albums found on Spotify
+    :param albums: a list of Spotify albums by artist; list[SimpleAlbum]
+    :return: list[AlbumInfo]
+    """
+    a_set_of_titles = set()
+    processed_albums = []
+    for album in albums:
+        album_image = album.images[0].url
+        album_title = album.name
+        artist_name = album.artists[0].name
+        filtered_name = get_filtered_name(album_title)
+        if filtered_name not in a_set_of_titles:
+            a_set_of_titles.add(filtered_name)
+            correct_title = album_title.lower()
+            rating = lastfm_get_album_listeners(correct_title, artist_name)
+            release_date = datetime.strptime(album.release_date[:4], '%Y')
+            album_info = AlbumInfo(
+                title=album_title,
+                artist_name=album.artists[0].name,
+                image=album_image,
+                names=[correct_title] + get_filtered_names_list(album_title),
+                rating=rating if rating else 0,
+                release_date=release_date,
+                artist_names=[artist_name]
+            )
+            # remove duplicates
+            album_info.remove_duplicate_names()
+            processed_albums.append(album_info)
+    return processed_albums
 
 
 def extract_genres_from_spotify_tracks(track_items: list[FullTrack]) -> Counter:
