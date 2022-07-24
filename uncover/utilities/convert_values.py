@@ -1,5 +1,6 @@
 import math
 from datetime import datetime
+from typing import Optional
 
 from uncover.schemas.characteristics import TimeSpan, CollageDimensions
 
@@ -52,3 +53,22 @@ def get_collage_dimensions(number_of_images: int) -> CollageDimensions:
     multipliers = _get_multipliers(number_of_images)
     dimensions = sorted(map(lambda x: DEFAULT_IMAGE_SIZE * x, multipliers), reverse=True)
     return CollageDimensions(*dimensions)
+
+
+def parse_release_date(release_date: str, forced_parsing: bool = False) -> Optional[datetime]:
+    """
+    parse datetime str into datetime object (extract Year)
+    :param release_date: a datetime str
+    :param forced_parsing: get an arbitrary date anyway (used for forced sorting by dates to avoid any exceptions)
+    :return: datetime object (year)
+    """
+    if not release_date:
+        return None
+    try:
+        release_date = datetime.strptime(release_date[:4], '%Y')
+    except (ValueError, TypeError) as e:
+        print(e)
+        if forced_parsing:
+            return datetime(1970, 1, 1)
+        return None
+    return release_date
