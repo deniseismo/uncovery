@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 
 from uncover import db
 from uncover.models import User
-from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_album_id
+from uncover.music_apis.spotify_api.spotify_album_handlers import get_spotify_album_info
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
 from uncover.music_apis.spotify_api.spotify_user_handlers import get_spotify_auth, check_spotify, get_spotify_user_info, \
     spotify_get_users_albums
@@ -99,8 +99,15 @@ def spotify_fetch_album_id():
         album_name = content['album_name']
         artist_name = content['artist_name']
         spotify_artist_name = content['spotify_artist_name']
-        album_id = spotify_get_album_id(album_name, artist_name, spotify_artist_name, country)
-        if not album_id:
+        album_info = get_spotify_album_info(
+            album_name=album_name,
+            artist_name=artist_name,
+            spotify_artist_name=spotify_artist_name,
+            token_based=True,
+            country=country,
+            token=token
+        )
+        if not album_info:
             return make_response(jsonify(
                 {'message': f"album id could not be found"}
             ),
@@ -111,7 +118,7 @@ def spotify_fetch_album_id():
         ),
             403)
     return jsonify({
-        "album_id": album_id
+        "album_id": album_info.id
     })
 
 
