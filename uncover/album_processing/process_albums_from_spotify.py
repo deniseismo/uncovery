@@ -1,5 +1,4 @@
 from collections import Counter
-from datetime import datetime
 from typing import Optional
 
 from tekore._model import FullTrack, PlaylistTrack, SimpleAlbum
@@ -7,6 +6,7 @@ from tekore._model import FullTrack, PlaylistTrack, SimpleAlbum
 from uncover.music_apis.lastfm_api.lastfm_album_handlers import lastfm_get_album_listeners
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
 from uncover.schemas.album_schema import AlbumInfo
+from uncover.utilities.convert_values import parse_release_date
 from uncover.utilities.name_filtering import get_filtered_name, remove_punctuation, get_filtered_names_list
 
 
@@ -33,6 +33,7 @@ def extract_albums_from_spotify_tracks(track_items: list[FullTrack], ordered=Fal
         if filtered_title in list_of_titles:
             continue
         artist_name = track.artists[0].name
+        parsed_release_date = parse_release_date(track.album.release_date)
         album_info = AlbumInfo(
             artist_name=artist_name,
             artist_names=[artist_name] + get_filtered_names_list(artist_name),
@@ -41,7 +42,7 @@ def extract_albums_from_spotify_tracks(track_items: list[FullTrack], ordered=Fal
             image=track.album.images[0].url,
             rating=track.popularity,
             spotify_id=track.album.id,
-            release_date=track.album.release_date[:4]
+            release_date=parsed_release_date
         )
         album_info.artist_names = list(set(album_info.artist_names))
         album_info.names = list(set(album_info.names))
@@ -74,14 +75,14 @@ def process_spotify_artist_albums(albums: list[SimpleAlbum]) -> list[AlbumInfo]:
             a_set_of_titles.add(filtered_name)
             correct_title = album_title.lower()
             rating = lastfm_get_album_listeners(correct_title, artist_name)
-            release_date = datetime.strptime(album.release_date[:4], '%Y')
+            parsed_release_date = parse_release_date(album.release_date)
             album_info = AlbumInfo(
                 title=album_title,
                 artist_name=album.artists[0].name,
                 image=album_image,
                 names=[correct_title] + get_filtered_names_list(album_title),
                 rating=rating if rating else 0,
-                release_date=release_date,
+                release_date=parsed_release_date,
                 artist_names=[artist_name]
             )
             # remove duplicates
