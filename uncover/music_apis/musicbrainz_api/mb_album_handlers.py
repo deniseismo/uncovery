@@ -1,74 +1,79 @@
+import json
 import time
-from datetime import datetime
+from typing import Optional
 
+import aiohttp
 import requests
 from flask import current_app
 
 
-def mb_get_album_alternative_name(album_id: str):
+def mb_get_album_alternative_name(album_mbid: str) -> Optional[str]:
     """
-    gets the alternative name for the album (e. g. White Album for 'The Beatles')
-    :param album_id: album_id from MusicBrainz
+    gets an alternative name for the album (e. g. White Album for 'The Beatles')
+    :param album_mbid: album_mbid from MusicBrainz
     :return: alternative name for an album
     """
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
-    url = "http://musicbrainz.org/ws/2/release-group/" + album_id
+    url = "http://musicbrainz.org/ws/2/release-group/" + album_mbid
     params = {"inc": "ratings", "fmt": "json"}
     response = requests.get(url=url, params=params, headers=headers)
     if response.status_code != 200:
         return None
     try:
-        alternative = response.json()['disambiguation']
-    except (KeyError, IndexError):
+        alternative_album_name = response.json()['disambiguation']
+    except (KeyError, TypeError, json.decoder.JSONDecodeError):
         return None
-    return alternative
+    return alternative_album_name
 
 
-def mb_get_album_release_date(album_id: str):
+def mb_get_album_release_date(album_mbid: str) -> Optional[str]:
     """
-    :param album_id: album_id from MusicBrainz
-    :return: album release date
+    get album's release date
+    :param album_mbid: album's mbid from MusicBrainz
+    :return: (str) album release date
     """
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
-    url = "http://musicbrainz.org/ws/2/release-group/" + album_id
+    url = "http://musicbrainz.org/ws/2/release-group/" + album_mbid
     params = {"fmt": "json"}
     response = requests.get(url=url, params=params, headers=headers)
     if response.status_code != 200:
         return None
     try:
         release_date = response.json()['first-release-date']
-    except (KeyError, IndexError, TypeError):
+    except (KeyError, TypeError, json.decoder.JSONDecodeError):
         return None
     if not getattr(response, 'from_cache', False):
         time.sleep(1)
     return release_date
 
 
-def mb_get_album_mbid(album: str, artist: str):
+def mb_get_album_mbid(album_name: str, artist: str):
     """
     search for an album's mbid on MusicBrainz
-    :param album: album's name
+    :param album_name: album's name
     :param artist: artist's name (e.g. MGMT, The Prodigy, etc.)
     :return: mbid (MusicBrainz ID)
     """
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/?query=release:"
-    album_query_filter = f'%20AND%20artist:{artist}%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json'
-    response = requests.get(url + album + album_query_filter, headers=headers)
+    OFFICIAL_STUDIO_ALBUMS_FILTER = "%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&fmt=json"
+    album_query_filter = f'%20AND%20artist:{artist}{OFFICIAL_STUDIO_ALBUMS_FILTER}'
+    response = requests.get(url + album_name + album_query_filter, headers=headers)
     if response.status_code != 200:
         return None
     try:
         mbid = response.json()["release-groups"][0]["id"]
-    except (KeyError, IndexError):
+    except (KeyError, IndexError, TypeError, json.decoder.JSONDecodeError) as e:
+        print(e)
         return None
     return mbid
 
 
-def mb_get_album_image(mbid: str, size='large', fast=False):
+def mb_get_album_image(mbid: str, size: str = 'large', fast: bool = False):
     """
     :param fast: a faster way to get the cover image
     :param mbid: mbid for an album release on MusicBrainz
-    :param size: small, etc.
+    :param size: large, small, etc.
     :return: an album cover location
     """
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
@@ -78,7 +83,7 @@ def mb_get_album_image(mbid: str, size='large', fast=False):
     image = None
     if fast:
         # a faster way (lower resolution)
-        url = "http://coverartarchive.org/release-group/" + mbid
+        url = f"http://coverartarchive.org/release-group/{mbid}"
         response = requests.get(url)
         if response.status_code != 200:
             return None
@@ -90,38 +95,31 @@ def mb_get_album_image(mbid: str, size='large', fast=False):
             return None
     else:
         # get what's supposed to be a 'front' cover (slower but most likely gets higher quality)
-        url = "http://coverartarchive.org/release-group/" + mbid + '/front'
+        url = f"http://coverartarchive.org/release-group/{mbid}/front"
         # response = requests.get(url)
         response = requests.head(url, headers=headers)
         if response.status_code != 307:
             return None
         try:
             image = response.headers['location']
-        except (KeyError, IndexError):
+        except KeyError:
             return None
     return image
 
 
-def parse_release_date(release_date):
-    if not release_date:
-        return None
-    release_date = datetime.strptime(release_date[:4], '%Y')
-    return release_date
-
-
-async def mb_fetch_album_release_date(album_id: str, session):
+async def mb_fetch_album_release_date(album_mbid: str, session) -> Optional[str]:
     """
-    ASYNC
+    fetch album's release date (ASYNC)
     :param session: ClientSession()
-    :param album_id: album_id from MusicBrainz
+    :param album_mbid: album_mbid from MusicBrainz
     :return: album release date
     """
-    if not album_id or not session:
+    if not album_mbid or not session:
         return None
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
-    url = "http://musicbrainz.org/ws/2/release-group/" + album_id
+    url = "http://musicbrainz.org/ws/2/release-group/" + album_mbid
     params = {"fmt": "json"}
-    print('fetching release date for: ', album_id)
+    print(f"fetching release date for: {album_mbid}")
     async with session.get(url=url, params=params, headers=headers) as response:
         if response.status != 200:
             print('status not ok')
@@ -129,30 +127,36 @@ async def mb_fetch_album_release_date(album_id: str, session):
         try:
             album_info = await response.json()
             release_date = album_info['first-release-date']
-        except (KeyError, IndexError, TypeError):
-            print('some error occurred')
+        except (KeyError, json.decoder.JSONDecodeError, TypeError) as e:
+            print(e)
             return None
         if not getattr(response, 'from_cache', False):
             time.sleep(1)
         return release_date
 
 
-async def mb_fetch_album_alternative_name(album_id: str, session):
+async def mb_fetch_album_alternative_name(album_mbid: str, session: aiohttp.ClientSession) -> Optional[str]:
     """
-    gets the alternative name for the album (e. g. White Album for 'The Beatles')
-    :param album_id: album_id from MusicBrainz
+    gets the alternative name for the album (e. g. White Album for 'The Beatles') (ASYNC)
+    :param album_mbid: album_mbid from MusicBrainz
+    :param session: aiohttp.ClientSession
     :return: alternative name for an album
     """
-    if not album_id or not session:
+    if not album_mbid or not session:
         return None
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
-    url = "http://musicbrainz.org/ws/2/release-group/" + album_id
+    url = "http://musicbrainz.org/ws/2/release-group/" + album_mbid
     params = {"inc": "ratings", "fmt": "json"}
     async with session.get(url=url, params=params, headers=headers) as response:
         if response.status != 200:
             return None
         try:
-            alternative = await response.json()
-        except (KeyError, IndexError):
+            mb_album_info = await response.json()
+        except (json.decoder.JSONDecodeError, TypeError) as e:
+            print(e)
             return None
-        return alternative['disambiguation']
+        try:
+            return mb_album_info['disambiguation']
+        except KeyError as e:
+            print(e)
+            return None
