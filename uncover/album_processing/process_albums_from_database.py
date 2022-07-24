@@ -37,7 +37,6 @@ def process_albums_from_db(album_entries: list) -> list[AlbumInfo]:
             album_info.names += [album_entry.alternative_title]
             album_info.names += get_filtered_names_list(album_entry.alternative_title)
         # remove duplicates
-        album_info.artist_names = list(set(album_info.artist_names))
-        album_info.names = list(set(album_info.names))
+        album_info.remove_duplicate_names()
         processed_albums.append(album_info)
     return processed_albums

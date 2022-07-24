@@ -44,8 +44,7 @@ def extract_albums_from_spotify_tracks(track_items: list[FullTrack], ordered=Fal
             spotify_id=track.album.id,
             release_date=parsed_release_date
         )
-        album_info.artist_names = list(set(album_info.artist_names))
-        album_info.names = list(set(album_info.names))
+        album_info.remove_duplicate_names()
         # append a title to a set of titles
         list_of_titles.add(filtered_title)
         # adds an album info only if a title hasn't been seen before

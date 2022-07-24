@@ -5,12 +5,14 @@ from sqlalchemy import func
 from sqlalchemy.sql import expression
 
 from uncover import cache
+from uncover.album_processing.album_processing_helpers import enumerate_artist_albums
 from uncover.cover_art_finder.cover_art_handlers import fetch_and_assign_images
 from uncover.album_processing.process_albums_from_database import process_albums_from_db
 from uncover.models import Album, Artist
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
 from uncover.music_apis.musicbrainz_api.mb_artist_handlers import mb_fetch_artists_albums
 from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_artists_albums_images
+from uncover.schemas.album_schema import AlbumInfo
 from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
 from uncover.utilities.logging_handlers import log_artist_missing_from_db
 
@@ -140,6 +142,7 @@ def fetch_artists_top_albums_images(artist_name: str, sorting):
     # initialize a dict to avoid KeyErrors
     asyncio.run(fetch_and_assign_images(albums_list=albums, artist=artist_name))
     albums_with_album_covers = _filter_albums_without_album_covers(albums)
+    enumerate_artist_albums(albums_with_album_covers)
 
     if not albums_with_album_covers:
         return None
@@ -156,7 +159,7 @@ def fetch_artists_top_albums_images(artist_name: str, sorting):
     return album_covers_response
 
 
-def _filter_albums_without_album_covers(albums: list[dict]) -> list[dict]:
+def _filter_albums_without_album_covers(albums: list[AlbumInfo]) -> list[AlbumInfo]:
     """
     keep only albums that have album covers
     :param albums: a list of album dicts
@@ -165,6 +168,5 @@ def _filter_albums_without_album_covers(albums: list[dict]) -> list[dict]:
     albums_with_albums_covers = []
     for count, album in enumerate(albums):
         if 'image' in album:
-            album['id'] = count
             albums_with_albums_covers.append(album)
     return albums_with_albums_covers
