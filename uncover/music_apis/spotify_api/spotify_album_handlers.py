@@ -1,202 +1,50 @@
-import random
-import time
-from datetime import datetime
+from typing import Optional
 
-import spotipy
 import tekore as tk
 from fuzzywuzzy import fuzz
+from tekore._model import SimpleAlbumPaging, SimpleAlbum
 
-from uncover import cache
-from uncover.music_apis.lastfm_api.lastfm_album_handlers import lastfm_get_album_listeners
+from uncover.album_processing.album_processing_helpers import sort_artist_albums, enumerate_artist_albums
+from uncover.album_processing.process_albums_from_spotify import process_spotify_artist_albums
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
-from uncover.music_apis.musicbrainz_api.mb_artist_handlers import mb_get_artists_albums
-from uncover.music_apis.spotify_api.spotify_artist_handlers import spotify_get_artist_name, spotify_get_artist_id
-from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client, get_spotify
-from uncover.music_apis.spotify_api.spotify_user_handlers import check_spotify
-from uncover.utilities.name_filtering import get_filtered_name, get_filtered_names_list
+from uncover.music_apis.spotify_api.spotify_artist_handlers import get_artist_spotify_name_by_name, \
+    get_spotify_artist_info
+from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
+from uncover.schemas.characteristics import SpotifyAlbumSearchParams, AlbumMatch
+from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
+from uncover.utilities.fuzzymatch import fuzzy_match_artist
+from uncover.utilities.name_filtering import get_filtered_name
 
 
-@cache.memoize(timeout=3600)
-def spotify_get_album_id(album_name, artist_name, spotify_artist_name, country):
+def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
     """
-    gets Spotify album id with through Tekore
-    :param spotify_artist_name:
-    :param country: current user's market/country for spotify
-    :param album_name: album's title
-    :param artist_name: artist's title
-    :return: Spotify album id
-    """
-    print(f'country: {country}')
-    artist_name = artist_name.lower().replace('the ', '')
-    query = "album:" + album_name + " artist:" + artist_name
-    user, token = check_spotify()
-    spotify_tekore_client = get_spotify_tekore_client()
-    if user and token:
-        try:
-            with spotify_tekore_client.token_as(token):
-                # try getting the album in one go: album and artist provided
-                album_info = spotify_tekore_client.search(
-                    query=query,
-                    types=('album',),
-                    market=country if country else 'from_token',
-                    limit=5
-                )
-                if album_info:
-                    if not album_info[0].items:
-                        if not spotify_artist_name:
-                            print('try finding with spotify artist name')
-                            # try finding an album with a different (Spotify's version) artist name
-                            spotify_artist_name = spotify_get_artist_name(artist_name)
-                            if not spotify_artist_name:
-                                # no artist name found
-                                return None
-                        if spotify_artist_name.lower() == artist_name.lower():
-                            # spotify's version is the same — no need to try again
-                            return None
-                        query = f"album:{album_name} artist:{spotify_artist_name}"
-                        album_info = spotify_tekore_client.search(
-                            query=query,
-                            types=('album',),
-                            market=country if country else 'from_token',
-                            limit=5
-                        )
-        except tk.HTTPError:
-            return None
-        if not album_info:
-            return None
-        print(len(album_info[0].items))
-        album_items = album_info[0].items
-        if not album_items:
-            return None
-        artist_name = artist_name.lower().replace(' & ', ' and ')
-        album_name = get_filtered_name(album_name)
-        ratio_threshold = 94
-        album_id_found = None
-        for album in album_items:
-            print(album.name)
-            try:
-                current_artist = album.artists[0].name. \
-                    lower().replace(' & ', ' and ').replace('the ', '')
-                current_album = get_filtered_name(album.name)
-                print(current_artist)
-                print(current_album)
-                print(artist_name)
-                current_artist_ratio = fuzz.ratio(artist_name, current_artist)
-                print(current_artist_ratio)
-                current_album_ratio = fuzz.ratio(album_name, current_album)
-                if current_album_ratio > 98 and current_artist_ratio > 85:
-                    # found perfect match, return immediately
-                    return album.id
-                elif current_album_ratio > ratio_threshold and current_artist_ratio > 85:
-                    ratio_threshold = current_album_ratio
-                    album_id_found = album.id
-            except (KeyError, TypeError, IndexError):
-                continue
-        return album_id_found
-    return None
-
-
-@cache.memoize(timeout=6000)
-def spotify_get_album_image(album: str, artist: str):
-    """
-    search for an album with the query: q=album:gold%20artist:abba&type=album
-    :param album: album's title
-    :param artist: artist's name
-    :return: album_image_url
-    """
-    spotify = get_spotify()
-    query = "album:" + album + " artist:" + artist
-    try:
-        album_info = spotify.search(q=query, type="album", limit=5, market='SE')
-    except spotipy.exceptions.SpotifyException:
-        return None
-    if not album_info:
-        return None
-    album_image_url = None
-    for item in album_info['albums']['items']:
-        if item['artists'][0]['name'].lower() == artist.lower():
-            try:
-                album_image_url = item['images'][0]['url']
-                break
-            except IndexError:
-                return None
-    if not album_image_url:
-        return None
-    if not getattr(album_info, 'from_cache', False):
-        time.sleep(0.25)
-    return album_image_url
-
-
-def spotipy_get_album_id(album: str, artist: str):
-    """
-    search for an album's id
-    :param album: album's title
-    :param artist: artist's name
-    :return: album id
-    """
-    if not album or not artist:
-        return None
-    spotify = get_spotify()
-    query = "album:" + album + " artist:" + artist
-    try:
-        album_info = spotify.search(q=query, type="album", limit=5, market='RU')
-    except spotipy.exceptions.SpotifyException:
-        return None
-    if not album_info:
-        return None
-    try:
-        album_items = album_info['albums']['items']
-    except (KeyError, TypeError, IndexError):
-        return None
-    if not album_items:
-        return None
-    for album in album_items:
-        try:
-            artist_name = album['artists'][0]['name']
-            album_id = album['id']
-            if fuzz.ratio(artist_name, artist) > 90:
-                return album_id
-        except (KeyError, TypeError, IndexError):
-            continue
-    if not getattr(album_info, 'from_cache', False):
-        time.sleep(1)
-    return None
-
-
-def get_artist_mb_albums_cover_arts_through_spotify(artist: str):
-    """
-    get artist's album images through Spotify's API
-    :param artist: artist's name
+    :param album_name:
+    :param artist_name:
     :return:
     """
-    # try correcting some typos in artist's name
-    correct_name = lastfm_get_artist_correct_name(artist)
-    if correct_name:
-        artist = correct_name
+    if not artist_name:
+        return None
+    spotify_tekore_client = get_spotify_tekore_client()
+    album_info = get_spotify_album_info(
+        album_name=album_name,
+        artist_name=artist_name,
+        tekore_client=spotify_tekore_client
+    )
+    if not album_info:
+        return None
+    if not album_info.images:
+        return None
     try:
-        # gets album titles
-        album_titles = mb_get_artists_albums(artist).keys()
-    except AttributeError:
+        image = album_info.images[0]
+        image_url = image.url
+        print(f'{image_url=}')
+        return image_url
+    except IndexError as e:
+        print(e)
         return None
-    if not album_titles:
-        return None
-    # initialize a dict to avoid KeyErrors
-    album_info = {
-        "info": {
-            "type": "artist",
-            "query": artist
-        },
-        "albums": dict()
-    }
-    for album_title in album_titles:
-        album_image = spotify_get_album_image(album_title, artist)
-        if album_image:
-            album_info["albums"][album_title] = album_image
-    print(f'there are {len(album_info["albums"])} albums found with Spotify')
-    return album_info
 
 
-def spotify_get_artists_albums_images(artist: str, sorting="popular"):
+def spotify_get_artists_albums_images(artist: str, sorting="popular") -> Optional[AlbumCoversResponse]:
     """
     a backup function that gets all the info from Spotify
     (in case MusicBrainz has nothing about a particular artist)
@@ -204,79 +52,217 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular"):
     :param artist: artist's name
     :return:
     """
-    spotify = get_spotify()
-    ORDER = {
-        "popular": ("rating", True),
-        "latest": ("release_date", True),
-        "earliest": ("release_date", False)
-    }
-    print('finding through backup spotify')
-    if not artist:
-        return None
+    spotify_tekore_client = get_spotify_tekore_client()
     artist_correct_name = lastfm_get_artist_correct_name(artist)
     if artist_correct_name:
         artist = artist_correct_name
-    artist_spotify_id = spotify_get_artist_id(artist)
-    if not artist_spotify_id:
+    artist_spotify_entry = get_spotify_artist_info(artist)
+    if not artist_spotify_entry:
         return None
-    albums = spotify.artist_albums(artist_id=artist_spotify_id, album_type="album", country="SE", limit=50)
+    # artist_id=artist_spotify_entry.id, album_type="album", country="SE", limit=50
+    albums = spotify_tekore_client.artist_albums(artist_id=artist_spotify_entry.id, market="GE", limit=50)
     if not albums:
         return None
-    album_info = {
-        "info": {
-            "type": "artist",
-            "query": artist
-        },
-        "albums": []
-    }
-    a_set_of_titles = set()
-    albums_list = []
-    try:
-        for an_album in albums['items']:
-            try:
-                album_image = an_album['images'][0]['url']
-                if album_image:
-                    album_title = an_album['name']
-                    filtered_name = get_filtered_name(album_title)
-                    if filtered_name not in a_set_of_titles:
-                        a_set_of_titles.add(filtered_name)
-                        correct_title = album_title.lower()
-                        rating = lastfm_get_album_listeners(correct_title, artist)
-                        print(f'rating: {rating}')
-                        print(f'filtered_name: {filtered_name}')
-                        print('test!jke')
-                        release_date = datetime.strptime(an_album["release_date"][:4], '%Y')
-                        an_album_dict = {
-                            "artist_name": artist,
-                            "title": album_title,
-                            "image": album_image,
-                            "names": [correct_title] + get_filtered_names_list(album_title),
-                            "rating": rating if rating else 0,
-                            "release_date": release_date
-                        }
-                        # remove duplicates
-                        an_album_dict['names'] = list(set(an_album_dict['names']))
-                        albums_list.append(an_album_dict)
-
-            except (KeyError, IndexError) as e:
-                print(e)
-                print('some key or index error exception occurred')
-                continue
-
-    except (KeyError, TypeError, IndexError) as e:
-        print('some spotify error occurred!')
-        print(e)
+    if not albums.items:
         return None
-
-    if not albums_list:
-        print('no album list')
+    if albums.total == 0:
         return None
-    if sorting == "shuffle":
-        random.seed(datetime.now())
-        random.shuffle(albums_list)
-        album_info['albums'] = albums_list
+    processed_albums = process_spotify_artist_albums(albums.items)
+    sort_artist_albums(processed_albums, sorting=sorting)
+    enumerate_artist_albums(processed_albums)
+    album_covers_response = AlbumCoversResponse(
+        info=ResponseInfo(
+            type="playlist",
+            query="spotify user top tracks albums"
+        ),
+        albums=processed_albums
+    )
+    return album_covers_response
+
+
+def get_spotify_album_info(
+        album_name: str,
+        artist_name: str,
+        spotify_artist_name: str = None,
+        tekore_client=None,
+        token_based: bool = False,
+        country: str = None,
+        token=None) -> Optional[SimpleAlbum]:
+    """
+    :param album_name: album's title
+    :param artist_name: artist's name
+    :param spotify_artist_name: artist's name as it's
+    :param tekore_client:
+    :param token_based:
+    :param country:
+    :param token:
+    :return:
+    """
+    if not (album_name and artist_name):
+        return None
+    # if tekore client is not provided, get a new one
+    if token_based and not token:
+        print(f"token based, but no token provided")
+        return None
+    if not tekore_client:
+        tekore_client = get_spotify_tekore_client()
+    if token:
+        print("access token provided")
+        try:
+            with tekore_client.token_as(token):
+                albums_found = get_album_search_results(
+                    album_name=album_name,
+                    artist_name=artist_name,
+                    spotify_tekore_client=tekore_client,
+                    spotify_artist_name=spotify_artist_name,
+                    country=country,
+                    token_based=token_based
+                )
+        except tk.HTTPError:
+            return None
     else:
-        album_info['albums'] = sorted(albums_list, key=lambda item: item[ORDER[sorting][0]], reverse=ORDER[sorting][1])
-    for count, album in enumerate(album_info['albums']):
-        album['id'] = count
-    return album_info
+        print("no access token, default search")
+        albums_found = get_album_search_results(
+            album_name=album_name,
+            artist_name=artist_name,
+            spotify_tekore_client=tekore_client,
+            token_based=token_based
+        )
+    print(albums_found)
+    if not albums_found:
+        return None
+    perfect_match = find_album_best_match(album_name, artist_name, albums_found.items)
+    print(f"perfect match: {perfect_match}")
+    if not perfect_match:
+        return None
+    return perfect_match
+
+
+def find_album_best_match(
+        album_title: str,
+        artist_name: str,
+        search_results: list[SimpleAlbum]
+) -> Optional[SimpleAlbum]:
+    """find the most appropriate (best) match amongst all the search results for an album to find
+
+    :param album_title: track's title to find
+    :param artist_name: artist's name
+    :param search_results: a list of all the search results
+    :return: perfect match if found
+    """
+    album_title = album_title.lower()
+    print(
+        f"searching for Album({album_title}) among {len(search_results)} results")
+    matches = []
+    for album in search_results:
+        album_found = get_filtered_name(album.name).lower()
+        correct_artist_found = fuzzy_match_artist(
+            artist_name, album.artists[0].name)
+        print(correct_artist_found)
+        if not correct_artist_found:
+            print("INCORRECT ARTIST")
+            continue
+        if album_found == album_title:
+            print("album found: perfect match")
+            return album
+        print(album.name, "→", album_found, "vs.", album_title,
+              fuzz.ratio(album_found, album_title), sep=" | ")
+        ratio = fuzz.ratio(album_found, album_title)
+        if ratio > 90:
+            print(f"pretty close: {album_found} vs. {album_title}")
+            return album
+        if ratio > 80:
+            # append a match to matches list
+            matches.append(
+                AlbumMatch(album, ratio)
+            )
+    # if there are matches
+    if matches:
+        try:
+            # pick track with the highest ratio
+            return sorted(matches, key=lambda x: x.ratio, reverse=True)[0].album
+        except IndexError as e:
+            print(e)
+            return None
+    return None
+
+
+def get_album_search_results(
+        album_name: str,
+        artist_name: str,
+        spotify_tekore_client: tk.Spotify,
+        spotify_artist_name: str = None,
+        country: str = None,
+        token_based: bool = False
+) -> Optional[SimpleAlbumPaging]:
+    """
+    get
+    :param album_name: album's title
+    :param artist_name: artist's name
+    :param spotify_artist_name: artist's name on Spotify
+    :param spotify_tekore_client: an instance of a Spotify client. Defaults to None.
+    :param country: user's country (spotify market)
+    :param token_based:
+    :return: albums found (max=5)
+    """
+    search_params = _configure_search_params_for_spotify_album_searching(
+        album_name=album_name,
+        artist_name=artist_name,
+        country=country,
+        token_based=token_based
+    )
+    print(search_params)
+    albums_found, = spotify_tekore_client.search(**search_params.to_dict())
+    # in case of not getting any response
+    if not albums_found:
+        print("no albums found")
+        return None
+    if albums_found.total == 0:
+        if not spotify_artist_name:
+            print('try finding with spotify artist name')
+            # try finding an album with a different (Spotify's version) artist name
+            spotify_artist_name = get_artist_spotify_name_by_name(artist_name)
+            if not spotify_artist_name:
+                # no artist name found
+                return None
+        if spotify_artist_name.lower() == artist_name.lower():
+            # spotify's version is the same — no need to try again
+            return None
+        search_params.query = f"{album_name} artist:{spotify_artist_name}"
+        albums_found, = spotify_tekore_client.search(**search_params.to_dict())
+        if albums_found.total == 0:
+            return None
+    return albums_found
+
+
+def _configure_search_params_for_spotify_album_searching(
+        album_name: str,
+        artist_name: str,
+        types: tuple[str] = ('album',),
+        limit: int = 50,
+        country: Optional[str] = None,
+        token_based: bool = False
+) -> SpotifyAlbumSearchParams:
+    """
+    configure search parameters for searching album on Spotify
+    :param album_name: album's title
+    :param artist_name: artist's name
+    :param types: type of search result (type of media you search for), e.g. 'album'
+    :param limit: (max=50)
+    :param country: user's country (Spotify's market to search on)
+    :param token_based: True/False
+    :return: SpotifyAlbumSearchParams with search params configured
+    """
+    market = None
+    if country:
+        market = country
+    elif token_based:
+        # no country provided, but the request is token based
+        market = 'from_token'
+    query = f"{album_name} artist:{artist_name}"
+    return SpotifyAlbumSearchParams(
+        query=query,
+        types=types,
+        market=market,
+        limit=limit
+    )
