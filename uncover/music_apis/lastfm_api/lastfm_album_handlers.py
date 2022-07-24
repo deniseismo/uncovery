@@ -25,7 +25,7 @@ def lastfm_get_album_listeners(album: str, artist: str):
         print(response.json())
         album_listeners = response.json()['album']['listeners']
 
-    except (KeyError, IndexError, TypeError, ValueError) as e:
+    except (KeyError, TypeError, ValueError) as e:
         print(e)
         print(f"there are no listeners for {album}")
         return None

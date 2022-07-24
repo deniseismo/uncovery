@@ -4,7 +4,7 @@ import time
 from tqdm import tqdm
 from uncover import create_app, db
 from uncover.music_apis.lastfm_api.lastfm_client_api import lastfm_get_response
-from uncover.music_apis.spotify_api.spotify_artist_handlers import spotify_get_artist_id, spotify_get_artists_genres
+from uncover.music_apis.spotify_api.spotify_artist_handlers import get_spotify_artist_info, spotify_get_artists_genres
 from uncover.utilities.misc import timeit
 from uncover.models import Artist, tags, Tag
 
@@ -119,9 +119,10 @@ def add_artist_music_genres(artist):
     :return:
     """
     tags = []
-    artist_spotify_id = spotify_get_artist_id(artist.name)
-    if artist_spotify_id:
-        tags = spotify_get_artists_genres(artist_spotify_id)
+    artist_spotify_entry = get_spotify_artist_info(artist.name)
+    if not artist_spotify_entry:
+        return False
+    tags = spotify_get_artists_genres(artist_spotify_entry)
     if not tags:
         tags = lookup_tags(artist.name)
     if tags:
@@ -148,11 +149,11 @@ def populate_music_genres():
     all_artists = Artist.query.all()
     for artist in tqdm(all_artists):
         # search tags via last.fm's API
-        artist_spotify_id = spotify_get_artist_id(artist.name)
+        artist_spotify_entry = get_spotify_artist_info(artist.name)
         tags = []
-        if artist_spotify_id:
+        if artist_spotify_entry:
             # try getting the tags through spotify first
-            tags = spotify_get_artists_genres(artist_spotify_id)
+            tags = spotify_get_artists_genres(artist_spotify_entry)
         if not tags:
             # if spotify hasn't found any tags, try getting through lastfm
             tags = lookup_tags(artist.name)

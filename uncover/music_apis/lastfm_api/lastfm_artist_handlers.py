@@ -20,7 +20,7 @@ def lastfm_get_artist_mbid(artist: str):
         return None
     try:
         artist_mbid = response.json()['artist']['mbid']
-    except KeyError:
+    except (KeyError, TypeError, json.decoder.JSONDecodeError):
         print(f"there is no mbid for {artist}")
         return None
     return artist_mbid

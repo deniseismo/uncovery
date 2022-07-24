@@ -1,10 +1,11 @@
+import json
 import random
 
 from uncover import cache
+from uncover.client.musician.musician_handlers import sql_find_specific_album
 from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
 from uncover.music_apis.lastfm_api.lastfm_client_api import lastfm_get_response
-from uncover.musician.musician_handlers import sql_find_specific_album
 from uncover.utilities.name_filtering import get_filtered_name, get_filtered_names_list
 
 
@@ -138,7 +139,7 @@ def lastfm_get_user_avatar(username: str):
         return None
     try:
         user_avatars = response.json()['user']['image']
-    except (KeyError, IndexError, TypeError, ValueError):
+    except (KeyError, TypeError, json.decoder.JSONDecodeError):
         print(f"there is no avatar for {username}")
         return None
     try:
