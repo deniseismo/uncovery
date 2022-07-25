@@ -1,90 +1,154 @@
 import os
 import secrets
 import urllib.request
+from io import BytesIO
+from typing import Optional
+from urllib.error import URLError, HTTPError
 
 from PIL import Image
 from flask import current_app
 
 from uncover import cache
+from uncover.schemas.characteristics import ImageOffset, ImageSize
 from uncover.utilities.convert_values import get_collage_dimensions
 
 
-def get_resized_image(image, size):
+def arrange_the_images(
+        images: list[Image.Image],
+        collage_image: Image.Image,
+        width: int,
+        image_size: ImageSize,
+        offset: ImageOffset = ImageOffset(0, 0)
+):
     """
-    get a resized copy of an image
-    :param image: a Pillow Image object to resize
-    :param size: a new size
-    :return: a resized image
-    """
-    return image.resize(size, Image.LANCZOS)
-
-
-def arrange_the_images(a_list_of_image_urls: list, collage_image: Image, width: int, size: tuple, offset=(0, 0)):
-    """
-    :param a_list_of_image_urls: a list of image URLs
+    arrange (paste) given images in a collage
+    :param images: a list of PIL Images
     :param collage_image: the output image
     :param width: (of the current 'frame' or part of the output picture we need to put images in)
-    :param size: a tuple (width, height) of images to put in
+    :param image_size: a tuple (width, height) of images to put in
     :param offset: a tuple (x_offset, y_offset) where we need to start putting images in
-    :return:
     """
-    for counter, image_url in enumerate(a_list_of_image_urls):
-        print(f"{counter}: {image_url}")
+    to_fit = (width - offset.x) // image_size.width
+    for counter, image in enumerate(images):
+        resized_image = image.resize(image_size, Image.LANCZOS)
+        paste_region = _calculate_image_paste_region(
+            image_number=counter,
+            image_size=image_size,
+            offset=offset,
+            to_fit=to_fit
+        )
+        collage_image.paste(resized_image, paste_region)
+
+
+def _calculate_image_paste_region(
+        image_number: int,
+        image_size: ImageSize,
+        offset: ImageOffset,
+        to_fit: int
+) -> tuple[int, int]:
+    """
+    get paste region for image to paste into (where exactly to put in a collage)
+    :param image_number:
+    :param image_size: ImageSize(width, height)
+    :param offset: ImageOffset(x, y)
+    :param to_fit: how many to fit
+    :return: tuple(int, int)
+    """
+    return offset.x + image_number % to_fit * image_size.width, offset.y + (image_number // to_fit) * image_size.height
+
+
+def _get_image_file_from_url(image_url: str) -> Optional[Image.Image]:
+    """
+    open a given url to get image file as a Pillow Image object
+    :param image_url: (str) url to image (local/external)
+    :return: Pillow Image file of an opened image
+    """
+    try:
+        req = urllib.request.Request(url=image_url)
+        req.add_header("User-Agent", current_app.config['USER_AGENT'])
         try:
-            an_image = Image.open(urllib.request.urlopen(image_url))
-        except ValueError:
-            try:
-                path = os.path.join(current_app.root_path, image_url)
-                an_image = Image.open(path)
-            except (OSError, ValueError):
-                return None
-        resized_image = get_resized_image(an_image, size)
-        to_fit = (width - offset[0]) // resized_image.width
-        collage_image.paste(resized_image,
-                            (offset[0] + counter % to_fit * resized_image.width,
-                             offset[1] + (counter // to_fit) * resized_image.height))
+            with urllib.request.urlopen(req) as response:
+                image_bytes = response.read()
+                image = Image.open(BytesIO(image_bytes))
+            return image
+        except (URLError, HTTPError) as e:
+            print(e)
+            return None
+    except ValueError as e:
+        print(e)
+        try:
+            print(current_app.root_path, image_url)
+            path = os.path.join(current_app.root_path, image_url)
+            print(f'final path= {path}')
+            image = Image.open(path)
+            return image
+        except (OSError, ValueError) as e:
+            print(e)
+            return None
 
 
-def create_a_collage(cover_art_urls: list, filename_path: str):
+def _collect_opened_images(a_list_of_image_urls: list[str]) -> list[Optional[Image.Image]]:
     """
-    a main collage creator function
+    get a list of opened images from image urls (collect only images that could be opened)
+    :param a_list_of_image_urls: list of image urls
+    :return: list of Pillow Image objects
+    """
+    images = []
+    for image_url in a_list_of_image_urls:
+        image = _get_image_file_from_url(image_url)
+        if not image:
+            continue
+        images.append(image)
+    return images
+
+
+def create_a_collage(cover_art_urls: list[str], filename_path: str):
+    """
+    create a collage from given cover art images (image urls)
     :param cover_art_urls: a list of filenames of all the images to create a collage from
     :param filename_path: a filename (prior randomized) to save as
-    :return:
     """
     if not cover_art_urls or not filename_path:
         return False
-    IMAGE_SIZE = {
-        'small': (300, 300),
-        'default': (600, 600),
-        'large': (900, 900)
+    IMAGE_SIZES_TABLE = {
+        'small': ImageSize(300, 300),
+        'default': ImageSize(600, 600),
+        'large': ImageSize(900, 900)
     }
-    number_of_cover_art_images = len(cover_art_urls)
-    width, height = get_collage_dimensions(number_of_cover_art_images)
+    number_of_urls = len(cover_art_urls)
+    images = _collect_opened_images(cover_art_urls)
+    if not images:
+        # TODO: raise Error, catch somewhere outside the function
+        return None
+    number_of_images = len(images)
+    print(f"{number_of_urls=}, {number_of_images=}")
+
+    width, height = get_collage_dimensions(number_of_images)
     collage_image = Image.new('RGB', (width, height))
 
     # arrange album images in a collage depending on the number of images in it
-    if number_of_cover_art_images == 4:
-        arrange_the_images(cover_art_urls[0:1], collage_image, width, IMAGE_SIZE['large'])
-        arrange_the_images(cover_art_urls[1:], collage_image, width, IMAGE_SIZE['small'], (900, 0))
-    elif number_of_cover_art_images == 5:
-        arrange_the_images(cover_art_urls[0:2], collage_image, width, IMAGE_SIZE['large'])
-        arrange_the_images(cover_art_urls[2:], collage_image, width, IMAGE_SIZE['default'], (0, 900))
-    elif number_of_cover_art_images == 7:
-        arrange_the_images(cover_art_urls[0:1], collage_image, width, IMAGE_SIZE['large'])
-        arrange_the_images(cover_art_urls[1:], collage_image, width, IMAGE_SIZE['small'], (900, 0))
-    elif number_of_cover_art_images == 8:
-        arrange_the_images(cover_art_urls[0:2], collage_image, width, IMAGE_SIZE['large'])
-        arrange_the_images(cover_art_urls[2:], collage_image, width, IMAGE_SIZE['default'], (0, 900))
+    if number_of_images == 4:
+        arrange_the_images(images[0:1], collage_image, width, IMAGE_SIZES_TABLE['large'])
+        arrange_the_images(images[1:], collage_image, width, IMAGE_SIZES_TABLE['small'], ImageOffset(900, 0))
+    elif number_of_images == 5:
+        arrange_the_images(images[0:2], collage_image, width, IMAGE_SIZES_TABLE['large'])
+        arrange_the_images(images[2:], collage_image, width, IMAGE_SIZES_TABLE['default'], ImageOffset(0, 900))
+    elif number_of_images == 7:
+        arrange_the_images(images[0:1], collage_image, width, IMAGE_SIZES_TABLE['large'])
+        arrange_the_images(images[1:], collage_image, width, IMAGE_SIZES_TABLE['small'], ImageOffset(900, 0))
+    elif number_of_images == 8:
+        arrange_the_images(images[0:2], collage_image, width, IMAGE_SIZES_TABLE['large'])
+        arrange_the_images(images[2:], collage_image, width, IMAGE_SIZES_TABLE['default'], ImageOffset(0, 900))
     else:
-        arrange_the_images(cover_art_urls, collage_image, width, IMAGE_SIZE['default'])
+        arrange_the_images(images, collage_image, width, IMAGE_SIZES_TABLE['default'])
     # save the collage to a file
     collage_image.save(filename_path, quality=95)
 
 
 @cache.memoize(timeout=360)
-def save_collage(cover_art_urls: list):
+def save_collage(cover_art_urls: list[str]):
     """
+    save collage created from given images (image urls)
     :param: a list of album filenames
     :return: a filename of the collage created
     """
