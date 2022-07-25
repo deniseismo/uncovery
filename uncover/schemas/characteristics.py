@@ -11,6 +11,9 @@ class TimeSpan(NamedTuple):
     start_date: datetime
     end_date: datetime
 
+    def __repr__(self):
+        return f"({self.start_date.year} — {self.end_date.year})"
+
 
 class CollageDimensions(NamedTuple):
     width: int
@@ -20,6 +23,16 @@ class CollageDimensions(NamedTuple):
 class AlbumMatch(NamedTuple):
     album: SimpleAlbum
     ratio: int
+
+
+class ImageOffset(NamedTuple):
+    x: int
+    y: int
+
+
+class ImageSize(NamedTuple):
+    width: int
+    height: int
 
 
 @dataclass
