@@ -3,6 +3,7 @@ from operator import attrgetter
 from typing import NamedTuple
 
 from uncover.schemas.album_schema import AlbumInfo
+from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
 
 
 class SortingParams(NamedTuple):
@@ -18,8 +19,8 @@ def _get_sorting_params(sorting: str) -> SortingParams:
     """
     ORDER_TABLE = {
         "popular": SortingParams("rating", True),
-        "latest": SortingParams("release_date", True),
-        "earliest": SortingParams("release_date", False)
+        "latest": SortingParams("year", True),
+        "earliest": SortingParams("year", False)
     }
     return ORDER_TABLE[sorting]
 
@@ -41,6 +42,29 @@ def sort_artist_albums(albums: list[AlbumInfo], sorting: str) -> bool:
 
 
 def enumerate_artist_albums(albums: list[AlbumInfo]) -> bool:
+    """
+    enumerate albums, asc. (add respective ids/order numbers)
+    :param albums: a list of AlbumInfo albums
+    :return: True
+    """
     for count, album in enumerate(albums):
         album.id = count
     return True
+
+
+def make_album_covers_response(albums: list[AlbumInfo], info_type: str, info_query: str) -> AlbumCoversResponse:
+    """
+    make a AlbumCoversResponse (ready to be jsonified and sent to the user)
+    :param albums: a list of processed and ready AlbumInfo
+    :param info_type: type of albums returned/request made (e.g. artist, playlist, explore, etc.)
+    :param info_query: information about user's request (e.g. artist's name)
+    :return: AlbumCoversResponse
+    """
+    album_covers_response = AlbumCoversResponse(
+        info=ResponseInfo(
+            type=info_type,
+            query=info_query
+        ),
+        albums=albums
+    )
+    return album_covers_response
