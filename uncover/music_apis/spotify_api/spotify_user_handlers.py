@@ -6,10 +6,11 @@ import tekore as tk
 from flask import current_app, session
 
 from uncover import cache
+from uncover.album_processing.album_processing_helpers import sort_artist_albums, enumerate_artist_albums
 from uncover.album_processing.process_albums_from_spotify import extract_albums_from_spotify_tracks
 from uncover.models import User
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
-from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
+from uncover.schemas.album_schema import AlbumInfo
 from uncover.schemas.spotify_user_info import SpotifyUserAuth, SpotifyUserProfile
 
 
@@ -101,7 +102,7 @@ def get_spotify_user_info(token) -> Optional[SpotifyUserProfile]:
 
 
 @cache.memoize(timeout=3600)
-def spotify_get_users_albums(token) -> Optional[AlbumCoversResponse]:
+def spotify_get_users_albums(token) -> Optional[list[AlbumInfo]]:
     """
     get current spotify user top albums
     :param token: an access token
@@ -123,11 +124,7 @@ def spotify_get_users_albums(token) -> Optional[AlbumCoversResponse]:
     albums = extract_albums_from_spotify_tracks(top_tracks.items)
     if not albums:
         return None
-    album_covers_response = AlbumCoversResponse(
-        info=ResponseInfo(
-            type="playlist",
-            query="spotify user top tracks albums"
-        ),
-        albums=albums
-    )
-    return album_covers_response
+    sort_artist_albums(albums, sorting="shuffle")
+    albums = albums[:9]
+    enumerate_artist_albums(albums)
+    return albums

@@ -1,11 +1,11 @@
 import pickle
-import random
 
 import tekore as tk
 from flask import Blueprint, session, url_for, request, make_response, jsonify
 from werkzeug.utils import redirect
 
 from uncover import db
+from uncover.album_processing.album_processing_helpers import make_album_covers_response
 from uncover.models import User
 from uncover.music_apis.spotify_api.spotify_album_handlers import get_spotify_album_info
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
@@ -137,8 +137,8 @@ def get_albums_by_spotify():
                                     filename=failure_art_filename)}
         ),
             401)
-    albums = spotify_get_users_albums(token)
-    if not albums:
+    spotify_user_albums = spotify_get_users_albums(token)
+    if not spotify_user_albums:
         # if the given username has no albums or the username's incorrect
         failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
@@ -147,10 +147,9 @@ def get_albums_by_spotify():
                                     filename=failure_art_filename)}
         ),
             404)
-    # shuffles a list of albums to get random results
-    random.shuffle(albums["albums"])
-    albums['albums'] = albums['albums'][:9]
-    # adds ids to albums
-    for count, album in enumerate(albums['albums']):
-        album['id'] = count
-    return jsonify(albums)
+    album_covers_response = make_album_covers_response(
+        albums=spotify_user_albums,
+        info_type="playlist",
+        info_query="spotify user top tracks albums"
+    )
+    return jsonify(album_covers_response)

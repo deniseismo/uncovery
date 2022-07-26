@@ -10,17 +10,18 @@ from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_arti
 from uncover.music_apis.spotify_api.spotify_artist_handlers import get_artist_spotify_name_by_name, \
     get_spotify_artist_info
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
+from uncover.schemas.album_schema import AlbumInfo
 from uncover.schemas.characteristics import SpotifyAlbumSearchParams, AlbumMatch
-from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
 from uncover.utilities.fuzzymatch import fuzzy_match_artist
 from uncover.utilities.name_filtering import get_filtered_name
 
 
 def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
     """
-    :param album_name:
-    :param artist_name:
-    :return:
+    get album's cover (image url) on spotify
+    :param album_name: (str) album's title
+    :param artist_name: (str) artist's name
+    :return: (str) album's cover (image url)
     """
     if not artist_name:
         return None
@@ -44,13 +45,13 @@ def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
         return None
 
 
-def spotify_get_artists_albums_images(artist: str, sorting="popular") -> Optional[AlbumCoversResponse]:
+def spotify_get_artists_albums_images(artist: str, sorting: str = "popular") -> Optional[list[AlbumInfo]]:
     """
     a backup function that gets all the info from Spotify
     (in case MusicBrainz has nothing about a particular artist)
     :param sorting: sorted by shuffle, popular, earliest, latest
     :param artist: artist's name
-    :return:
+    :return: artist's albums (list[AlbumInfo]) found on spotify
     """
     spotify_tekore_client = get_spotify_tekore_client()
     artist_correct_name = lastfm_get_artist_correct_name(artist)
@@ -70,14 +71,7 @@ def spotify_get_artists_albums_images(artist: str, sorting="popular") -> Optiona
     processed_albums = process_spotify_artist_albums(albums.items)
     sort_artist_albums(processed_albums, sorting=sorting)
     enumerate_artist_albums(processed_albums)
-    album_covers_response = AlbumCoversResponse(
-        info=ResponseInfo(
-            type="playlist",
-            query="spotify user top tracks albums"
-        ),
-        albums=processed_albums
-    )
-    return album_covers_response
+    return processed_albums
 
 
 def get_spotify_album_info(
@@ -92,11 +86,11 @@ def get_spotify_album_info(
     :param album_name: album's title
     :param artist_name: artist's name
     :param spotify_artist_name: artist's name as it's
-    :param tekore_client:
-    :param token_based:
-    :param country:
-    :param token:
-    :return:
+    :param tekore_client: spotify tekore client
+    :param token_based: (bool) if True, get album only if user's access token specified (and on user's market (country))
+    :param country: two-letter country code, spotify's market to search for an item on
+    :param token: user's access token
+    :return: (SimpleAlbum) album found on spotify
     """
     if not (album_name and artist_name):
         return None
@@ -151,8 +145,7 @@ def find_album_best_match(
     :return: perfect match if found
     """
     album_title = album_title.lower()
-    print(
-        f"searching for Album({album_title}) among {len(search_results)} results")
+    print(f"searching for Album({album_title}) among {len(search_results)} results")
     matches = []
     for album in search_results:
         album_found = get_filtered_name(album.name).lower()
@@ -173,9 +166,7 @@ def find_album_best_match(
             return album
         if ratio > 80:
             # append a match to matches list
-            matches.append(
-                AlbumMatch(album, ratio)
-            )
+            matches.append(AlbumMatch(album, ratio))
     # if there are matches
     if matches:
         try:
