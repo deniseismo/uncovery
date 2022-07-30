@@ -1,28 +1,34 @@
 import json
 import random
+from typing import Optional
 
 from uncover import cache
-from uncover.client.musician.musician_handlers import sql_find_specific_album
-from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
-from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
+from uncover.album_processing.album_processing_helpers import enumerate_artist_albums, sort_artist_albums
+from uncover.album_processing.process_albums_from_lastfm import process_lastfm_user_top_albums
 from uncover.music_apis.lastfm_api.lastfm_client_api import lastfm_get_response
-from uncover.utilities.name_filtering import get_filtered_name, get_filtered_names_list
+from uncover.music_apis.lastfm_api.lastfm_helpers import lastfm_show_response_error
+from uncover.schemas.album_schema import AlbumInfo
 
 
-def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", amount=25):
+def lastfm_get_users_top_albums(
+        username: str,
+        time_period: str = "overall",
+        amount: int = 25
+) -> Optional[tuple[list[AlbumInfo], str]]:
     """
     :param amount: amount ot albums
     :param time_period: (Optional) : overall | 7day | 1month | 3month | 6month | 12month | shuffle
                                     - The time period over which to retrieve top artists for.
     :param username: lastfm username
-    :param size: 0 - small (34x34), 1 - medium (64x64), 2 - large (174x174), 3 - XL (300x300)
     :return: a dictionary  {"info": username, "albums": 9 x [album_title : image_url]}
     """
+    image_size = 3
     shuffle = False
     possible_time_periods = ["overall", "7day", "1month", "3month", "6month", "12month"]
     if time_period == "shuffle":
         shuffle = True
         time_period = random.choice(possible_time_periods)
+        print(f"shuffle: {time_period}")
     else:
         amount = 9
     response = lastfm_get_response({
@@ -31,11 +37,26 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
         'period': time_period,
         'limit': amount
     })
+    if not response:
+        return None
     # in case of an error, return None
     if response.status_code != 200:
+        lastfm_show_response_error(response)
         return None
-    # in case the user doesn't have any albums for a specific time period but perhaps does have for 'overall'
-    if shuffle and time_period != "overall" and not response.json()['topalbums']['album']:
+    try:
+        lastfm_user_albums_info = response.json()
+    except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
+        print(e)
+        return None
+    try:
+        lastfm_user_albums = lastfm_user_albums_info['topalbums']['album']
+    except (KeyError, TypeError) as e:
+        print(e)
+        return None
+
+    # in case the user doesn't have any albums for time period picked by random (shuffle), → try to show albums overall
+    if shuffle and time_period != "overall" and not lastfm_user_albums:
+        print(f"shuffle: {time_period} had nothing to show, trying to get albums overall instead")
         time_period = "overall"
         response = lastfm_get_response({
             'method': 'user.getTopAlbums',
@@ -43,82 +64,39 @@ def lastfm_get_users_top_albums(username: str, size=3, time_period="overall", am
             'period': time_period,
             'limit': amount
         })
-    # initialize a dict to avoid KeyErrors
-    try:
-        username_correct = response.json()['topalbums']['@attr']['user']
-    except (KeyError, IndexError, TypeError):
-        return None
-    album_info = {
-        "info": {
-            "type": "user",
-            "query": username_correct
-        },
-        "albums": list()
-    }
-    albums_found = response.json()['topalbums']['album']
-    try:
-        a_set_of_titles = set()
-        for album in albums_found:
-            # gets the correct artist's name
-            resizable = True
-            artist_name = album['artist']['name']
-            artist_correct_name = lastfm_get_artist_correct_name(album['artist']['name'])
-            if artist_correct_name:
-                artist_name = artist_correct_name
+        if not response:
+            return None
+        try:
+            lastfm_user_albums_info = response.json()
+        except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
+            print(e)
+            return None
+        try:
+            lastfm_user_albums = lastfm_user_albums_info['topalbums']['album']
+        except (KeyError, TypeError) as e:
+            print(e)
+            return None
 
-            album_name = album['name']
-            album_correct_name = get_filtered_name(album_name)
-
-            # try getting the album image through database
-            album_image = sql_find_specific_album(artist_name, album_name)
-            if not album_image:
-                # second attempt in case the album name was badly written
-                album_image = sql_find_specific_album(artist_name, album_correct_name)
-            # try getting through the ultimate image finder function if database doesn't have the image
-            if not album_image:
-                resizable = False
-                album_image = ultimate_album_image_finder(album_title=album_name,
-                                                          artist=artist_name,
-                                                          fast=True,
-                                                          ultrafast=True)
-            if not album_image:
-                try:
-                    album_image = album['image'][size]['#text']
-                except (TypeError, IndexError, KeyError):
-                    album_image = None
-            # checks for incorrect/broken images
-            if album_image:
-                filtered_name = get_filtered_name(album['name'])
-                an_album_dict = {
-                    "title": album_name,
-                    "names": [album_name.lower()] + get_filtered_names_list(album_name),
-                    "artist_name": artist_name,
-                    "artist_names": [artist_name] + get_filtered_names_list(artist_name)
-                }
-                if resizable:
-                    an_album_dict['image_small'] = 'static/optimized_cover_art_images/' + album_image + "-size200.jpg"
-                    an_album_dict['image_medium'] = 'static/optimized_cover_art_images/' + album_image + "-size300.jpg"
-                    an_album_dict['image'] = 'static/optimized_cover_art_images/' + album_image + ".jpg"
-                else:
-                    an_album_dict['image'] = album_image
-                an_album_dict['artist_names'] = list(set(an_album_dict["artist_names"]))
-                an_album_dict['names'] = list(set(an_album_dict['names']))
-                # appends an album dict with all the info to the list
-                if filtered_name not in a_set_of_titles:
-                    a_set_of_titles.add(filtered_name)
-                    album_info["albums"].append(an_album_dict)
-    except (KeyError, IndexError):
+    if not lastfm_user_albums:
+        print(f"no albums found for User({username}), {time_period}")
         return None
-    if not album_info["albums"]:
-        print('user has nothing to show')
-        # if the user has no albums to show
+
+    try:
+        username_correct = lastfm_user_albums_info['topalbums']['@attr']['user']
+        username = username_correct if username_correct else username
+    except (KeyError, TypeError) as e:
+        print(e)
+
+    processed_albums = process_lastfm_user_top_albums(lastfm_user_albums, image_size=image_size)
+
+    if not processed_albums:
         return None
     if shuffle:
-        random.shuffle(album_info["albums"])
+        sort_artist_albums(processed_albums, sorting="shuffle")
+
     # get ids right
-    for count, album in enumerate(album_info['albums']):
-        album['id'] = count
-    return album_info
+    enumerate_artist_albums(processed_albums)
+    return processed_albums, username
 
 
 @cache.memoize(timeout=6000)
@@ -133,9 +111,11 @@ def lastfm_get_user_avatar(username: str):
         'method': 'user.getInfo',
         'user': username
     })
+    if not response:
+        return None
     # in case of an error, return None
     if response.status_code != 200:
-        print(f"couldn't find {username} on last.fm")
+        lastfm_show_response_error(response)
         return None
     try:
         user_avatars = response.json()['user']['image']
