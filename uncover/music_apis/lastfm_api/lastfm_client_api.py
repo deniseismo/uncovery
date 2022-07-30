@@ -1,14 +1,16 @@
 import asyncio
+from typing import Optional
 
+import aiohttp
 import requests
 from flask import current_app
 
 
-def lastfm_get_response(payload: dict):
+def lastfm_get_response(payload: dict) -> Optional[requests.Response]:
     """
     get a response from lastfm given some payload info
-    :param payload:
-    :return:
+    :param payload: user's request information: method and other lastfm api specific params
+    :return: requests.Response
     """
     # define headers and URL
     headers = {'user-agent': current_app.config['USER_AGENT']}
@@ -16,14 +18,19 @@ def lastfm_get_response(payload: dict):
     # Add API key and format to the payload
     payload['api_key'] = current_app.config['API_KEY']
     payload['format'] = 'json'
-    response = requests.get(url, headers=headers, params=payload)
+    try:
+        response = requests.get(url, headers=headers, params=payload)
+    except requests.exceptions.ConnectionError as e:
+        print(e)
+        return None
     return response
 
 
-async def lastfm_fetch_response(payload: dict, session):
+async def lastfm_fetch_response(payload: dict, session: aiohttp.ClientSession):
     """
     get a response from lastfm given some payload info (async)
     :param payload:
+    :param session: aiohttp.ClientSession
     :return:
     """
     # define headers and URL
