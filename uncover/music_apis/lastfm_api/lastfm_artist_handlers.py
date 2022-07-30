@@ -14,13 +14,16 @@ def lastfm_get_artist_mbid(artist: str):
         'method': 'artist.getInfo',
         'artist': artist
     })
+    if not response:
+        return None
     # in case of an error, return None
     if response.status_code != 200:
         print(f"couldn't find {artist} on last.fm")
         return None
     try:
         artist_mbid = response.json()['artist']['mbid']
-    except (KeyError, TypeError, json.decoder.JSONDecodeError):
+    except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
+        print(e)
         print(f"there is no mbid for {artist}")
         return None
     return artist_mbid
@@ -33,16 +36,18 @@ def lastfm_get_artist_correct_name(artist: str):
     :param artist: artist's name as is
     :return: corrected version of the artist's name
     """
-    print('getting artist correction')
     response = lastfm_get_response({
         'method': 'artist.getCorrection',
         'artist': artist
     })
+    if not response:
+        return None
     # in case of an error, return None
     if response.status_code != 200:
         return None
     try:
         correct_name = response.json()["corrections"]["correction"]["artist"]["name"]
-    except (KeyError, TypeError, json.decoder.JSONDecodeError):
+    except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
+        print(e)
         return None
     return correct_name

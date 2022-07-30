@@ -2,7 +2,7 @@ import discogs_client
 from flask import current_app
 
 
-def get_discogs_client():
+def get_discogs_client() -> discogs_client.Client:
     """
     get a discogs client object
     :return: discogs client

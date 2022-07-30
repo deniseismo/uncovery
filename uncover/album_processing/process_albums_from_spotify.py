@@ -42,7 +42,7 @@ def extract_albums_from_spotify_tracks(track_items: list[FullTrack], ordered=Fal
             image=track.album.images[0].url,
             rating=track.popularity,
             spotify_id=track.album.id,
-            release_date=parsed_release_date
+            year=parsed_release_date.year
         )
         album_info.remove_duplicate_names()
         # append a title to a set of titles
@@ -81,7 +81,7 @@ def process_spotify_artist_albums(albums: list[SimpleAlbum]) -> list[AlbumInfo]:
                 image=album_image,
                 names=[correct_title] + get_filtered_names_list(album_title),
                 rating=rating if rating else 0,
-                release_date=parsed_release_date,
+                year=parsed_release_date.year,
                 artist_names=[artist_name]
             )
             # remove duplicates

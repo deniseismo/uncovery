@@ -40,7 +40,7 @@ def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
         image_url = image.url
         print(f'{image_url=}')
         return image_url
-    except IndexError as e:
+    except (IndexError, AttributeError) as e:
         print(e)
         return None
 

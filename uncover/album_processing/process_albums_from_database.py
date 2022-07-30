@@ -1,16 +1,16 @@
 from flask import url_for
 
+from uncover.models import Album
 from uncover.schemas.album_schema import AlbumInfo
 from uncover.utilities.name_filtering import get_filtered_names_list
 
 
-def process_albums_from_db(album_entries: list) -> list[AlbumInfo]:
+def process_albums_from_db(album_entries: list[Album]) -> list[AlbumInfo]:
     """
     process album entries from database
     :param album_entries: a list of album entries from db
     :return: a list of album info dicts
     """
-    # url_for('static', filename='collage/' + collage_filename)
     SMALL_SIZE = "size200"
     MEDIUM_SIZE = "size300"
     processed_albums = []
@@ -32,7 +32,7 @@ def process_albums_from_db(album_entries: list) -> list[AlbumInfo]:
         if album_entry.artist.spotify_name:
             album_info.spotify_name = album_entry.artist.spotify_name
         if album_entry.release_date:
-            album_info.release_date = album_entry.release_date.strftime("%Y")
+            album_info.year = album_entry.release_date.year
         if album_entry.alternative_title:
             album_info.names += [album_entry.alternative_title]
             album_info.names += get_filtered_names_list(album_entry.alternative_title)

@@ -14,7 +14,7 @@ def mb_get_album_alternative_name(album_mbid: str) -> Optional[str]:
     :return: alternative name for an album
     """
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
-    url = "http://musicbrainz.org/ws/2/release-group/" + album_mbid
+    url = f"http://musicbrainz.org/ws/2/release-group/{album_mbid}"
     params = {"inc": "ratings", "fmt": "json"}
     response = requests.get(url=url, params=params, headers=headers)
     if response.status_code != 200:

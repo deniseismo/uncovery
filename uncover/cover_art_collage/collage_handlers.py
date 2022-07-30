@@ -146,7 +146,7 @@ def create_a_collage(cover_art_urls: list[str], filename_path: str):
 
 
 @cache.memoize(timeout=360)
-def save_collage(cover_art_urls: list[str]):
+def save_collage(cover_art_urls: list[str]) -> Optional[str]:
     """
     save collage created from given images (image urls)
     :param: a list of album filenames

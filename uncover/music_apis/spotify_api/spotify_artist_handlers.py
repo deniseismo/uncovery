@@ -74,7 +74,7 @@ def get_spotify_artist_info(artist_name: str, tekore_client: tk.Spotify = None) 
         spotify_tekore_client = get_spotify_tekore_client()
     else:
         spotify_tekore_client = tekore_client
-    artists_found = get_artist_id_search_results(
+    artists_found = get_spotify_artist_search_results(
         artist_name, spotify_tekore_client)
     if not artists_found:
         return None
@@ -84,7 +84,7 @@ def get_spotify_artist_info(artist_name: str, tekore_client: tk.Spotify = None) 
     return perfect_match
 
 
-def get_artist_id_search_results(artist_name: str, spotify_tekore_client: tk.Spotify) \
+def get_spotify_artist_search_results(artist_name: str, spotify_tekore_client: tk.Spotify) \
         -> Optional[FullArtistOffsetPaging]:
     """
     search for a particular artist on spotify
@@ -105,14 +105,12 @@ def get_artist_id_search_results(artist_name: str, spotify_tekore_client: tk.Spo
 
 
 def find_artist_best_match(artist_name: str, search_results: list[FullArtist]) -> Optional[FullArtist]:
-    """find the most appropriate (best) match amongst all the search results for an artist id to find
-
-    :param artist_name: artist's name
-    :param search_results: a list of all the search results
-    :return: perfect match if found
+    """find best match (for artist_name) among search results (artists founds on spotify)
+    :param artist_name: (str) artist's name
+    :param search_results: list[FullArtist] a list of all the search results with artists from spotify
+    :return: (FullArtist) perfect match if found
     """
-    print(
-        f"searching for Artist({artist_name}) among {len(search_results)} results")
+    print(f"searching for Artist({artist_name}) among {len(search_results)} results")
     print([result.name for result in search_results])
     first_result = search_results[0]
     print(f"first result: {first_result}")
