@@ -11,6 +11,7 @@ from flask import current_app
 from uncover import cache
 from uncover.schemas.characteristics import ImageOffset, ImageSize
 from uncover.utilities.convert_values import get_collage_dimensions
+from uncover.utilities.name_filtering import remove_leading_slash
 
 
 def arrange_the_images(
@@ -63,6 +64,7 @@ def _get_image_file_from_url(image_url: str) -> Optional[Image.Image]:
     :param image_url: (str) url to image (local/external)
     :return: Pillow Image file of an opened image
     """
+    image_url = remove_leading_slash(image_url)
     try:
         req = urllib.request.Request(url=image_url)
         req.add_header("User-Agent", current_app.config['USER_AGENT'])
