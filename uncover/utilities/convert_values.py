@@ -5,13 +5,14 @@ from typing import Optional
 from uncover.schemas.characteristics import TimeSpan, CollageDimensions
 
 
-def convert_a_list_of_dates_to_time_span(time_span: list) -> TimeSpan:
+def convert_a_list_of_dates_to_time_span(time_span: list[int, int]) -> TimeSpan:
     """
     convert [start_year, end_year] to datetime objects
     :param time_span: a list of start and end years picked by the user
     :return: a TimeSpan instance (start_date, end_date)
     """
     start_year, end_year = time_span
+    print(time_span, type(start_year), type(end_year))
     end_year += 1
     return TimeSpan(start_date=datetime.strptime(str(start_year), '%Y'),
                     end_date=datetime.strptime(str(end_year), '%Y'))
@@ -62,13 +63,12 @@ def parse_release_date(release_date: str, forced_parsing: bool = False) -> Optio
     :param forced_parsing: get an arbitrary date anyway (used for forced sorting by dates to avoid any exceptions)
     :return: datetime object (year)
     """
-    if not release_date:
-        return None
-    try:
-        release_date = datetime.strptime(release_date[:4], '%Y')
-    except (ValueError, TypeError) as e:
-        print(e)
-        if forced_parsing:
-            return datetime(1970, 1, 1)
-        return None
+    if not isinstance(release_date, datetime):
+        try:
+            release_date = datetime.strptime(release_date[:4], '%Y')
+        except (ValueError, TypeError) as e:
+            print(e)
+            if forced_parsing:
+                return datetime(1970, 1, 1)
+            return None
     return release_date

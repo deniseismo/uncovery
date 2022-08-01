@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Optional
+from typing import Optional, Union
 
 from tekore._model import FullTrack, PlaylistTrack, SimpleAlbum
 
@@ -10,7 +10,7 @@ from uncover.utilities.convert_values import parse_release_date
 from uncover.utilities.name_filtering import get_filtered_name, remove_punctuation, get_filtered_names_list
 
 
-def extract_albums_from_spotify_tracks(track_items: list[FullTrack], ordered=False) -> Optional[list[AlbumInfo]]:
+def extract_albums_from_spotify_tracks(track_items: list[Union[PlaylistTrack, FullTrack]], ordered=False) -> Optional[list[AlbumInfo]]:
     """
     :param track_items: a list of FullTrack items (a tekore Track object)
     :param ordered: ordered by the number of occurrences of an album in a playlist
@@ -90,7 +90,7 @@ def process_spotify_artist_albums(albums: list[SimpleAlbum]) -> list[AlbumInfo]:
     return processed_albums
 
 
-def extract_genres_from_spotify_tracks(track_items: list[FullTrack]) -> Counter:
+def extract_genres_from_spotify_tracks(track_items: list[Union[FullTrack, PlaylistTrack]]) -> Counter:
     """
     get a Counter of music genres (a sorted dict of music genre counts in a playlist)
     :param track_items: a list of FullTrack items (a tekore Track object)

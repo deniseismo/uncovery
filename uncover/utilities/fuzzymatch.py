@@ -1,7 +1,7 @@
 from fuzzywuzzy import fuzz
 
 
-def fuzzy_match_artist(artist_1: str, artist_2: str, strict=False) -> bool:
+def fuzzy_match_artist(artist_1: str, artist_2: str, strict: bool = False) -> bool:
     """
     decide whether two artists names is the same artist name, e.g. The Notorious B.I.G. = Notorious BIG
     :param artist_1: (str) artist's name
