@@ -9,7 +9,7 @@ from uncover.album_processing.album_processing_helpers import make_album_covers_
 from uncover.models import User
 from uncover.music_apis.spotify_api.spotify_album_handlers import get_spotify_album_info
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
-from uncover.music_apis.spotify_api.spotify_user_handlers import get_spotify_auth, check_spotify, get_spotify_user_info, \
+from uncover.music_apis.spotify_api.spotify_user_handlers import get_spotify_auth, authenticate_spotify_user, get_spotify_user_info, \
     spotify_get_users_albums
 from uncover.utilities.failure_handlers import pick_failure_art_image
 
@@ -91,7 +91,7 @@ def spotify_fetch_album_id():
     content = request.get_json()
     if not content:
         return None
-    user, token = check_spotify()
+    user, token = authenticate_spotify_user()
 
     if user and token:
         user_info = get_spotify_user_info(token)
@@ -128,7 +128,7 @@ def get_albums_by_spotify():
     gets album cover art images based on Spotify's playlist
     :return: jsonified dictionary {album_name: cover_art}
     """
-    user, token = check_spotify()
+    user, token = authenticate_spotify_user()
     if not user or not token:
         failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(

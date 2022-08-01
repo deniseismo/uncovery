@@ -11,7 +11,7 @@ from uncover.album_processing.process_albums_from_database import process_albums
 from uncover.cover_art_finder.cover_art_handlers import fetch_and_assign_images
 from uncover.models import Album, Artist
 from uncover.music_apis.musicbrainz_api.mb_artist_handlers import mb_fetch_artists_albums
-from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_artists_albums_images
+from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_artists_albums
 from uncover.schemas.album_schema import AlbumInfo
 from uncover.utilities.logging_handlers import log_artist_missing_from_db
 
@@ -112,7 +112,7 @@ def fetch_artists_top_albums_images(artist_name: str, sorting: str) -> Optional[
     if not albums:
         try:
             print('trying spotifyjke')
-            albums = spotify_get_artists_albums_images(artist_name, sorting)
+            albums = spotify_get_artists_albums(artist_name, sorting)
             print(f'albums with spotify: {albums}')
             if albums:
                 log_artist_missing_from_db(artist_name=artist_name)

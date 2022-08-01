@@ -17,13 +17,9 @@ from uncover.schemas.spotify_user_info import SpotifyUserAuth, SpotifyUserProfil
 def get_spotify_auth() -> tk.UserAuth:
     """
     get a tekore spotify User auth object
-    :return: redirect url
+    :return: (tk.UserAuth)
     """
-    conf = (
-        current_app.config['SPOTIFY_CLIENT_ID'],
-        current_app.config['SPOTIFY_CLIENT_SECRET'],
-        current_app.config['SPOTIFY_REDIRECT_URI']
-    )
+    conf = _get_app_spotify_credentials()
     cred = tk.Credentials(*conf)
     # scopes allow client to read user's name, id, avatar & user's top artists/tracks
     scope = tk.Scope(tk.scope.user_top_read, tk.scope.user_read_private)
@@ -31,11 +27,10 @@ def get_spotify_auth() -> tk.UserAuth:
     return auth
 
 
-def check_spotify() -> Optional[SpotifyUserAuth]:
+def authenticate_spotify_user() -> Optional[SpotifyUserAuth]:
     """
-    checks if the person's logged in and the token's not expired
-    refreshes token if present
-    :return: (user, token)
+    checks/authenticates spotify user; refreshes token if present
+    :return: (SpotifyUserAuth) with spotify user id and access token
     """
     user = session.get('user', None)
     token = session.get('token', None)
@@ -51,11 +46,7 @@ def check_spotify() -> Optional[SpotifyUserAuth]:
     if token.is_expiring:
         # get new access token
         print('token is expiring')
-        conf = (
-            current_app.config['SPOTIFY_CLIENT_ID'],
-            current_app.config['SPOTIFY_CLIENT_SECRET'],
-            current_app.config['SPOTIFY_REDIRECT_URI']
-        )
+        conf = _get_app_spotify_credentials()
         print(user)
         cred = tk.Credentials(*conf)
         user_entry = User.query.filter_by(spotify_id=user).first()
@@ -76,26 +67,24 @@ def get_spotify_user_info(token) -> Optional[SpotifyUserProfile]:
     """
     get information about the current spotify user
     :param token: a Spotify access token
-    :return: user info {username, user_image}
+    :return: (SpotifyUserProfile) with spotify user info (username, avatar, country)
     """
-    print('getting user info...')
-    print(token)
     spotify_tekore_client = get_spotify_tekore_client()
+    if not spotify_tekore_client:
+        return None
     try:
         with spotify_tekore_client.token_as(token):
-            print('getting here')
             current_user = spotify_tekore_client.current_user()
+
             username = current_user.display_name
-            current_user_image_list = current_user.images
             country = current_user.country
+            user_image = None
+            current_user_image_list = current_user.images
             if current_user_image_list:
                 try:
                     user_image = current_user.images[0].url
-                except (IndexError, TypeError):
-                    user_image = None
-            else:
-                user_image = None
-
+                except (IndexError, TypeError) as e:
+                    print(e)
     except tk.HTTPError:
         return None
     return SpotifyUserProfile(username=username, user_image=user_image, country=country)
@@ -106,16 +95,21 @@ def spotify_get_users_albums(token) -> Optional[list[AlbumInfo]]:
     """
     get current spotify user top albums
     :param token: an access token
-    :return: a dict {album_title: album_image_url}
+    :return: ([list[AlbumInfo]) of spotify user top albums (in reality, albums from top tracks)
     """
     time_periods = ['short_term', 'medium_term', 'long_term']
     if not token:
         return None
     spotify_tekore_client = get_spotify_tekore_client()
+    if not spotify_tekore_client:
+        return None
     try:
         with spotify_tekore_client.token_as(token):
             # get user's top 50 tracks
-            top_tracks = spotify_tekore_client.current_user_top_tracks(limit=50, time_range=random.choice(time_periods))
+            top_tracks = spotify_tekore_client.current_user_top_tracks(
+                limit=50,
+                time_range=random.choice(time_periods)
+            )
     except tk.HTTPError:
         return None
 
@@ -128,3 +122,15 @@ def spotify_get_users_albums(token) -> Optional[list[AlbumInfo]]:
     albums = albums[:9]
     enumerate_artist_albums(albums)
     return albums
+
+
+def _get_app_spotify_credentials() -> tuple[str, str, str]:
+    """
+    get spotify client credentials [client id, client secret, redirect uri]
+    :return: (tuple[str, str, str]) spotify credentials [client id, client secret, redirect uri]
+    """
+    return (
+        current_app.config['SPOTIFY_CLIENT_ID'],
+        current_app.config['SPOTIFY_CLIENT_SECRET'],
+        current_app.config['SPOTIFY_REDIRECT_URI']
+    )

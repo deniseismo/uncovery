@@ -1,7 +1,7 @@
 from flask import render_template, request, Blueprint, url_for, jsonify
 
 from uncover.cover_art_collage.collage_handlers import save_collage
-from uncover.music_apis.spotify_api.spotify_user_handlers import check_spotify, get_spotify_user_info
+from uncover.music_apis.spotify_api.spotify_user_handlers import authenticate_spotify_user, get_spotify_user_info
 
 main = Blueprint('main', __name__)
 
@@ -14,7 +14,7 @@ def home():
     """
     logged_in = False
     user_info = None
-    user, token = check_spotify()
+    user, token = authenticate_spotify_user()
     if user and token:
         logged_in = True
         user_info = get_spotify_user_info(token.access_token)
