@@ -45,12 +45,12 @@ def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
         return None
 
 
-def spotify_get_artists_albums_images(artist: str, sorting: str = "popular") -> Optional[list[AlbumInfo]]:
+def spotify_get_artists_albums(artist: str, sorting: str = "popular") -> Optional[list[AlbumInfo]]:
     """
     a backup function that gets all the info from Spotify
     (in case MusicBrainz has nothing about a particular artist)
-    :param sorting: sorted by shuffle, popular, earliest, latest
-    :param artist: artist's name
+    :param artist: (str) artist's name
+    :param sorting: (str) sorted by shuffle, popular, earliest, latest
     :return: artist's albums (list[AlbumInfo]) found on spotify
     """
     spotify_tekore_client = get_spotify_tekore_client()
@@ -60,7 +60,6 @@ def spotify_get_artists_albums_images(artist: str, sorting: str = "popular") -> 
     artist_spotify_entry = get_spotify_artist_info(artist)
     if not artist_spotify_entry:
         return None
-    # artist_id=artist_spotify_entry.id, album_type="album", country="SE", limit=50
     albums = spotify_tekore_client.artist_albums(artist_id=artist_spotify_entry.id, market="GE", limit=50)
     if not albums:
         return None
@@ -78,14 +77,15 @@ def get_spotify_album_info(
         album_name: str,
         artist_name: str,
         spotify_artist_name: str = None,
-        tekore_client=None,
+        tekore_client: tk.Spotify = None,
         token_based: bool = False,
         country: str = None,
         token=None) -> Optional[SimpleAlbum]:
     """
+    find album on spotify
     :param album_name: album's title
     :param artist_name: artist's name
-    :param spotify_artist_name: artist's name as it's
+    :param spotify_artist_name: artist's name on spotify
     :param tekore_client: spotify tekore client
     :param token_based: (bool) if True, get album only if user's access token specified (and on user's market (country))
     :param country: two-letter country code, spotify's market to search for an item on
@@ -168,14 +168,10 @@ def find_album_best_match(
             # append a match to matches list
             matches.append(AlbumMatch(album, ratio))
     # if there are matches
-    if matches:
-        try:
-            # pick track with the highest ratio
-            return sorted(matches, key=lambda x: x.ratio, reverse=True)[0].album
-        except IndexError as e:
-            print(e)
-            return None
-    return None
+    if not matches:
+        return None
+    best_album_match = _pick_closest_album_match(matches)
+    return best_album_match
 
 
 def get_album_search_results(
@@ -257,3 +253,16 @@ def _configure_search_params_for_spotify_album_searching(
         market=market,
         limit=limit
     )
+
+
+def _pick_closest_album_match(album_matches: list[AlbumMatch]) -> Optional[SimpleAlbum]:
+    """
+    pick album with the highest ratio (closeness) among album matches
+    :param album_matches: (list[AlbumMatch]) list of AlbumMatches (SimpleAlbum, ratio)
+    :return: (SimpleAlbum) hopefully perfect match (album we were looking for on spotify)
+    """
+    try:
+        return sorted(album_matches, key=lambda album_match: album_match.ratio, reverse=True)[0].album
+    except (IndexError, TypeError) as e:
+        print(e)
+        return None

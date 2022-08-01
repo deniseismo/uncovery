@@ -7,6 +7,7 @@ from tekore._model import FullArtist, FullArtistOffsetPaging
 
 from uncover import cache
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
+from uncover.schemas.characteristics import ArtistMatch
 
 
 @cache.memoize(timeout=3600)
@@ -58,14 +59,11 @@ def spotify_get_artists_genres(artist_spotify_entry: FullArtist) -> list[str]:
 
 
 def get_spotify_artist_info(artist_name: str, tekore_client: tk.Spotify = None) -> Optional[FullArtist]:
-    """get spotify ID for an artist (via tekore library)
-
-    Args:
-        artist_name (str): artist's name
-        tekore_client (optional): an instance of a Spotify client. Defaults to None.
-
-    Returns:
-        (tekore.FullArtist): tekore.FullArtist (Artist info object)
+    """
+    get spotify artist information (find artist on spotify)
+    :param artist_name: artist's name
+    :param tekore_client: spotify tekore client
+    :return: (FullArtist) artist information
     """
     if not artist_name:
         return None
@@ -74,12 +72,16 @@ def get_spotify_artist_info(artist_name: str, tekore_client: tk.Spotify = None) 
         spotify_tekore_client = get_spotify_tekore_client()
     else:
         spotify_tekore_client = tekore_client
+    if not spotify_tekore_client:
+        return None
     artists_found = get_spotify_artist_search_results(
         artist_name, spotify_tekore_client)
     if not artists_found:
+        print(f"can't find {artist_name} on Spotify")
         return None
     perfect_match = find_artist_best_match(artist_name, artists_found.items)
     if not perfect_match:
+        print(f"can't find {artist_name} on Spotify")
         return None
     return perfect_match
 
@@ -87,10 +89,10 @@ def get_spotify_artist_info(artist_name: str, tekore_client: tk.Spotify = None) 
 def get_spotify_artist_search_results(artist_name: str, spotify_tekore_client: tk.Spotify) \
         -> Optional[FullArtistOffsetPaging]:
     """
-    search for a particular artist on spotify
+    get all search results for a particular artist on spotify
     :param artist_name: artist's name
     :param spotify_tekore_client: an instance of a Spotify client. Defaults to None.
-    :return: artists found (max=50)
+    :return: (FullArtistOffsetPaging) artists found (max=50)
     """
     artists_found, = spotify_tekore_client.search(
         query=artist_name, types=('artist',), market="GE", limit=50)
@@ -130,12 +132,21 @@ def find_artist_best_match(artist_name: str, search_results: list[FullArtist]) -
             print(f"pretty close: {artist.name} vs. {artist_name}")
             return artist
         if ratio > 90:
-            matches.append((artist, ratio))
+            matches.append(ArtistMatch(artist, ratio))
     if matches:
-        try:
-            # pick with the highest ratio
-            return sorted(matches, key=lambda x: x[1], reverse=True)[0][0]
-        except IndexError as e:
-            print(e)
-            return None
+        best_artist_match = _pick_closest_artist_match(matches)
+        return best_artist_match
     return first_result
+
+
+def _pick_closest_artist_match(artist_matches: list[ArtistMatch]) -> Optional[FullArtist]:
+    """
+    pick artist with the highest ratio (closeness) among artist matches
+    :param artist_matches: (list[ArtistMatch]) list of ArtistMatches (FullArtist, ratio)
+    :return: (FullArtist) hopefully perfect match (artist we were looking for on spotify)
+    """
+    try:
+        return sorted(artist_matches, key=lambda artist_match: artist_match.ratio, reverse=True)[0].artist
+    except (IndexError, TypeError) as e:
+        print(e)
+        return None
