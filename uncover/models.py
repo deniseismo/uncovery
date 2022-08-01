@@ -46,6 +46,14 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag_name = db.Column(db.String(), nullable=False, index=True, unique=True)
 
+    def __eq__(self, other):
+        if isinstance(other, Tag):
+            return self.tag_name == other.tag_name
+        elif isinstance(other, str):
+            return self.tag_name == other
+        else:
+            return NotImplemented
+
     def __repr__(self):
         return f"Genre('{self.tag_name}')"
 
