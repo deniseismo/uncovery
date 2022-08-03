@@ -4,13 +4,17 @@ import tekore as tk
 from flask import Blueprint, session, url_for, request, make_response, jsonify
 from werkzeug.utils import redirect
 
-from uncover import db
 from uncover.album_processing.album_processing_helpers import make_album_covers_response
 from uncover.models import User
 from uncover.music_apis.spotify_api.spotify_album_handlers import get_spotify_album_info
 from uncover.music_apis.spotify_api.spotify_client_api import get_spotify_tekore_client
-from uncover.music_apis.spotify_api.spotify_user_handlers import get_spotify_auth, authenticate_spotify_user, get_spotify_user_info, \
+from uncover.music_apis.spotify_api.spotify_user_handlers import (
+    get_spotify_auth,
+    authenticate_spotify_user,
+    get_spotify_user_info,
     spotify_get_users_albums
+)
+from uncover.client.database_manipulation.db_user_handlers import add_new_spotify_user_to_database
 from uncover.utilities.failure_handlers import pick_failure_art_image
 
 spotify = Blueprint('spotify', __name__)
@@ -42,9 +46,7 @@ def spotify_logout():
 def spotify_callback():
     """
     a function that gets triggered after the user successfully granted the permission
-    :return:
     """
-    print('spotify callback worked!')
     error = request.args.get('error', None)
     code = request.args.get('code', None)
     state = request.args.get('state', None)
@@ -64,21 +66,18 @@ def spotify_callback():
     # put serialized token in a session
     session['token'] = pickle.dumps(token)
     spotify_tekore_client = get_spotify_tekore_client()
+    if not spotify_tekore_client:
+        return None
     try:
         with spotify_tekore_client.token_as(token):
             current_user = spotify_tekore_client.current_user()
-            user_id = current_user.id
+            spotify_user_id = current_user.id
             # put user's id in a session
-            session['user'] = user_id
-            user_entry = User.query.filter_by(spotify_id=user_id).first()
+            session['user'] = spotify_user_id
+            user_entry = User.query.filter_by(spotify_id=spotify_user_id).first()
             if not user_entry:
-                print(f'new user! id: {user_id}')
-                # if the user is not yet registered in db
-                # save user to the db with the refresh token
-                refresh_token = token.refresh_token
-                user_entry = User(spotify_id=user_id, spotify_token=refresh_token)
-                db.session.add(user_entry)
-                db.session.commit()
+                print(f'New Spotify User({spotify_user_id})!')
+                add_new_spotify_user_to_database(spotify_user_id, token.refresh_token)
 
     except tk.HTTPError:
         print('http error')
@@ -88,6 +87,10 @@ def spotify_callback():
 
 @spotify.route('/fetch_album_id', methods=['POST'])
 def spotify_fetch_album_id():
+    """
+    get album's id on Spotify (with regard to user's market (country) on Spotify)
+    :return: jsonified dict {"album_id": "album's id on spotify"}
+    """
     content = request.get_json()
     if not content:
         return None
@@ -125,8 +128,8 @@ def spotify_fetch_album_id():
 @spotify.route("/by_spotify", methods=["POST"])
 def get_albums_by_spotify():
     """
-    gets album cover art images based on Spotify's playlist
-    :return: jsonified dictionary {album_name: cover_art}
+    gets album cover art images based on Spotify user's favorite/most played tracks
+    :return: jsonified AlbumCoversResponse with all the information about albums & their cover art images
     """
     user, token = authenticate_spotify_user()
     if not user or not token:
