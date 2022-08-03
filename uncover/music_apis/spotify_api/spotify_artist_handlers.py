@@ -24,6 +24,8 @@ def get_artist_spotify_name_by_name(artist_name: str) -> Optional[str]:
 
     app_token = tk.request_client_token(client_id, client_secret)
     spotify_tekore_client = get_spotify_tekore_client()
+    if not spotify_tekore_client:
+        return None
     try:
         with spotify_tekore_client.token_as(app_token):
             artists_found, = spotify_tekore_client.search(

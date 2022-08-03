@@ -26,6 +26,8 @@ def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
     if not artist_name:
         return None
     spotify_tekore_client = get_spotify_tekore_client()
+    if not spotify_tekore_client:
+        return None
     album_info = get_spotify_album_info(
         album_name=album_name,
         artist_name=artist_name,
@@ -54,6 +56,8 @@ def spotify_get_artists_albums(artist: str, sorting: str = "popular") -> Optiona
     :return: artist's albums (list[AlbumInfo]) found on spotify
     """
     spotify_tekore_client = get_spotify_tekore_client()
+    if not spotify_tekore_client:
+        return None
     artist_correct_name = lastfm_get_artist_correct_name(artist)
     if artist_correct_name:
         artist = artist_correct_name
@@ -100,6 +104,8 @@ def get_spotify_album_info(
         return None
     if not tekore_client:
         tekore_client = get_spotify_tekore_client()
+    if not tekore_client:
+        return None
     if token:
         print("access token provided")
         try:
