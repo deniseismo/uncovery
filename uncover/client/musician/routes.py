@@ -1,10 +1,8 @@
-from dataclasses import asdict
-
 from flask import request, url_for, Blueprint, make_response, jsonify
 
 from uncover import cache
 from uncover.album_processing.album_processing_helpers import make_album_covers_response
-from uncover.client.musician.musician_handlers import fetch_artists_top_albums_images, sql_select_artist_albums
+from uncover.client.musician.musician_handlers import fetch_artists_top_albums_images, get_artist_albums_from_database
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
 from uncover.utilities.failure_handlers import pick_failure_art_image
 
@@ -14,8 +12,8 @@ musician = Blueprint('musician', __name__)
 @musician.route("/by_artist", methods=["POST"])
 def get_albums_by_artist():
     """
-    gets artist's top albums
-    :return: jsonified dictionary {album_name: cover_art}
+    gets artist's top albums (or sorted as per user's request)
+    :return: jsonified dictionary {"album_name": cover_art}
     """
     # input's value from the form
     content = request.get_json()
@@ -49,13 +47,13 @@ def get_albums_by_artist():
     artist = artist.strip()
     # get albums images
     if sorting == "shuffle":
-        cache.delete_memoized(sql_select_artist_albums, artist_name=artist, sorting='shuffle')
+        cache.delete_memoized(get_artist_albums_from_database, artist_name=artist, sorting='shuffle')
 
     correct_name = lastfm_get_artist_correct_name(artist)
     if correct_name:
         # corrects the name if there is need
         artist = correct_name
-    artist_albums = sql_select_artist_albums(artist, sorting)
+    artist_albums = get_artist_albums_from_database(artist, sorting)
     if not artist_albums:
         print('this worked!')
         artist_albums = fetch_artists_top_albums_images(artist, sorting)

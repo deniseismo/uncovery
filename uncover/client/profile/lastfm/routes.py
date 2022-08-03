@@ -8,13 +8,11 @@ lastfm_profile = Blueprint('lastfm_profile', __name__)
 
 
 @lastfm_profile.route("/by_lastfm_username", methods=["POST"])
-def get_albums_by_username():
+def get_albums_by_lastfm_username():
     """
     gets user's top albums based on their last.fm stats
     :return: jsonified dictionary {album_name: cover_art}
     """
-    # TODO: validator on input (e.g. not having spaces in the username)
-    # input's values from the form
     content = request.get_json()
     username = content['qualifier']
     time_period = content['option']
@@ -59,10 +57,10 @@ def get_albums_by_username():
 
 
 @lastfm_profile.route("/get_user_avatar", methods=["POST"])
-def get_avatar_image():
+def get_lastfm_user_avatar():
     """
-    gets user's avatar image
-    :return: a jsonified dict with user avatar image url in it
+    gets user's avatar on last.fm
+    :return: a jsonified dict {"avatar": user_avatar} with the lastfm avatar
     """
     try:
         content = request.get_json()

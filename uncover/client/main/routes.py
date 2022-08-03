@@ -24,15 +24,15 @@ def home():
 @main.route("/save_collage", methods=["POST"])
 def get_collage():
     """
-    gets album pictures list to create a collage from
+    create collage from cover art images → get collage url
     :return: a URL to the saved collage
     """
     content = request.get_json()
-    album_pictures = content['images'][:9]
-    print(album_pictures)
-    collage_filename = save_collage(album_pictures)
-    image_file = url_for('static', filename='collage/' + collage_filename)
-    return jsonify(image_file)
+    cover_art_urls = content['images'][:9]
+    print(cover_art_urls)
+    collage_filename = save_collage(cover_art_urls)
+    collage_url = url_for('static', filename='collage/' + collage_filename)
+    return jsonify(collage_url)
 
 
 @main.route('/static/')

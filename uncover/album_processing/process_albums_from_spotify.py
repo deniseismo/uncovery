@@ -90,13 +90,15 @@ def process_spotify_artist_albums(albums: list[SimpleAlbum]) -> list[AlbumInfo]:
     return processed_albums
 
 
-def extract_genres_from_spotify_tracks(track_items: list[Union[FullTrack, PlaylistTrack]]) -> Counter:
+def extract_genres_from_spotify_tracks(track_items: list[Union[FullTrack, PlaylistTrack]]) -> Optional[Counter]:
     """
     get a Counter of music genres (a sorted dict of music genre counts in a playlist)
     :param track_items: a list of FullTrack items (a tekore Track object)
     :return: a Counter of music genres (a sorted dict of music genre counts in a playlist)
     """
     spotify_tekore_client = get_spotify_tekore_client()
+    if not spotify_tekore_client:
+        return None
     genres_counter = Counter()
     for track in track_items:
         if isinstance(track, PlaylistTrack):

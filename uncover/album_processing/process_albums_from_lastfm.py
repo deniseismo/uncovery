@@ -1,6 +1,6 @@
 from flask import url_for
 
-from uncover.client.musician.musician_handlers import sql_find_specific_album
+from uncover.client.database_manipulation.db_album_handlers import db_find_album_by_name
 from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
 from uncover.schemas.album_schema import AlbumInfo
@@ -23,20 +23,23 @@ def process_lastfm_user_top_albums(albums: list[dict], image_size: int = 3) -> l
         if album_filtered_name in a_set_of_titles:
             continue
         resizable = True
+        album_image = None
         artist_name = album['artist']['name']
         artist_correct_name = lastfm_get_artist_correct_name(artist_name)
         if artist_correct_name:
             artist_name = artist_correct_name
         # try getting the album image through database
-        album_image = sql_find_specific_album(artist_name, album_name)
-        if not album_image and album_filtered_name != album_name:
+        album_entry_from_db = db_find_album_by_name(artist_name, album_name)
+        if not album_entry_from_db and album_filtered_name != album_name:
             # second attempt in case the album name was poorly written
-            album_image = sql_find_specific_album(artist_name, album_filtered_name)
+            album_entry_from_db = db_find_album_by_name(artist_name, album_filtered_name)
+        if album_entry_from_db:
+            album_image = album_entry_from_db.cover_art
         # try getting through the ultimate image finder function if database doesn't have the image
         if not album_image:
             resizable = False
             album_image = ultimate_album_image_finder(album_title=album_name,
-                                                      artist=artist_name,
+                                                      artist_name=artist_name,
                                                       fast=True,
                                                       ultrafast=True)
         if not album_image:
