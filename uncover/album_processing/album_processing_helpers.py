@@ -1,6 +1,6 @@
 import random
 from operator import attrgetter
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 from uncover.schemas.album_schema import AlbumInfo
 from uncover.schemas.response import AlbumCoversResponse, ResponseInfo
@@ -68,3 +68,13 @@ def make_album_covers_response(albums: list[AlbumInfo], info_type: str, info_que
         albums=albums
     )
     return album_covers_response
+
+
+def filter_out_albums_without_album_covers(albums: list[AlbumInfo]) -> list[Optional[AlbumInfo]]:
+    """
+    keep only albums that have album covers
+    :param albums: a list of album dicts
+    :return: a list of album dicts with album covers, discard albums without album covers
+    """
+    albums_with_albums_covers = [album for album in albums if album.image]
+    return albums_with_albums_covers
