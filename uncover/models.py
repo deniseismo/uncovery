@@ -39,7 +39,7 @@ class Album(db.Model):
                                   backref=db.backref('albums', lazy='dynamic'))
 
     def __repr__(self):
-        return f"Album('{self.title}', '{self.cover_art}')"
+        return f"Album('{self.title}) by Artist({self.artist.name})"
 
 
 class Tag(db.Model):

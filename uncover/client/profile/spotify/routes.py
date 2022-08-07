@@ -91,35 +91,33 @@ def spotify_fetch_album_id():
     get album's id on Spotify (with regard to user's market (country) on Spotify)
     :return: jsonified dict {"album_id": "album's id on spotify"}
     """
-    content = request.get_json()
-    if not content:
-        return None
     user, token = authenticate_spotify_user()
-
-    if user and token:
-        user_info = get_spotify_user_info(token)
-        country = user_info.country
-        album_name = content['album_name']
-        artist_name = content['artist_name']
-        spotify_artist_name = content['spotify_artist_name']
-        album_info = get_spotify_album_info(
-            album_name=album_name,
-            artist_name=artist_name,
-            spotify_artist_name=spotify_artist_name,
-            token_based=True,
-            country=country,
-            token=token
-        )
-        if not album_info:
-            return make_response(jsonify(
-                {'message': f"album id could not be found"}
-            ),
-                404)
-    else:
+    if not (user and token):
         return make_response(jsonify(
             {'message': f"no token or user provided"}
         ),
             403)
+    content = request.get_json()
+    if not content:
+        return None
+    user_info = get_spotify_user_info(token)
+    country = user_info.country
+    album_name = content['album_name']
+    artist_name = content['artist_name']
+    spotify_artist_name = content['spotify_artist_name']
+    album_info = get_spotify_album_info(
+        album_name=album_name,
+        artist_name=artist_name,
+        spotify_artist_name=spotify_artist_name,
+        token_based=True,
+        country=country,
+        token=token
+    )
+    if not album_info:
+        return make_response(jsonify(
+            {'message': f"album id could not be found"}
+        ),
+            404)
     return jsonify({
         "album_id": album_info.id
     })

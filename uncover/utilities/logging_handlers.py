@@ -4,31 +4,33 @@ import os
 from flask import current_app
 
 
-def log_artist_missing_from_db(artist_name: str):
+def log_artist_missing_from_db(artist_name: str) -> bool:
     """
-    logs artist's name to the csv file of all the artists not yet found in db
-    :param artist_name: artist's name
+    log missing artists from db to the log csv file
+    :param artist_name: (str) artist's name
     """
+    MISSING_ARTISTS_FILENAME = "artists_missing_from_db.csv"
+    MISSING_ARTISTS_PATH = os.path.join(current_app.root_path, "logging", MISSING_ARTISTS_FILENAME)
     try:
-        with open('uncover/logging/artists_missing_from_db.csv', 'r', newline='', encoding='utf-8') as file:
+        with open(MISSING_ARTISTS_PATH, 'r', newline='', encoding='utf-8') as file:
             contents = file.read()
-    except (IOError, OSError):
+    except (IOError, OSError) as e:
+        print(e)
         return False
     if artist_name in contents:
-        print(f"{artist_name}'s already there")
         # no need to add the artist
+        print(f"missing Artist({artist_name}) has already been added to the missing artists list")
         return False
-    with open('uncover/logging/artists_missing_from_db.csv', 'a', newline='', encoding='utf-8') as file:
+    with open(MISSING_ARTISTS_FILENAME, 'a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow([artist_name])
         return True
 
 
-def log_arbitrary_data(data_to_log: str, filename: str):
+def log_arbitrary_data(data_to_log: str, filename: str) -> bool:
     """
     :param data_to_log: any data you want to log in
     :param filename: filename to save data into
-    :return:
     """
     filepath = os.path.join(current_app.root_path, 'dev/logs', filename)
     try:
@@ -37,4 +39,4 @@ def log_arbitrary_data(data_to_log: str, filename: str):
             writer.writerow([data_to_log])
     except IOError as e:
         print('file not found', e)
-        return None
+        return False

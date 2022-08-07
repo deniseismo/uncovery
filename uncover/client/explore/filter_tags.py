@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Optional
 
 from flask import current_app
 
@@ -7,7 +8,7 @@ from uncover import cache
 
 
 @cache.memoize(timeout=60000)
-def load_all_music_genres():
+def _load_all_music_genres():
     """
     load a list of music genres from disk
     :return:
@@ -25,14 +26,14 @@ def load_all_music_genres():
     return music_genres_list
 
 
-def get_suggested_tags(query_tag: str):
+def get_suggested_tags(query_tag: str) -> Optional[list[str]]:
     """
     get a list of suggested music genres based on user's input
     :param query_tag: a music tag (genre) to search for
     :return: a list of suggested music genres (genres that the user might have in mind)
     """
     print(f"searching for {query_tag}")
-    all_music_genres = load_all_music_genres()
+    all_music_genres = _load_all_music_genres()
     filtered_tags_list = []
     # check if the input's not empty
     if not query_tag:

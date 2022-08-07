@@ -29,7 +29,6 @@ def get_collage():
     """
     content = request.get_json()
     cover_art_urls = content['images'][:9]
-    print(cover_art_urls)
     collage_filename = save_collage(cover_art_urls)
     collage_url = url_for('static', filename='collage/' + collage_filename)
     return jsonify(collage_url)

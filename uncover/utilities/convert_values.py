@@ -14,8 +14,10 @@ def convert_a_list_of_dates_to_time_span(time_span: list[int, int]) -> TimeSpan:
     start_year, end_year = time_span
     print(time_span, type(start_year), type(end_year))
     end_year += 1
-    return TimeSpan(start_date=datetime.strptime(str(start_year), '%Y'),
-                    end_date=datetime.strptime(str(end_year), '%Y'))
+    return TimeSpan(
+        start_date=datetime.strptime(str(start_year), '%Y'),
+        end_date=datetime.strptime(str(end_year), '%Y')
+    )
 
 
 def _get_multipliers(number: int) -> tuple[int, int]:
@@ -49,7 +51,7 @@ def get_collage_dimensions(number_of_images: int) -> CollageDimensions:
     }
     try:
         return DIMENSIONS[number_of_images]
-    except KeyError as e:
+    except KeyError:
         print(f"{number_of_images} is not a default number of images, proceeding to further calculations")
     multipliers = _get_multipliers(number_of_images)
     dimensions = sorted(map(lambda x: DEFAULT_IMAGE_SIZE * x, multipliers), reverse=True)

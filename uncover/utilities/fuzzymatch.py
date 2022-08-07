@@ -14,6 +14,4 @@ def fuzzy_match_artist(artist_1: str, artist_2: str, strict: bool = False) -> bo
         return ratio > 92
     partial_ratio = fuzz.partial_ratio(artist_1, artist_2)
     set_ratio = fuzz.token_set_ratio(artist_1, artist_2)
-    return (ratio > 92
-            or partial_ratio > 90
-            or set_ratio > 95)
+    return ratio > 92 or partial_ratio > 90 or set_ratio > 95

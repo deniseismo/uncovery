@@ -37,21 +37,17 @@ def authenticate_spotify_user() -> Optional[SpotifyUserAuth]:
     if token:
         token = pickle.loads(session.get('token', None))
 
-    if user is None or token is None:
-        print('something is None')
+    if not (user and token):
         session.pop('user', None)
         session.pop('token', None)
         return SpotifyUserAuth(None, None)
 
     if token.is_expiring:
         # get new access token
-        print('token is expiring')
         conf = _get_app_spotify_credentials()
-        print(user)
         cred = tk.Credentials(*conf)
         user_entry = User.query.filter_by(spotify_id=user).first()
         if user_entry:
-            print(f'user found: {user}')
             # get user's refresh token from db
             refresh_token = user_entry.spotify_token
             if refresh_token:

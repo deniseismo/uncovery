@@ -121,10 +121,6 @@ async def mb_fetch_artists_albums(artist: str, sorting: str = "popular", limit: 
     :param artist: artist's name
     :return:
     """
-    if not artist or not sorting:
-        return None
-    if sorting not in ["popular", "latest", "earliest", "shuffle"]:
-        return None
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
 
     artist_mbid = mb_get_artist_mbid(artist)

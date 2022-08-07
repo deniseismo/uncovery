@@ -40,11 +40,6 @@ def fetch_artists_top_albums_images(artist_name: str, sorting: str) -> Optional[
     :param artist_name: artist's name
     :return: a dict of all the album images found
     """
-    if not artist_name or not sorting:
-        return None
-    if sorting not in ["popular", "latest", "earliest", "shuffle"]:
-        return None
-
     # get artist's albums via musicbrainz (without images)
     albums = asyncio.run(mb_fetch_artists_albums(artist_name, sorting))
 
