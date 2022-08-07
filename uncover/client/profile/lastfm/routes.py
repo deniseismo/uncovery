@@ -3,6 +3,8 @@ from flask import Blueprint, request, make_response, jsonify, url_for
 from uncover.album_processing.album_processing_helpers import make_album_covers_response
 from uncover.music_apis.lastfm_api.lastfm_user_handlers import lastfm_get_users_top_albums, lastfm_get_user_avatar
 from uncover.utilities.failure_handlers import pick_failure_art_image
+from uncover.utilities.validation.exceptions.validation_exceptions import LastFMUserInputError
+from uncover.utilities.validation.user_input_validation import validate_lastfm_user_input
 
 lastfm_profile = Blueprint('lastfm_profile', __name__)
 
@@ -13,24 +15,15 @@ def get_albums_by_lastfm_username():
     gets user's top albums based on their last.fm stats
     :return: jsonified dictionary {album_name: cover_art}
     """
-    content = request.get_json()
-    username = content['qualifier']
-    time_period = content['option']
-    if not username:
-        # if the input's empty, send an error message and a 'failure' image
+    user_input = request.get_json()
+    try:
+        valid_user_input = validate_lastfm_user_input(user_input)
+        username = valid_user_input.username
+        time_period = valid_user_input.time_period
+    except LastFMUserInputError as e:
         failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
-            {'message': 'a user has no name, huh?',
-             'failure_art': url_for('static',
-                                    filename=failure_art_filename)}
-        ),
-            404)
-    username = username.strip()
-    if not (1 < len(username) < 16):
-        # if the input's empty, send an error message and a 'failure' image
-        failure_art_filename = pick_failure_art_image()
-        return make_response(jsonify(
-            {'message': 'you are not fooling no one',
+            {'message': str(e),
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),
@@ -70,7 +63,7 @@ def get_lastfm_user_avatar():
         return None
     try:
         username = content['qualifier']
-    except (KeyError, IndexError, TypeError):
+    except KeyError:
         return None
     if not username:
         return None

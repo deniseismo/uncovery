@@ -1,12 +1,11 @@
-import json
-from dataclasses import asdict
-
 from flask import request, url_for, Blueprint, make_response, jsonify
 
 from uncover.album_processing.album_processing_helpers import make_album_covers_response
 from uncover.client.explore.filter_albums import get_albums_by_filters
 from uncover.client.explore.filter_tags import get_suggested_tags
 from uncover.utilities.failure_handlers import pick_failure_art_image
+from uncover.utilities.validation.exceptions.validation_exceptions import ExploreFiltersUserInputError
+from uncover.utilities.validation.user_input_validation import validate_explore_filters_user_input
 
 explore = Blueprint('explore', __name__)
 
@@ -17,34 +16,25 @@ def get_album_cover_arts_by_filters():
     get cover arts by user-defined filters
     :return: a jsonified dict with all the albums found
     """
-    content = request.get_json()
-    print(content)
-    genres = None
-    time_span = None
-    colors = None
+    user_input = request.get_json()
     try:
-        genres = content['option']['genres']
-    except KeyError:
-        pass
-    try:
-        time_span = content['option']['time_span']
-    except KeyError:
-        pass
-    try:
-        colors = content['option']['colors']
-    except KeyError:
-        pass
-    # gets albums
-    print(type(genres), type(time_span))
-    if not isinstance(genres, list) or not (isinstance(time_span, list)):
+        valid_user_input = validate_explore_filters_user_input(user_input)
+        genres = valid_user_input.genres
+        time_span = valid_user_input.time_span
+        colors = valid_user_input.colors
+    except ExploreFiltersUserInputError as e:
         failure_art_filename = pick_failure_art_image()
         return make_response(jsonify(
-            {'message': f"couldn't find any covers",
+            {'message': str(e),
              'failure_art': url_for('static',
                                     filename=failure_art_filename)}
         ),
             404)
-    albums_by_user_filters = get_albums_by_filters(genres=genres, a_list_of_time_span_dates=time_span, colors_list=colors)
+    albums_by_user_filters = get_albums_by_filters(
+        genres=genres,
+        a_list_of_time_span_dates=time_span,
+        colors_list=colors
+    )
     if not albums_by_user_filters:
         # if no albums found, make a failure response
         failure_art_filename = pick_failure_art_image()
