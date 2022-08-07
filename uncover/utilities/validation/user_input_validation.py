@@ -4,7 +4,8 @@ from pydantic import ValidationError
 
 from uncover.utilities.validation.exceptions.validation_exceptions import LastFMUserInputError, ArtistUserInputError, \
     ExploreFiltersUserInputError
-from uncover.utilities.validation.validation_models import LastFMUserInput, ArtistUserInput, ExploreFiltersUserInput
+from uncover.utilities.validation.validation_models import LastFMUserInput, ArtistUserInput, ExploreFiltersUserInput, \
+    ExploreFilters
 
 
 def validate_lastfm_user_input(user_input: dict) -> Optional[LastFMUserInput]:
@@ -39,7 +40,7 @@ def validate_artist_user_input(user_input: dict) -> Optional[ArtistUserInput]:
         raise ArtistUserInputError("incorrect artist name")
 
 
-def validate_explore_filters_user_input(user_input: dict) -> Optional[ExploreFiltersUserInput]:
+def validate_explore_filters_user_input(user_input: dict) -> Optional[ExploreFilters]:
     """
     validate user input for explore filters handlers (genres, colors, time span)
     :param user_input: (dict) user's input with genres, colors & time span picked
@@ -49,7 +50,7 @@ def validate_explore_filters_user_input(user_input: dict) -> Optional[ExploreFil
         raise ExploreFiltersUserInputError("incorrect input type")
     try:
         explore_filters_user_input = ExploreFiltersUserInput(**user_input)
-        return explore_filters_user_input
+        return explore_filters_user_input.option
     except ValidationError as e:
         print(e.json())
         raise ExploreFiltersUserInputError("incorrect filters")
