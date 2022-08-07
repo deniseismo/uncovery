@@ -10,6 +10,7 @@ from uncover.music_apis.lastfm_api.lastfm_helpers import lastfm_show_response_er
 from uncover.schemas.album_schema import AlbumInfo
 
 
+@cache.memoize(timeout=6000)
 def lastfm_get_users_top_albums(
         username: str,
         time_period: str = "overall",
@@ -31,22 +32,12 @@ def lastfm_get_users_top_albums(
         print(f"shuffle: {time_period}")
     else:
         amount = 9
-    response = lastfm_get_response({
-        'method': 'user.getTopAlbums',
-        'username': username,
-        'period': time_period,
-        'limit': amount
-    })
-    if not response:
-        return None
-    # in case of an error, return None
-    if response.status_code != 200:
-        lastfm_show_response_error(response)
-        return None
-    try:
-        lastfm_user_albums_info = response.json()
-    except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
-        print(e)
+    lastfm_user_albums_info = _lastfm_get_user_top_albums_info_for_specific_time_period(
+        username=username,
+        time_period=time_period,
+        amount=amount
+    )
+    if not lastfm_user_albums_info:
         return None
     try:
         lastfm_user_albums = lastfm_user_albums_info['topalbums']['album']
@@ -58,18 +49,12 @@ def lastfm_get_users_top_albums(
     if shuffle and time_period != "overall" and not lastfm_user_albums:
         print(f"shuffle: {time_period} had nothing to show, trying to get albums overall instead")
         time_period = "overall"
-        response = lastfm_get_response({
-            'method': 'user.getTopAlbums',
-            'username': username,
-            'period': time_period,
-            'limit': amount
-        })
-        if not response:
-            return None
-        try:
-            lastfm_user_albums_info = response.json()
-        except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
-            print(e)
+        lastfm_user_albums_info = _lastfm_get_user_top_albums_info_for_specific_time_period(
+            username=username,
+            time_period=time_period,
+            amount=amount
+        )
+        if not lastfm_user_albums_info:
             return None
         try:
             lastfm_user_albums = lastfm_user_albums_info['topalbums']['album']
@@ -100,7 +85,41 @@ def lastfm_get_users_top_albums(
 
 
 @cache.memoize(timeout=6000)
-def lastfm_get_user_avatar(username: str):
+def _lastfm_get_user_top_albums_info_for_specific_time_period(
+        username: str,
+        time_period: str,
+        amount: int
+) -> Optional[dict]:
+    """
+    separate function for getting lastfm user's albums for different time period;
+    makes it easy to 'memoize' search results for the specified params (username & time period picked beforehand)
+    :param username: (str) lastfm username
+    :param time_period: (str) one of the ["overall", "7day", "1month", "3month", "6month", "12month"];
+        lastfm-specific time period types
+    :return: (dict) information about user & their top albums for the time period specified
+    """
+    response = lastfm_get_response({
+        'method': 'user.getTopAlbums',
+        'username': username,
+        'period': time_period,
+        'limit': amount
+    })
+    if not response:
+        return None
+    # in case of an error, return None
+    if response.status_code != 200:
+        lastfm_show_response_error(response)
+        return None
+    try:
+        lastfm_user_albums_info = response.json()
+    except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
+        print(e)
+        return None
+    return lastfm_user_albums_info
+
+
+@cache.memoize(timeout=6000)
+def lastfm_get_user_avatar(username: str) -> Optional[str]:
     """
     gets user's avatar image URL
     :param username: user's name
