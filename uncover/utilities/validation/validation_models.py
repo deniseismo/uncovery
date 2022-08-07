@@ -21,7 +21,7 @@ class LastFMUserInput(BaseModel):
 
     @validator("time_period")
     def is_valid_time_period(cls, v: str) -> str:
-        valid_time_periods = ["overall", "7day", "1month", "3month", "6month", "12month"]
+        valid_time_periods = ["overall", "7day", "1month", "3month", "6month", "12month", "shuffle"]
         if v not in valid_time_periods:
             raise ValueError("incorrect time period")
         return v
@@ -51,10 +51,14 @@ class ArtistUserInput(BaseModel):
         return v
 
 
+class ExploreFilters(BaseModel):
+    genres: list[Optional[str]]
+    time_span: list[int, int]
+    colors: list[Optional[str]]
+
+
 class ExploreFiltersUserInput(BaseModel):
     """
     validation model for user input in explore route; validates genres, time span & colors picked by user
     """
-    genres: Optional[list[str]]
-    time_span: Optional[list[int, int]]
-    colors: Optional[list[str]]
+    option: ExploreFilters
