@@ -86,16 +86,30 @@ def get_spotify_user_info(token) -> Optional[SpotifyUserProfile]:
     return SpotifyUserProfile(username=username, user_image=user_image, country=country)
 
 
-@cache.memoize(timeout=3600)
 def spotify_get_users_albums(token) -> Optional[list[AlbumInfo]]:
     """
     get current spotify user top albums
     :param token: an access token
     :return: ([list[AlbumInfo]) of spotify user top albums (in reality, albums from top tracks)
     """
-    time_periods = ['short_term', 'medium_term', 'long_term']
-    if not token:
-        return None
+    time_ranges = ['short_term', 'medium_term', 'long_term']
+    time_range = random.choice(time_ranges)
+    albums = _spotify_get_users_albums_for_specific_time_range(token, time_range)
+    sort_artist_albums(albums, sorting="shuffle")
+    albums = albums[:9]
+    enumerate_artist_albums(albums)
+    return albums
+
+
+@cache.memoize(timeout=3600)
+def _spotify_get_users_albums_for_specific_time_range(token, time_range: str) -> Optional[list[AlbumInfo]]:
+    """
+    separate function for getting spotify user's albums for different time range;
+    makes it easy to 'memoize' search results for the pair (token (specific user) and time range picked beforehand)
+    :param token: spotify user access token
+    :param time_range: (str) one of the ['short_term', 'medium_term', 'long_term'] spotify-specific time range types
+    :return: (list[AlbumInfo]) AlbumIfo albums extracted from spotify user's top track for a time range specified
+    """
     spotify_tekore_client = get_spotify_tekore_client()
     if not spotify_tekore_client:
         return None
@@ -104,7 +118,7 @@ def spotify_get_users_albums(token) -> Optional[list[AlbumInfo]]:
             # get user's top 50 tracks
             top_tracks = spotify_tekore_client.current_user_top_tracks(
                 limit=50,
-                time_range=random.choice(time_periods)
+                time_range=time_range
             )
     except tk.HTTPError:
         return None
@@ -114,9 +128,6 @@ def spotify_get_users_albums(token) -> Optional[list[AlbumInfo]]:
     albums = extract_albums_from_spotify_tracks(top_tracks.items)
     if not albums:
         return None
-    sort_artist_albums(albums, sorting="shuffle")
-    albums = albums[:9]
-    enumerate_artist_albums(albums)
     return albums
 
 
