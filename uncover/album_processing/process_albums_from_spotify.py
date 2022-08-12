@@ -57,15 +57,18 @@ def extract_albums_from_spotify_tracks(track_items: list[Union[PlaylistTrack, Fu
     return albums
 
 
-def process_spotify_artist_albums(albums: list[SimpleAlbum]) -> list[AlbumInfo]:
+def process_spotify_artist_albums(albums: list[SimpleAlbum], album_types: tuple[str] = ('album',)) -> list[AlbumInfo]:
     """
     extract all the needed info from artist's albums found on Spotify
     :param albums: a list of Spotify albums by artist; list[SimpleAlbum]
+    :param album_types: tuple(str) types of album allowed
     :return: list[AlbumInfo]
     """
     a_set_of_titles = set()
     processed_albums = []
     for album in albums:
+        if album.album_type not in album_types:
+            continue
         album_image = album.images[0].url
         album_title = album.name
         artist_name = album.artists[0].name
