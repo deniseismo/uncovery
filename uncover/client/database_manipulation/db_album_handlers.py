@@ -3,12 +3,12 @@ from typing import Optional
 from fuzzywuzzy import fuzz
 from sqlalchemy import func
 
+from uncover import cache
 from uncover.client.database_manipulation.db_artist_handlers import db_get_artist
 from uncover.client.database_manipulation.db_helpers import get_db_album_sorting_function
 from uncover.models import Artist, Album, tags, Tag, colors, Color
 from uncover.schemas.characteristics import TimeSpan
 from uncover.utilities.logging_handlers import log_artist_missing_from_db
-from uncover.utilities.misc import timeit
 
 
 def db_get_albums_by_artist_entry(artist_entry: Artist, sorting: str, limit: int = 9) -> Optional[list[Album]]:
@@ -26,7 +26,7 @@ def db_get_albums_by_artist_entry(artist_entry: Artist, sorting: str, limit: int
     return album_entries
 
 
-@timeit
+@cache.memoize(3600)
 def db_find_album_by_name(artist_name: str, album_to_find: str) -> Optional[Album]:
     """
     finds a specific album image via database

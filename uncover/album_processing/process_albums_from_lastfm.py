@@ -1,5 +1,6 @@
 from flask import url_for
 
+from uncover import cache
 from uncover.client.database_manipulation.db_album_handlers import db_find_album_by_name
 from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
@@ -7,6 +8,7 @@ from uncover.schemas.album_schema import AlbumInfo
 from uncover.utilities.name_filtering import get_filtered_name, get_filtered_names_list
 
 
+@cache.memoize(3600)
 def process_lastfm_user_top_albums(albums: list[dict], image_size: int = 3) -> list[AlbumInfo]:
     """
     extract all the needed info from artist's albums found on Spotify

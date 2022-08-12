@@ -6,7 +6,10 @@ import aiohttp
 import requests
 from flask import current_app
 
+from uncover import cache
 
+
+@cache.memoize(timeout=3600)
 def mb_get_album_alternative_name(album_mbid: str) -> Optional[str]:
     """
     gets an alternative name for the album (e. g. White Album for 'The Beatles')
@@ -26,12 +29,15 @@ def mb_get_album_alternative_name(album_mbid: str) -> Optional[str]:
     return alternative_album_name
 
 
+@cache.memoize(timeout=3600)
 def mb_get_album_release_date(album_mbid: str) -> Optional[str]:
     """
     get album's release date
     :param album_mbid: album's mbid from MusicBrainz
     :return: (str) album release date
     """
+    if not album_mbid:
+        return None
     headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     url = "http://musicbrainz.org/ws/2/release-group/" + album_mbid
     params = {"fmt": "json"}
@@ -47,7 +53,8 @@ def mb_get_album_release_date(album_mbid: str) -> Optional[str]:
     return release_date
 
 
-def mb_get_album_mbid(album_name: str, artist: str):
+@cache.memoize(timeout=3600)
+def mb_get_album_mbid(album_name: str, artist: str) -> Optional[str]:
     """
     search for an album's mbid on MusicBrainz
     :param album_name: album's name
@@ -69,7 +76,8 @@ def mb_get_album_mbid(album_name: str, artist: str):
     return mbid
 
 
-def mb_get_album_image(mbid: str, size: str = 'large', fast: bool = False):
+@cache.memoize(timeout=3600)
+def mb_get_album_image(mbid: str, size: str = 'large', fast: bool = False) -> Optional[str]:
     """
     :param fast: a faster way to get the cover image
     :param mbid: mbid for an album release on MusicBrainz

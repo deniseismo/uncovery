@@ -1,5 +1,6 @@
 from flask import Blueprint, request, make_response, jsonify, url_for
 
+from uncover import cache
 from uncover.album_processing.album_processing_helpers import make_album_covers_response
 from uncover.music_apis.lastfm_api.lastfm_user_handlers import lastfm_get_users_top_albums, lastfm_get_user_avatar
 from uncover.utilities.failure_handlers import pick_failure_art_image
@@ -28,8 +29,8 @@ def get_albums_by_lastfm_username():
                                     filename=failure_art_filename)}
         ),
             404)
-    # if time_period == "shuffle":
-    #     cache.delete_memoized(lastfm_get_users_top_albums, username=username, time_period='shuffle')
+    if time_period == "shuffle":
+        cache.delete_memoized(lastfm_get_users_top_albums, username=username, time_period='shuffle')
     lastfm_user_albums_info = lastfm_get_users_top_albums(username, time_period=time_period)
     if not lastfm_user_albums_info:
         # if the given username has no albums or the username's incorrect

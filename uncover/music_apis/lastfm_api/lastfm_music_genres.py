@@ -2,9 +2,11 @@ import json.decoder
 import time
 from typing import Optional
 
+from uncover import cache
 from uncover.music_apis.lastfm_api.lastfm_client_api import lastfm_get_response
 
 
+@cache.memoize(timeout=3600)
 def lastfm_get_artist_music_genres(artist_name: str) -> Optional[list[str]]:
     """
     :param artist_name: musician/band

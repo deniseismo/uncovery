@@ -58,7 +58,7 @@ def _remove_trailing_spaces(name: str) -> str:
 
 
 @cache.memoize(timeout=36000)
-def remove_punctuation(name: str):
+def remove_punctuation(name: str) -> Optional[str]:
     if not name:
         return None
     pattern = "[^\w\s]"

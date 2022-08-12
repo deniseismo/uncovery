@@ -108,6 +108,7 @@ def get_spotify_artist_search_results(artist_name: str, spotify_tekore_client: t
     return artists_found
 
 
+@cache.memoize(timeout=3600)
 def find_artist_best_match(artist_name: str, search_results: list[FullArtist]) -> Optional[FullArtist]:
     """find best match (for artist_name) among search results (artists founds on spotify)
     :param artist_name: (str) artist's name

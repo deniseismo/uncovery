@@ -1,10 +1,12 @@
 import json
+from typing import Optional
 
 from uncover import cache
 from uncover.music_apis.lastfm_api.lastfm_client_api import lastfm_get_response
 
 
-def lastfm_get_artist_mbid(artist: str):
+@cache.memoize(timeout=3600)
+def lastfm_get_artist_mbid(artist: str) -> Optional[str]:
     """
     get the MusicBrainz id through last.fm API (a backup function)
     :param artist: artist's name

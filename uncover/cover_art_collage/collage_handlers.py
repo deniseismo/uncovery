@@ -20,7 +20,7 @@ def arrange_the_images(
         width: int,
         image_size: ImageSize,
         offset: ImageOffset = ImageOffset(0, 0)
-):
+) -> None:
     """
     arrange (paste) given images in a collage
     :param images: a list of PIL Images
@@ -147,7 +147,7 @@ def create_a_collage(cover_art_urls: list[str], filename_path: str):
     collage_image.save(filename_path, quality=95)
 
 
-@cache.memoize(timeout=360)
+@cache.memoize(timeout=3600)
 def save_collage(cover_art_urls: list[str]) -> Optional[str]:
     """
     save collage created from given images (image urls)

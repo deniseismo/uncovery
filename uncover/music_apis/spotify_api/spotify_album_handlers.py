@@ -4,6 +4,7 @@ import tekore as tk
 from fuzzywuzzy import fuzz
 from tekore._model import SimpleAlbumPaging, SimpleAlbum
 
+from uncover import cache
 from uncover.album_processing.album_processing_helpers import sort_artist_albums, enumerate_artist_albums
 from uncover.album_processing.process_albums_from_spotify import process_spotify_artist_albums
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
@@ -16,6 +17,7 @@ from uncover.utilities.fuzzymatch import fuzzy_match_artist
 from uncover.utilities.name_filtering import get_filtered_name
 
 
+@cache.memoize(timeout=3600)
 def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
     """
     get album's cover (image url) on spotify
@@ -47,21 +49,22 @@ def spotify_get_album_image(album_name: str, artist_name: str) -> Optional[str]:
         return None
 
 
-def spotify_get_artists_albums(artist: str, sorting: str = "popular") -> Optional[list[AlbumInfo]]:
+@cache.memoize(timeout=3600)
+def spotify_get_artists_albums(artist_name: str, sorting: str = "popular") -> Optional[list[AlbumInfo]]:
     """
     a backup function that gets all the info from Spotify
     (in case MusicBrainz has nothing about a particular artist)
-    :param artist: (str) artist's name
+    :param artist_name: (str) artist's name
     :param sorting: (str) sorted by shuffle, popular, earliest, latest
     :return: artist's albums (list[AlbumInfo]) found on spotify
     """
     spotify_tekore_client = get_spotify_tekore_client()
     if not spotify_tekore_client:
         return None
-    artist_correct_name = lastfm_get_artist_correct_name(artist)
+    artist_correct_name = lastfm_get_artist_correct_name(artist_name)
     if artist_correct_name:
-        artist = artist_correct_name
-    artist_spotify_entry = get_spotify_artist_info(artist)
+        artist_name = artist_correct_name
+    artist_spotify_entry = get_spotify_artist_info(artist_name)
     if not artist_spotify_entry:
         return None
     albums = spotify_tekore_client.artist_albums(artist_id=artist_spotify_entry.id, market="GE", limit=50)
@@ -138,6 +141,7 @@ def get_spotify_album_info(
     return perfect_match
 
 
+@cache.memoize(timeout=3600)
 def find_album_best_match(
         album_title: str,
         artist_name: str,

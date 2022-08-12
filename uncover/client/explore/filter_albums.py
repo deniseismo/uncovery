@@ -4,10 +4,8 @@ from uncover.album_processing.process_albums_from_database import process_albums
 from uncover.client.database_manipulation.db_album_handlers import db_get_albums_by_filters
 from uncover.schemas.album_schema import AlbumInfo
 from uncover.utilities.convert_values import convert_a_list_of_dates_to_time_span
-from uncover.utilities.misc import timeit
 
 
-@timeit
 def get_albums_by_filters(
         genres: list[str],
         a_list_of_time_span_dates: list[int, int],
@@ -21,7 +19,6 @@ def get_albums_by_filters(
     :return:
     """
     time_span = convert_a_list_of_dates_to_time_span(a_list_of_time_span_dates)
-
     print(f'time_span: {time_span}, genres: {genres}, colors: {colors_list}')
 
     album_entries = db_get_albums_by_filters(genres, time_span, colors_list)
