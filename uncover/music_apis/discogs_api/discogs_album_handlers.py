@@ -7,7 +7,7 @@ from uncover.music_apis.discogs_api.discogs_client_api import get_discogs_client
 
 
 @cache.memoize(timeout=3600)
-def get_album_discogs_id(album_name: str, artist_name: str):
+def get_album_discogs_id(album_name: str, artist_name: str) -> Optional[str]:
     """
     :param artist_name: artist's name
     :param album_name: album name
@@ -19,9 +19,12 @@ def get_album_discogs_id(album_name: str, artist_name: str):
     except DiscogsAPIError as e:
         print(e)
         return None
+    if not album_search_results.count:
+        return None
     try:
         album_id = album_search_results[0].id
     except (IndexError, AttributeError) as e:
+        print("discogs id error")
         print(e)
         return None
     return album_id
