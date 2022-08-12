@@ -10,10 +10,8 @@ class LastFMUserInput(BaseModel):
     username: str = Field(alias='qualifier')
     time_period: str = Field(alias='option')
 
-    @validator("username", pre=True)
+    @validator("username")
     def is_valid_username(cls, v: str) -> str:
-        if not isinstance(v, str):
-            raise TypeError("username must be a string")
         v = v.strip()
         if not (1 < len(v) < 16):
             raise ValueError("incorrect username length; must be at least 2 characters long and at most 16 chars.")
@@ -34,10 +32,8 @@ class ArtistUserInput(BaseModel):
     artist_name: str = Field(alias='qualifier')
     sorting: str = Field(alias='option')
 
-    @validator("artist_name", pre=True)
+    @validator("artist_name")
     def is_valid_artist_name(cls, v: str) -> str:
-        if not isinstance(v, str):
-            raise TypeError("artist name must be a string")
         v = v.strip()
         if len(v) > 98:
             raise ValueError("incorrect username length")
