@@ -8,32 +8,32 @@ from uncover.music_apis.lastfm_api.lastfm_client_api import lastfm_get_response,
 
 
 @cache.memoize(timeout=60000)
-def lastfm_get_album_listeners(album: str, artist: str) -> Optional[int]:
+def lastfm_get_album_listeners(album_title: str, artist: str) -> Optional[int]:
     """
-    gets the number of listeners of a particular album
-    :param album: album's title
+    gets the number of listeners of a particular album; used as a metric for album's rating
+    :param album_title: album's title
     :param artist: artist's name
-    :return:
+    :return: (int) number of album listeners on last.fm
     """
-    if not album or not artist:
+    if not album_title or not artist:
         return None
+    album_title = album_title.lower()
     response = lastfm_get_response({
         'method': ' album.getInfo',
-        'album': album,
+        'album': album_title,
         'artist': artist
     })
     if not response:
         return None
     # in case of an error, return None
     if response.status_code != 200:
-        print(f"couldn't find {album} on last.fm")
+        print(f"couldn't find {album_title} on last.fm")
         return None
     try:
-        print(response.json())
         album_listeners = response.json()['album']['listeners']
     except (KeyError, TypeError, json.decoder.JSONDecodeError) as e:
         print(e)
-        print(f"there are no listeners for {album}")
+        print(f"there are no listeners for {album_title}")
         return None
     return int(album_listeners)
 
