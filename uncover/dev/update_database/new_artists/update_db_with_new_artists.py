@@ -1,20 +1,27 @@
 import csv
+import os
+from typing import Optional
 
 import requests_cache
+from flask import current_app
 from tqdm import tqdm
+
 from uncover import create_app
 from uncover import db
+from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
 from uncover.dev.color_analyzer.fill_db_colors import add_album_color
-from uncover.dev.db_utils.manage_image_saving import save_image
 from uncover.dev.db_utils.manage_names import get_spotify_artist_name
-from uncover.dev.db_utils.manage_release_dates import add_album_release_date
-from uncover.dev.db_utils.tags_utils import add_artist_music_genres
+from uncover.dev.db_utils.manage_release_dates import get_album_release_date_by_album_mbid
+from uncover.dev.image_processing.process_images import save_image_from_external_source
+from uncover.dev.update_database.music_genres.add_music_genres import add_music_genres_to_artist, \
+    collect_all_music_genres_for_artist
+from uncover.models import Artist, Album
 from uncover.music_apis.discogs_api.discogs_album_handlers import get_album_discogs_id
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
-from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
 from uncover.music_apis.musicbrainz_api.mb_artist_handlers import mb_get_artists_albums
-from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_artists_albums_images
-from uncover.models import Artist, Album
+from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_artists_albums
+from uncover.schemas.album_schema import AlbumInfo
+from uncover.utilities.convert_values import parse_release_date
 
 app = create_app()
 app.app_context().push()
@@ -22,84 +29,99 @@ app.app_context().push()
 requests_cache.install_cache()
 
 
-def update_db_with_new_artists():
-    with open('./artists_missing_from_db.csv', 'r', newline='', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        for artist in tqdm(reader):
-            print(artist)
-            artist_name = artist[0]
-            correct_name = lastfm_get_artist_correct_name(artist_name)
-            if correct_name:
-                artist_name = correct_name
-            if Artist.query.filter_by(name=artist_name).first():
-                continue
-            print(f'ARTIST: {artist_name}')
-
-            artist_albums = mb_get_artists_albums(artist_name, limit=100)
-            if not artist_albums:
-                artist_albums = spotify_get_artists_albums_images(artist_name)
-                if artist_albums:
-                    artist_albums = artist_albums['albums']
-                else:
+def update_db_with_new_artists() -> None:
+    """
+    updates database with new artists from .csv file; adds artists albums, artists genres, the whole shebang.
+    """
+    NEW_ARTISTS_FILENAME = "artists_missing_from_db.csv"
+    NEW_ARTISTS_PATH = os.path.join(current_app.root_path, 'dev/update_database/new_artists', NEW_ARTISTS_FILENAME)
+    try:
+        with open(NEW_ARTISTS_PATH, 'r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            for artist in tqdm(reader):
+                artist_name = artist[0]
+                print(f"processing new artist: ({artist_name})")
+                correct_name = lastfm_get_artist_correct_name(artist_name)
+                if correct_name:
+                    artist_name = correct_name
+                if Artist.query.filter_by(name=artist_name).first():
+                    print(f"{artist_name} is already in the database")
                     continue
-            artist_entry = Artist(name=artist_name)
-            add_artist_music_genres(artist_entry)
-            artist_spotify_name = get_spotify_artist_name(artist_name)
-            if artist_spotify_name:
-                if artist_spotify_name != artist_name:
+                print(f'new Artist({artist_name})')
+                artist_albums = _collect_all_artist_albums(artist_name)
+                if not artist_albums:
+                    continue
+                artist_entry = Artist(name=artist_name)
+                music_genres = collect_all_music_genres_for_artist(artist_name)
+                if music_genres:
+                    add_music_genres_to_artist(music_genres, artist_entry)
+                artist_spotify_name = get_spotify_artist_name(artist_name)
+                if artist_spotify_name and artist_spotify_name != artist_name:
                     artist_entry.spotify_name = artist_spotify_name
+                db.session.add(artist_entry)
+                db.session.commit()
 
-            db.session.add(artist_entry)
+                artist_id = Artist.query.filter_by(name=artist_name).first().id
+
+                add_artist_albums_to_database(artist_albums, artist_name, artist_id)
+
             db.session.commit()
-            artist_id = Artist.query.filter_by(name=artist_name).first().id
 
-            for album in tqdm(artist_albums):
-                title = album['title']
-                rating = album['rating']
-                # spotify_id = spotipy_get_album_id(title, artist_name)
-                try:
-                    mb_id = album['mbid']
-                except (KeyError, TypeError):
-                    mb_id = None
-                try:
-                    image_url = album['image']
-                except (KeyError, TypeError):
-                    image_url = None
+    except (IOError, OSError) as e:
+        print(e)
 
-                try:
-                    alternative_title = album['altenative_name']
-                except KeyError:
-                    alternative_title = None
-                discogs_id = get_album_discogs_id(title, artist_name)
-                if not image_url:
-                    image_url = ultimate_album_image_finder(title, artist_name, mbid=mb_id)
-                    print(image_url)
-                cover_art = save_image(image_url)
-                print(cover_art)
-                if image_url and cover_art:
-                    print("image url and cover art TRUTHY")
-                    album_entry = Album(artist_id=artist_id,
-                                        title=title,
-                                        rating=rating,
-                                        mb_id=mb_id,
-                                        cover_art=cover_art)
-                    # if spotify_id:
-                    #     album_entry.spotify_id = spotify_id
-                    if mb_id:
-                        album_entry.mb_id = mb_id
-                    if alternative_title:
-                        album_entry.alternative_title = alternative_title
-                    if discogs_id:
-                        album_entry.discogs_id = discogs_id
-                    try:
-                        release_date = album['release_date']
-                    except (KeyError, TypeError):
-                        release_date = None
-                    if release_date:
-                        album_entry.release_date = release_date
-                    else:
-                        add_album_release_date(album_entry)
-                    add_album_color(album_entry, 'static/cover_art_new_batch')
-                    db.session.add(album_entry)
 
+def add_artist_albums_to_database(artist_albums: list[AlbumInfo], artist_name: str, artist_id: int) -> None:
+    """
+    add new artists albums given a list of AlbumInfo albums and artist's name and their id in db
+    :param artist_albums: (list[AlbumInfo] a list of AlbumInfo albums with _most_ of the needed info
+    :param artist_name: (str) artist's name
+    :param artist_id: artist's id in db
+    """
+    for album_info in artist_albums:
+        print(album_info.title)
+        album_image_url = album_info.image
+        album_release_date = parse_release_date(album_info.year) if album_info.year else None
+        discogs_id = get_album_discogs_id(album_info.title, artist_name)
+        if not album_image_url:
+            album_image_url = ultimate_album_image_finder(album_info.title, artist_name, mbid=album_info.mbid)
+        if not album_image_url:
+            continue
+        cover_art = save_image_from_external_source(album_image_url)
+        print(cover_art)
+        if not cover_art:
+            continue
+        album_entry = Album(artist_id=artist_id,
+                            title=album_info.title,
+                            rating=album_info.rating,
+                            cover_art=cover_art)
+        if album_info.mbid:
+            album_entry.mb_id = album_info.mbid
+        if album_info.alternative_name:
+            album_entry.alternative_title = album_info.alternative_name
+        if discogs_id:
+            album_entry.discogs_id = discogs_id
+        if not album_release_date:
+            album_release_date = get_album_release_date_by_album_mbid(album_info.mbid)
+        if album_release_date:
+            album_entry.release_date = album_release_date
+        add_album_color(album_entry, 'static/cover_art_new_batch')
+        db.session.add(album_entry)
         db.session.commit()
+
+
+def _collect_all_artist_albums(artist_name: str) -> Optional[list[AlbumInfo]]:
+    artist_albums = mb_get_artists_albums(artist_name, limit=100)
+    if not artist_albums:
+        print("didn't find studio albums on musicbrainz")
+        artist_albums = mb_get_artists_albums(artist_name, limit=100, album_type="soundtrack")
+        if not artist_albums:
+            print("didn't find soundtrack albums on musicbrainz")
+            artist_albums = spotify_get_artists_albums(artist_name)
+            if not artist_albums:
+                print("didn't find any albums, even on spotify")
+                return None
+    return artist_albums
+
+
+update_db_with_new_artists()
