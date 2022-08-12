@@ -33,28 +33,26 @@ def mb_get_artist_mbid(artist_name: str) -> Optional[str]:
     return None
 
 
-def mb_get_artists_albums(artist: str, sorting: str = "popular", limit: int = 9) -> Optional[list[AlbumInfo]]:
+def mb_get_artists_albums(
+        artist: str,
+        sorting: str = "popular",
+        limit: int = 9,
+        album_type: str = "studio",
+) -> Optional[list[AlbumInfo]]:
     """
     get artist's official studio albums (information about albums, no images) from MusicBrainz
-    :param limit: a number of albums retrieved
-    :param sorting: sorting by: popularity, release date, random
     :param artist: artist's name
-    :return:(list[AlbumInfo]) a list of all the needed info about artist's albums
+    :param sorting: sorting by: popularity, release date, random
+    :param limit: a number of albums retrieved
+    :param album_type: (str) type of albums returned, default is studio albums
+    :return: (list[AlbumInfo]) a list of all the needed info about artist's albums
     """
-    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
     artist_mbid = mb_get_artist_mbid(artist)
-    print(artist_mbid)
-
     if not artist_mbid:
         # if nothing found
         return None
-    album_query_filter = '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&limit=100&fmt=json'
-    response = requests.get(
-        'https://musicbrainz.org/ws/2/release-group?query=arid:'
-        + artist_mbid
-        + album_query_filter,
-        headers=headers
-    )
+    search_params = _configure_musicbrainz_artist_albums_search_params(artist_mbid, album_type)
+    response = requests.get(**search_params)
     # in case of an error, return None
     if response.status_code != 200:
         return None
@@ -75,30 +73,20 @@ def mb_get_artists_albums(artist: str, sorting: str = "popular", limit: int = 9)
     return processed_albums
 
 
-def mb_get_artist_albums_mbids(artist: str, album_query_filter: Optional[str] = None) -> Optional[dict]:
+def mb_get_artist_albums_mbids(artist_name: str, album_type: str = "studio") -> Optional[dict]:
     """
     a shortcut function to get only MusicBrainz ids for artist's albums and their respective album titles
     (used for finding new albums)
-    :param album_query_filter: query filter to filter out all unnecessary albums (compilations, remixes, etc)
-    :param artist: artist's name
+    :param artist_name: (str) artist's name
+    :param album_type: (str) album type (e.g. studio, soundtrack, etc.)
     :return: dict {mbid: album's title}
     """
-    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
-    artist_mbid = mb_get_artist_mbid(artist)
+    artist_mbid = mb_get_artist_mbid(artist_name)
     print(artist_mbid)
-
     if not artist_mbid:
-        # if nothing found
         return None
-    if album_query_filter is None:
-        album_query_filter = '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&limit=100&fmt=json'
-    response = requests.get(
-        'https://musicbrainz.org/ws/2/release-group?query=arid:'
-        + artist_mbid
-        + album_query_filter,
-        headers=headers
-    )
-    print(response.url)
+    search_params = _configure_musicbrainz_artist_albums_search_params(artist_mbid, album_type)
+    response = requests.get(**search_params)
     # in case of an error, return None
     if response.status_code != 200:
         return None
@@ -110,7 +98,9 @@ def mb_get_artist_albums_mbids(artist: str, album_query_filter: Optional[str] = 
     albums_mbids = {}
     print(f'albums found: {len(albums_found)}')
     for album_found in albums_found:
-        albums_mbids[album_found['id']] = album_found['title']
+        album_mbid = album_found['id']
+        album_title = album_found['title']
+        albums_mbids[album_mbid] = album_title
     return albums_mbids
 
 
@@ -121,20 +111,13 @@ async def mb_fetch_artists_albums(artist: str, sorting: str = "popular", limit: 
     :param artist: artist's name
     :return:
     """
-    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
-
     artist_mbid = mb_get_artist_mbid(artist)
 
     if not artist_mbid:
         # if nothing found
         return None
-    album_query_filter = '%20AND%20primarytype:album%20AND%20secondarytype:(-*)%20AND%20status:official&limit=100&fmt=json'
-    response = requests.get(
-        'https://musicbrainz.org/ws/2/release-group?query=arid:'
-        + artist_mbid
-        + album_query_filter,
-        headers=headers
-    )
+    search_params = _configure_musicbrainz_artist_albums_search_params(artist_mbid, album_type)
+    response = requests.get(**search_params)
     # in case of an error, return None
     if response.status_code != 200:
         return None
@@ -165,3 +148,27 @@ async def mb_fetch_artists_albums(artist: str, sorting: str = "popular", limit: 
     sort_artist_albums(processed_albums, sorting)
     processed_albums = processed_albums[:limit]
     return processed_albums
+
+
+def _configure_musicbrainz_artist_albums_search_params(artist_mbid: str, album_type: str = "studio") -> dict:
+    """
+    helper function for configuring search url and headers for searching artist's albums on musicbrainz
+    :param artist_mbid: (str) artist's id on musicbrainz
+    :param album_type: (str) album's type (e.g. studio, single, ep, etc.)
+    :return:
+    """
+    headers = {'User-Agent': current_app.config['MUSIC_BRAINZ_USER_AGENT']}
+    ALBUM_TYPES = {
+        "studio": " AND primarytype:album AND secondarytype:(-*) AND ",
+        "soundtrack": " AND primarytype:album AND secondarytype:Soundtrack AND "
+    }
+    MB_ARTIST_SEARCH_BASE_URL = 'https://musicbrainz.org/ws/2/release-group?query=arid:'
+    album_status = "official"
+    MB_ALBUM_LIMIT = 100
+    album_type_query = ALBUM_TYPES[album_type]
+    album_query_filter = f"{album_type_query}status:{album_status}&limit={MB_ALBUM_LIMIT}&fmt=json"
+    url = f"{MB_ARTIST_SEARCH_BASE_URL}{artist_mbid}{album_query_filter}"
+    return {
+        "url": url,
+        "headers": headers
+    }
