@@ -6,7 +6,7 @@ from flask import current_app
 from tqdm import tqdm
 
 from uncover import create_app
-from uncover.dev.color_analyzer.get_dominant_colors import get_album_colors
+from uncover.dev.image_processing.color_processing.db_color_manipulations import get_album_entry_image_hex_colors
 from uncover.models import Album
 
 app = create_app()
@@ -41,8 +41,7 @@ def prepare_new_albums_for_madnessbracket(album_id_start: int) -> None:
         mb_id = album.mb_id
         discogs_id = album.discogs_id
         release_date = album.release_date
-        album_cover_art_filename = album.cover_art
-        album_cover_color = get_album_colors(album_cover_art_filename)
+        album_cover_color = get_album_entry_image_hex_colors(album, folder_type="new")
         _write_new_album_data_to_csv({
             "artist": artist_name,
             "album_title": album_title,

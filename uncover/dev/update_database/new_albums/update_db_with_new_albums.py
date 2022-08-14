@@ -6,7 +6,8 @@ from tqdm import tqdm
 
 from uncover import db, create_app
 from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
-from uncover.dev.color_analyzer.fill_db_colors import add_album_color
+from uncover.dev.image_processing.color_processing.db_color_manipulations import get_album_entry_image_salient_colors, \
+    add_album_entry_colors_to_db
 from uncover.dev.image_processing.process_images import save_image_from_external_source
 from uncover.dev.update_database.music_genres.add_music_genres import collect_all_music_genres_for_artist, \
     add_music_genres_to_artist
@@ -74,7 +75,9 @@ def update_db_with_new_albums() -> None:
                     album_entry.discogs_id = discogs_id
                 rating = lastfm_get_album_listeners(album_title, artist_name)
                 album_entry.rating = rating if rating else 0
-                add_album_color(album_entry, 'static/cover_art_new_batch')
+                album_colors = get_album_entry_image_salient_colors(album_entry, folder_type="new")
+                if album_colors:
+                    add_album_entry_colors_to_db(album_entry, album_colors)
                 db.session.add(album_entry)
                 db.session.commit()
                 print("-" * 5)
