@@ -27,6 +27,17 @@ class ColorInfo(Enum):
         else:
             return NotImplemented
 
+    def __eq__(self, other):
+        if issubclass(type(other), ColorInfo):
+            return other.color_values == self.color_values
+        elif isinstance(other, tuple):
+            return other == self.color_values
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(self.color_values)
+
 
 class BasicColor(ColorInfo):
     WHITE = RGBColor(255, 255, 255)
