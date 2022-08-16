@@ -37,9 +37,10 @@ function resizeCoverArtImages(data, amountOfAlbums) {
     case 9:
       for (let i = 0; i < allCoverArtElements.length; i++) {
         let imageURL = data['albums'][i]['image'];
-        if (data['albums'][i].hasOwnProperty('image_small')) {
+        if (data['albums'][i].hasOwnProperty('image_small') && data['albums'][i]['image_small']) {
           imageURL = data['albums'][i]['image_small'];
         }
+        console.log(`image url = ${imageURL}`);
         allCoverArtElements[i].src = `${imageURL}`;
       }
       break;
@@ -52,7 +53,7 @@ function resizeCoverArtImages(data, amountOfAlbums) {
     case 4:
       for (let i = 0; i < allCoverArtElements.length; i++) {
         let imageURL = data['albums'][i]['image'];
-        if (data['albums'][i].hasOwnProperty('image_medium')) {
+        if (data['albums'][i].hasOwnProperty('image_medium') && data['albums'][i]['image_medium']) {
           imageURL = data['albums'][i]['image_medium'];
         }
         allCoverArtElements[i].classList.add('cover-medium');
@@ -64,7 +65,7 @@ function resizeCoverArtImages(data, amountOfAlbums) {
       [document.querySelector(".art-0"), document.querySelector(".art-1")]
         .forEach((image, i) => {
           let imageURL = data['albums'][i]['image'];
-          if (data['albums'][i].hasOwnProperty('image_medium')) {
+          if (data['albums'][i].hasOwnProperty('image_medium') && data['albums'][i]['image_medium']) {
             imageURL = data['albums'][i]['image_medium'];
           }
           image.classList.add('cover-medium');
@@ -72,7 +73,7 @@ function resizeCoverArtImages(data, amountOfAlbums) {
         });
       for (let i = 2; i < allCoverArtElements.length; i++) {
         let imageURL = data['albums'][i]['image'];
-          if (data['albums'][i].hasOwnProperty('image_small')) {
+          if (data['albums'][i].hasOwnProperty('image_small') && data['albums'][i]['image_small']) {
             imageURL = data['albums'][i]['image_small'];
           }
           allCoverArtElements[i].src = `${imageURL}`;
@@ -83,7 +84,7 @@ function resizeCoverArtImages(data, amountOfAlbums) {
       document.querySelector(".art-2")]
         .forEach((image, i) => {
           let imageURL = data['albums'][i]['image'];
-          if (data['albums'][i].hasOwnProperty('image_medium')) {
+          if (data['albums'][i].hasOwnProperty('image_medium') && data['albums'][i]['image_medium']) {
             imageURL = data['albums'][i]['image_medium'];
           }
           image.classList.add('cover-medium');
@@ -95,7 +96,7 @@ function resizeCoverArtImages(data, amountOfAlbums) {
         .forEach((image, i) => {
           image.classList.add('cover-small');
           let imageURL = data['albums'][i + 3]['image'];
-          if (data['albums'][i + 3].hasOwnProperty('image_small')) {
+          if (data['albums'][i + 3].hasOwnProperty('image_small') && data['albums'][i]['image_small']) {
             imageURL = data['albums'][i + 3]['image_small'];
           }
           image.src = `${imageURL}`;
