@@ -68,6 +68,15 @@ class Color(db.Model):
     def __repr__(self):
         return f"Color('{self.color_name}')"
 
+    def __eq__(self, other):
+        if isinstance(other, Color):
+            return self.color_name == other.color_name
+        elif isinstance(other, str):
+            return self.color_name == other
+        else:
+            return NotImplemented
+
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
