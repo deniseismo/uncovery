@@ -1,5 +1,4 @@
 import math
-import statistics
 from typing import Literal, Union
 
 from colormath.color_diff import delta_e_cie2000
@@ -7,26 +6,6 @@ from colormath.color_objects import LCHabColor, LabColor
 
 from uncover.dev.image_processing.color_processing.color_conversion import convert_rgb_to_lch, convert_rgb_to_lab
 from uncover.dev.image_processing.color_processing.color_models import RGBColor, BasicColor, ShadeColor, ImageColor
-
-
-def get_dominant_color_of_bw_image(
-        color_list: list[RGBColor]
-) -> Literal[BasicColor.BLACK, BasicColor.WHITE, BasicColor.GRAY]:
-    """
-    determine the most dominant color of a black & white picture: black, white or gray;
-    image must be a black & white one; check image with 'is_image_black_and_white' function beforehand
-    :param color_list: a list of prominent colors (rgb values)
-    :return: True if black, False if white
-    """
-    mean_lightness = statistics.mean(convert_rgb_to_lch(color).lch_l for color in color_list)
-    if mean_lightness <= 33:
-        # black
-        return BasicColor.BLACK
-    elif 33 < mean_lightness <= 66:
-        # white
-        return BasicColor.GRAY
-    else:
-        return BasicColor.WHITE
 
 
 def is_color_gray(lch_color: LCHabColor) -> bool:
