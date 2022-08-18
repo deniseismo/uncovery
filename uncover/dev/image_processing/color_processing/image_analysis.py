@@ -45,14 +45,18 @@ def get_image_salient_color(image_file: str) -> Optional[ImageColor]:
     :param image_file: (str) image file in filesystem
     :return: (ImageColor) with the most prominent color and info about the image 'black-and-whiteness'
     """
-    color_thief = ColorThief(image_file)
-    # gets the most dominant color
-    dominant_color = color_thief.get_color(quality=1)
-    # gets a full palette of 10 colors
-    full_palette = color_thief.get_palette(color_count=10, quality=1)
-    # main_palette = color_thief.get_palette(color_count=3, quality=1)
-    # determines if it's b&w using full palette
-    main_palette = color_thief.get_palette(color_count=5, quality=1)
+    try:
+        color_thief = ColorThief(image_file)
+        # gets the most dominant color
+        dominant_color = color_thief.get_color(quality=1)
+        # gets a full palette of 10 colors
+        full_palette = color_thief.get_palette(color_count=10, quality=1)
+        # main_palette = color_thief.get_palette(color_count=3, quality=1)
+        # determines if it's b&w using full palette
+        main_palette = color_thief.get_palette(color_count=5, quality=1)
+    except Exception as e:
+        print(f"there's been a problem with ColorThief: {e}")
+        return None
 
     dominant_color_nearest_shade = get_color_nearest_to_reference_colors(list(ShadeColor), dominant_color)
 

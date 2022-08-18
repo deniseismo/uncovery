@@ -9,17 +9,18 @@ from tqdm import tqdm
 from uncover import create_app
 from uncover import db
 from uncover.cover_art_finder.cover_art_handlers import ultimate_album_image_finder
-from uncover.dev.color_analyzer.fill_db_colors import add_album_color
-from uncover.dev.db_utils.manage_names import get_spotify_artist_name
-from uncover.dev.db_utils.manage_release_dates import get_album_release_date_by_album_mbid
+from uncover.dev.image_processing.color_processing.db_color_manipulations import get_album_entry_image_salient_colors, \
+    add_album_entry_colors_to_db
 from uncover.dev.image_processing.process_images import save_image_from_external_source
 from uncover.dev.update_database.music_genres.add_music_genres import add_music_genres_to_artist, \
     collect_all_music_genres_for_artist
 from uncover.models import Artist, Album
 from uncover.music_apis.discogs_api.discogs_album_handlers import get_album_discogs_id
 from uncover.music_apis.lastfm_api.lastfm_artist_handlers import lastfm_get_artist_correct_name
+from uncover.music_apis.musicbrainz_api.mb_album_handlers import mb_get_album_release_date
 from uncover.music_apis.musicbrainz_api.mb_artist_handlers import mb_get_artists_albums
 from uncover.music_apis.spotify_api.spotify_album_handlers import spotify_get_artists_albums
+from uncover.music_apis.spotify_api.spotify_artist_handlers import get_artist_spotify_name_by_name
 from uncover.schemas.album_schema import AlbumInfo
 from uncover.utilities.convert_values import parse_release_date
 
@@ -55,7 +56,7 @@ def update_db_with_new_artists() -> None:
                 music_genres = collect_all_music_genres_for_artist(artist_name)
                 if music_genres:
                     add_music_genres_to_artist(music_genres, artist_entry)
-                artist_spotify_name = get_spotify_artist_name(artist_name)
+                artist_spotify_name = get_artist_spotify_name_by_name(artist_name)
                 if artist_spotify_name and artist_spotify_name != artist_name:
                     artist_entry.spotify_name = artist_spotify_name
                 db.session.add(artist_entry)
@@ -102,10 +103,14 @@ def add_artist_albums_to_database(artist_albums: list[AlbumInfo], artist_name: s
         if discogs_id:
             album_entry.discogs_id = discogs_id
         if not album_release_date:
-            album_release_date = get_album_release_date_by_album_mbid(album_info.mbid)
+            album_release_date = mb_get_album_release_date(album_info.mbid)
+            if album_release_date:
+                album_release_date = parse_release_date(album_release_date)
         if album_release_date:
             album_entry.release_date = album_release_date
-        add_album_color(album_entry, 'static/cover_art_new_batch')
+        album_colors = get_album_entry_image_salient_colors(album_entry, folder_type="new")
+        if album_colors:
+            add_album_entry_colors_to_db(album_entry, album_colors)
         db.session.add(album_entry)
         db.session.commit()
 
