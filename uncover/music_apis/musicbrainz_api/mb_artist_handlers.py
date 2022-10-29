@@ -116,7 +116,7 @@ async def mb_fetch_artists_albums(artist: str, sorting: str = "popular", limit: 
     if not artist_mbid:
         # if nothing found
         return None
-    search_params = _configure_musicbrainz_artist_albums_search_params(artist_mbid, album_type)
+    search_params = _configure_musicbrainz_artist_albums_search_params(artist_mbid, album_type="studio")
     response = requests.get(**search_params)
     # in case of an error, return None
     if response.status_code != 200:
